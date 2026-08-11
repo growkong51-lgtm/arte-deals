@@ -425,6 +425,26 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .desc{color:var(--silver); font-size:13.5px; line-height:1.6; white-space:pre-wrap;}
 
 /* my listings / inbox rows */
+.msg-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.msg-tab{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); padding:8px 14px; cursor:pointer;
+  background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:999px;
+  transition:color .18s ease, border-color .18s ease, background .18s ease;
+}
+.msg-tab span{opacity:.7; margin-left:4px;}
+.msg-tab:hover{color:#fff;}
+.msg-tab.active{color:#fff; border-color:var(--red-2); background:rgba(224,18,48,0.12);}
+.msg-row{align-items:flex-start; cursor:pointer;}
+.msg-chip{
+  display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px;
+  letter-spacing:.12em; text-transform:uppercase; padding:2px 7px; margin-right:7px;
+  vertical-align:middle; position:relative; top:-1px;
+}
+.msg-chip.sent{color:var(--silver-bright); border:1px solid rgba(201,204,209,0.4); background:rgba(201,204,209,0.08);}
+.msg-chip.recv{color:#fff; background:var(--red-2); border:1px solid var(--red-2);}
+.msg-text{color:var(--silver); margin-top:5px; white-space:normal;}
+.msg-you{color:var(--muted);}
 .row-card{display:flex; gap:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; align-items:center; flex-wrap:wrap;}
 .row-card img{width:70px; height:56px; object-fit:cover; border-radius:7px; flex-shrink:0;}
 .row-card .rc-body{flex:1; min-width:0;}
@@ -670,6 +690,7 @@ let inbox = [];              // array of messages
 let uploadedImages = [];     // base64 array for post form (max 8)
 const MAX_PHOTOS = 8;
 let uploadingCount = 0;
+let inboxFilter = 'all';
 const MAX_AVATAR_CHANGES = 3;   // one first photo, then three swaps
 let sellerProfiles = {};        // id -> {name, avatar_url}
 let currentRoute = 'home';
@@ -740,9 +761,10 @@ function rowToListing(r){
 }
 function rowToMessage(r){
   return {
-    id: r.id, from: r.from_user, fromName: r.from_name,
+    id: r.id, from: r.from_user, fromName: r.from_name, to: r.to_user,
     listingId: r.listing_id, listingTitle: r.listing_title,
-    text: r.body, read: r.read, date: new Date(r.created_at).getTime()
+    text: r.body, read: r.read, date: new Date(r.created_at).getTime(),
+    mine: currentUser ? r.from_user === currentUser.username : false
   };
 }
 function dbFail(e, fallbackMsg){
@@ -958,14 +980,16 @@ async function loadUserExtras(){
   if(!currentUser) return;
   const { data: favRows } = await sb.from('favorites').select('listing_id').eq('user_id', currentUser.username);
   favorites = (favRows || []).map(r=>r.listing_id);
-  const { data: msgRows } = await sb.from('messages').select('*').eq('to_user', currentUser.username).order('created_at',{ascending:false});
+  const { data: msgRows } = await sb.from('messages').select('*')
+    .or('to_user.eq.'+currentUser.username+',from_user.eq.'+currentUser.username)
+    .order('created_at',{ascending:false});
   inbox = (msgRows || []).map(rowToMessage);
   updateInboxBadge();
 }
 function updateInboxBadge(){
   const badge = document.getElementById('inboxBadge');
   if(!badge) return;
-  const unread = inbox.filter(m=>!m.read).length;
+  const unread = inbox.filter(m=>!m.read && !m.mine).length;
   if(unread>0){ badge.style.display='flex'; badge.textContent=unread>9?'9+':unread; }
   else badge.style.display='none';
 }
@@ -1239,25 +1263,55 @@ function renderFavorites(app){
 
 /* ---- INBOX ---- */
 function renderInbox(app){
-  const unreadIds = inbox.filter(m=>!m.read).map(m=>m.id);
-  inbox.forEach(m=>m.read=true);
+  const unreadIds = inbox.filter(m=>!m.read && !m.mine).map(m=>m.id);
+  inbox.forEach(m=>{ if(!m.mine) m.read = true; });
   if(unreadIds.length) sb.from('messages').update({read:true}).in('id', unreadIds).then(()=>{});
   updateInboxBadge();
+
   const sorted = inbox.slice().sort((a,b)=>b.date-a.date);
+  const shown  = sorted.filter(m => inboxFilter==='all'
+                                 || (inboxFilter==='sent' && m.mine)
+                                 || (inboxFilter==='received' && !m.mine));
+
+  const counts = {
+    all: sorted.length,
+    received: sorted.filter(m=>!m.mine).length,
+    sent: sorted.filter(m=>m.mine).length
+  };
+
   app.innerHTML = `<main>
     <div class="section-head"><h2 class="metal-text">Inbox</h2></div>
-    ${sorted.length? sorted.map(m=>`
-      <div class="row-card" style="align-items:flex-start; cursor:pointer;" onclick="openDetail('${m.listingId}')">
-        ${avatarHTML(m.from, m.fromName, 40)}
+    <div class="msg-tabs">
+      ${['all','received','sent'].map(k=>`
+        <button class="msg-tab ${inboxFilter===k?'active':''}" onclick="setInboxFilter('${k}')">
+          ${k.charAt(0).toUpperCase()+k.slice(1)} <span>${counts[k]}</span>
+        </button>`).join('')}
+    </div>
+    ${shown.length ? shown.map(m=>{
+      const otherId   = m.mine ? m.to : m.from;
+      const otherProf = sellerProfiles[otherId];
+      const otherName = m.mine ? ((otherProf && otherProf.name) || 'Seller') : m.fromName;
+      return `
+      <div class="row-card msg-row" onclick="openDetail('${m.listingId}')">
+        ${avatarHTML(otherId, otherName, 40)}
         <div class="rc-body">
-          <div class="rc-title">${esc(m.fromName)} <span style="color:var(--muted); font-weight:400;">on ${esc(m.listingTitle)}</span></div>
-          <div class="rc-meta" style="color:var(--silver); margin-top:5px;">${esc(m.text)}</div>
+          <div class="rc-title">
+            <span class="msg-chip ${m.mine?'sent':'recv'}">${m.mine?'Sent':'Received'}</span>
+            ${m.mine ? 'To ' : ''}${esc(otherName)}
+            <span style="color:var(--muted); font-weight:400;"> on ${esc(m.listingTitle)}</span>
+          </div>
+          <div class="rc-meta msg-text">${m.mine?'<span class="msg-you">You:</span> ':''}${esc(m.text)}</div>
           <div class="rc-meta" style="margin-top:5px;">${timeAgo(m.date)}</div>
         </div>
-      </div>`).join('')
-      : `<div class="empty">No messages yet. When a buyer contacts you about a listing, it'll show up here.</div>`}
+      </div>`;}).join('')
+      : `<div class="empty">${inboxFilter==='sent'
+          ? "You haven't messaged any sellers yet."
+          : inboxFilter==='received'
+            ? "No one has messaged you yet."
+            : "No messages yet. Message a seller, or wait for a buyer to reach you."}</div>`}
   </main>`;
 }
+function setInboxFilter(k){ inboxFilter = k; renderInbox(document.getElementById('app')); }
 
 /* ---- POST MODAL ---- */
 function openPostModal(listingToEdit){
@@ -1529,6 +1583,11 @@ async function sendMessage(e){
     body: text
   });
   if(error){ dbFail(error, 'Message not sent'); return false; }
+  inbox.unshift({
+    id: 'local-'+Date.now(), from: currentUser.username, fromName: currentUser.name,
+    to: msgTargetListing.seller, listingId: msgTargetListing.id,
+    listingTitle: msgTargetListing.title, text, date: Date.now(), read: true, mine: true
+  });
   toast('Message sent to '+msgTargetListing.sellerName);
   closeModal('msgOverlay');
   return false;
