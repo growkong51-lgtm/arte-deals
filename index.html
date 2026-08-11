@@ -605,9 +605,15 @@ select.calc-box{
   color:var(--muted); background:rgba(255,255,255,0.05); padding:4px 12px;
   border-radius:999px; margin:8px 0 4px;
 }
-.bubble-row{display:flex; max-width:100%;}
-.bubble-row.me{justify-content:flex-end;}
-.bubble-row.them{justify-content:flex-start;}
+.bubble-row{display:flex; flex-direction:column; max-width:100%; cursor:pointer;}
+.bubble-row.me{align-items:flex-end;}
+.bubble-row.them{align-items:flex-start;}
+.bubble-stamp{
+  display:none; font-size:10.5px; letter-spacing:.04em; color:var(--muted);
+  margin:5px 4px 2px; animation:stampIn .16s ease;
+}
+.bubble-row.show-stamp .bubble-stamp{display:block;}
+@keyframes stampIn{from{opacity:0; transform:translateY(-3px);} to{opacity:1; transform:none;}}
 .bubble{
   max-width:76%; padding:9px 13px 7px; font-size:14px; line-height:1.45;
   word-wrap:break-word; white-space:pre-wrap; position:relative;
@@ -2101,8 +2107,9 @@ function renderChat(){
     const d = new Date(m.date).toDateString();
     let sep = '';
     if(d !== lastDay){ lastDay = d; sep = `<div class="chat-day">${dayLabel(m.date)}</div>`; }
-    return sep + `<div class="bubble-row ${m.mine?'me':'them'}">
+    return sep + `<div class="bubble-row ${m.mine?'me':'them'}" onclick="this.classList.toggle('show-stamp')">
       <div class="bubble">${esc(m.text)}<span class="bubble-time">${clockTime(m.date)}</span></div>
+      <div class="bubble-stamp">${fullStamp(m.date)}</div>
     </div>`;
   }).join('');
 
@@ -2117,6 +2124,20 @@ function dayLabel(ts){
   const y = new Date(now.getTime()-86400000);
   if(d.toDateString() === y.toDateString()) return 'Yesterday';
   return d.toLocaleDateString('en-PH',{day:'numeric',month:'short',year:'numeric'});
+}
+function fullStamp(ts){
+  const d = new Date(ts), now = new Date();
+  const time = d.toLocaleTimeString('en-PH',{hour:'numeric',minute:'2-digit'});
+  const days = Math.floor((now - d) / 86400000);
+  if(d.toDateString() === now.toDateString()) return 'Today at ' + time;
+  const y = new Date(now.getTime() - 86400000);
+  if(d.toDateString() === y.toDateString()) return 'Yesterday at ' + time;
+  if(days < 7) return d.toLocaleDateString('en-PH',{weekday:'long'}) + ' at ' + time;
+  const sameYear = d.getFullYear() === now.getFullYear();
+  const datePart = d.toLocaleDateString('en-PH', sameYear
+    ? {weekday:'long', day:'numeric', month:'short'}
+    : {weekday:'long', day:'numeric', month:'short', year:'numeric'});
+  return datePart + ' at ' + time;
 }
 function clockTime(ts){
   return new Date(ts).toLocaleTimeString('en-PH',{hour:'numeric',minute:'2-digit'});
