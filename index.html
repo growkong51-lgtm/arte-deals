@@ -447,22 +447,21 @@ select.calc-box{
 @media(max-width:440px){ .fin-row{grid-template-columns:1fr 1fr auto; gap:7px;} .fin-x{width:42px;} }
 
 /* ---- seller's own terms on the listing page ---- */
-.st-down{font-size:14px; color:var(--muted); margin:0 0 14px;}
+.st-down{font-size:12.5px; color:var(--muted); margin:0 0 12px;}
 .st-down b{color:#fff; font-weight:600;}
 .st-table{width:100%; border-collapse:collapse;}
 .st-table th{
-  text-align:left; padding:0 0 10px; font-family:'Rajdhani',sans-serif; font-weight:700;
-  font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
-  border-bottom:1px solid var(--line);
+  text-align:left; padding:0 0 9px; font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid rgba(255,255,255,0.09);
 }
 .st-table th.r, .st-table td.r{text-align:right;}
 .st-table td{
-  padding:13px 0; font-size:14.5px; color:var(--silver-bright);
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:11px 0; font-size:12.5px; color:var(--muted);
+  border-bottom:1px solid rgba(255,255,255,0.055);
 }
 .st-table td.r{
-  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px; color:var(--red-2);
-  white-space:nowrap;
+  font-size:13px; font-weight:600; color:#fff; white-space:nowrap;
 }
 .st-table tr:last-child td{border-bottom:none;}
 .cr-terms{
@@ -1033,11 +1032,12 @@ function readFinancingField(){
 function sellerTermsHTML(raw){
   const f = parseFinancing(raw);
   let out = '';
-  if(f.down) out += '<div class="st-down">Downpayment: <b>' + esc(f.down) + '</b></div>';
+  const peso = v => /^[\d.,\s]+$/.test(String(v).trim()) ? '\u20b1' + String(v).trim() : String(v);
+  if(f.down) out += '<div class="st-down">Downpayment: <b>' + esc(peso(f.down)) + '</b></div>';
   if(f.rows.length){
     out += '<table class="st-table"><thead><tr><th>Term</th><th class="r">Monthly</th></tr></thead><tbody>';
     f.rows.forEach(r=>{
-      out += '<tr><td>' + esc(r.term || '\u2014') + '</td><td class="r">' + esc(r.amount || '') + '</td></tr>';
+      out += '<tr><td>' + esc(r.term || '\u2014') + '</td><td class="r">' + esc(peso(r.amount || '')) + '</td></tr>';
     });
     out += '</tbody></table>';
   }
