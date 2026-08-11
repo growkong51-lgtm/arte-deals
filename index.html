@@ -425,6 +425,99 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .desc{color:var(--silver); font-size:13.5px; line-height:1.6; white-space:pre-wrap;}
 
 /* my listings / inbox rows */
+/* ---------- conversation list ---------- */
+.convo-row{
+  display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;
+  background:rgba(255,255,255,0.03); border:1px solid var(--line);
+  border-radius:12px; margin-bottom:9px; transition:background .18s ease, border-color .18s ease;
+}
+.convo-row:hover{background:rgba(255,255,255,0.06); border-color:rgba(201,204,209,0.3);}
+.convo-row.unread{border-color:rgba(224,18,48,0.45); background:rgba(224,18,48,0.06);}
+.convo-body{flex:1; min-width:0;}
+.convo-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+.convo-name{font-weight:600; font-size:14.5px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.convo-time{font-size:11px; color:var(--muted); flex-shrink:0;}
+.convo-listing{font-size:11.5px; color:var(--red-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.convo-preview{font-size:13px; color:var(--silver); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.convo-row.unread .convo-preview{color:#fff; font-weight:500;}
+.convo-dot{
+  flex-shrink:0; min-width:20px; height:20px; padding:0 6px; border-radius:10px;
+  background:var(--red-2); color:#fff; font-size:11px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ---------- chat window ---------- */
+.overlay.chat-top{z-index:940;}
+.chat-modal{
+  display:flex; flex-direction:column; width:100%; max-width:520px;
+  height:min(88vh, 720px); padding:0; overflow:hidden;
+}
+.chat-head{
+  display:flex; align-items:center; gap:10px; padding:12px 14px;
+  border-bottom:1px solid var(--line); background:rgba(255,255,255,0.03); flex-shrink:0;
+}
+.chat-back{
+  width:32px; height:32px; border-radius:50%; border:none; flex-shrink:0;
+  background:rgba(255,255,255,0.06); color:var(--silver); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.chat-back:hover{color:#fff; background:rgba(255,255,255,0.12);}
+.chat-back svg{width:18px; height:18px;}
+.chat-peer{display:flex; align-items:center; gap:9px; min-width:0;}
+.chat-peer-name{font-weight:600; font-size:14.5px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.chat-listing{
+  display:flex; align-items:center; gap:10px; padding:9px 14px; flex-shrink:0;
+  border-bottom:1px solid var(--line); background:rgba(224,18,48,0.05);
+}
+.chat-listing:empty{display:none;}
+.chat-listing img{width:46px; height:34px; object-fit:cover; border-radius:5px; flex-shrink:0;}
+.chat-listing .cl-body{flex:1; min-width:0;}
+.chat-listing .cl-title{font-size:12.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.chat-listing .cl-price{font-size:12px; color:var(--red-2); font-family:'Rajdhani',sans-serif; font-weight:700;}
+.chat-scroll{flex:1; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:8px;}
+.chat-empty{margin:auto; color:var(--muted); font-size:13px; text-align:center;}
+.chat-day{
+  align-self:center; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); background:rgba(255,255,255,0.05); padding:4px 12px;
+  border-radius:999px; margin:8px 0 4px;
+}
+.bubble-row{display:flex; max-width:100%;}
+.bubble-row.me{justify-content:flex-end;}
+.bubble-row.them{justify-content:flex-start;}
+.bubble{
+  max-width:76%; padding:9px 13px 7px; font-size:14px; line-height:1.45;
+  word-wrap:break-word; white-space:pre-wrap; position:relative;
+}
+.bubble-row.me .bubble{
+  background:linear-gradient(135deg, var(--red-2), var(--red-dark));
+  color:#fff; border-radius:16px 16px 4px 16px;
+}
+.bubble-row.them .bubble{
+  background:rgba(255,255,255,0.08); color:var(--silver-bright);
+  border:1px solid var(--line); border-radius:16px 16px 16px 4px;
+}
+.bubble-time{display:block; font-size:10px; opacity:.65; margin-top:3px; text-align:right;}
+.chat-compose{
+  display:flex; align-items:flex-end; gap:9px; padding:11px 12px; flex-shrink:0;
+  border-top:1px solid var(--line); background:rgba(255,255,255,0.03);
+}
+.chat-compose textarea{
+  flex:1; resize:none; max-height:120px; min-height:42px; padding:11px 14px;
+  border-radius:21px; font-size:14px; line-height:1.4;
+}
+.chat-send{
+  width:42px; height:42px; border-radius:50%; border:none; flex-shrink:0; cursor:pointer;
+  background:linear-gradient(135deg, var(--red-2), var(--red-dark)); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+.chat-send:hover{box-shadow:0 0 16px rgba(224,18,48,0.5);}
+.chat-send:active{transform:scale(0.9);}
+.chat-send svg{width:18px; height:18px;}
+@media(max-width:560px){
+  .chat-modal{height:100vh; max-width:100%; border-radius:0;}
+  .bubble{max-width:82%;}
+}
 .msg-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
 .msg-tab{
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
@@ -659,21 +752,23 @@ Safari Snorkel"></textarea>
 </div>
 
 <!-- MESSAGE SELLER MODAL -->
-<div class="overlay" id="msgOverlay">
-  <div class="modal">
-    <div class="modal-head">
-      <h3 class="display">Message Seller</h3>
-      <button class="modal-close" onclick="closeModal('msgOverlay')">✕</button>
+<div class="overlay chat-top" id="msgOverlay">
+  <div class="modal chat-modal">
+    <div class="chat-head">
+      <button class="chat-back" onclick="closeChat()" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div id="chatPeer" class="chat-peer"></div>
     </div>
-    <div class="modal-body">
-      <form onsubmit="return sendMessage(event)">
-        <div class="field">
-          <label>Message</label>
-          <textarea id="msgText" placeholder="Hi, is this still available?" required></textarea>
-        </div>
-        <button class="btn btn-primary btn-block" type="submit">Send Message</button>
-      </form>
-    </div>
+    <div class="chat-listing" id="chatListing"></div>
+    <div class="chat-scroll" id="chatScroll"></div>
+    <form class="chat-compose" onsubmit="return sendMessage(event)">
+      <textarea id="msgText" rows="1" placeholder="Write a message..." required
+                oninput="growCompose(this)" onkeydown="composeKey(event)"></textarea>
+      <button class="chat-send" type="submit" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
   </div>
 </div>
 
@@ -691,6 +786,7 @@ let uploadedImages = [];     // base64 array for post form (max 8)
 const MAX_PHOTOS = 8;
 let uploadingCount = 0;
 let inboxFilter = 'all';
+let chatPeerId = null, chatListingId = null, chatPoll = null;
 const MAX_AVATAR_CHANGES = 3;   // one first photo, then three swaps
 let sellerProfiles = {};        // id -> {name, avatar_url}
 let currentRoute = 'home';
@@ -1262,53 +1358,45 @@ function renderFavorites(app){
 }
 
 /* ---- INBOX ---- */
+function conversationKey(m){ return (m.mine ? m.to : m.from) + '|' + m.listingId; }
+function buildConversations(){
+  const map = {};
+  inbox.forEach(m=>{
+    const k = conversationKey(m);
+    if(!map[k]) map[k] = { peer: m.mine?m.to:m.from, listingId: m.listingId,
+                           listingTitle: m.listingTitle, msgs: [] };
+    map[k].msgs.push(m);
+  });
+  return Object.values(map).map(c=>{
+    c.msgs.sort((a,b)=>a.date-b.date);
+    c.last   = c.msgs[c.msgs.length-1];
+    c.unread = c.msgs.filter(m=>!m.read && !m.mine).length;
+    const prof = sellerProfiles[c.peer];
+    c.peerName = (prof && prof.name)
+      || (c.msgs.find(m=>!m.mine) || {}).fromName
+      || 'Seller';
+    return c;
+  }).sort((a,b)=>b.last.date-a.last.date);
+}
 function renderInbox(app){
-  const unreadIds = inbox.filter(m=>!m.read && !m.mine).map(m=>m.id);
-  inbox.forEach(m=>{ if(!m.mine) m.read = true; });
-  if(unreadIds.length) sb.from('messages').update({read:true}).in('id', unreadIds).then(()=>{});
   updateInboxBadge();
-
-  const sorted = inbox.slice().sort((a,b)=>b.date-a.date);
-  const shown  = sorted.filter(m => inboxFilter==='all'
-                                 || (inboxFilter==='sent' && m.mine)
-                                 || (inboxFilter==='received' && !m.mine));
-
-  const counts = {
-    all: sorted.length,
-    received: sorted.filter(m=>!m.mine).length,
-    sent: sorted.filter(m=>m.mine).length
-  };
-
+  const convos = buildConversations();
   app.innerHTML = `<main>
-    <div class="section-head"><h2 class="metal-text">Inbox</h2></div>
-    <div class="msg-tabs">
-      ${['all','received','sent'].map(k=>`
-        <button class="msg-tab ${inboxFilter===k?'active':''}" onclick="setInboxFilter('${k}')">
-          ${k.charAt(0).toUpperCase()+k.slice(1)} <span>${counts[k]}</span>
-        </button>`).join('')}
-    </div>
-    ${shown.length ? shown.map(m=>{
-      const otherId   = m.mine ? m.to : m.from;
-      const otherProf = sellerProfiles[otherId];
-      const otherName = m.mine ? ((otherProf && otherProf.name) || 'Seller') : m.fromName;
-      return `
-      <div class="row-card msg-row" onclick="openDetail('${m.listingId}')">
-        ${avatarHTML(otherId, otherName, 40)}
-        <div class="rc-body">
-          <div class="rc-title">
-            <span class="msg-chip ${m.mine?'sent':'recv'}">${m.mine?'Sent':'Received'}</span>
-            ${m.mine ? 'To ' : ''}${esc(otherName)}
-            <span style="color:var(--muted); font-weight:400;"> on ${esc(m.listingTitle)}</span>
+    <div class="section-head"><h2 class="metal-text">Messages</h2></div>
+    ${convos.length ? convos.map(c=>`
+      <div class="convo-row ${c.unread?'unread':''}" onclick="openChat('${c.peer}','${c.listingId}')">
+        ${avatarHTML(c.peer, c.peerName, 46)}
+        <div class="convo-body">
+          <div class="convo-top">
+            <span class="convo-name">${esc(c.peerName)}</span>
+            <span class="convo-time">${timeAgo(c.last.date)}</span>
           </div>
-          <div class="rc-meta msg-text">${m.mine?'<span class="msg-you">You:</span> ':''}${esc(m.text)}</div>
-          <div class="rc-meta" style="margin-top:5px;">${timeAgo(m.date)}</div>
+          <div class="convo-listing">${esc(c.listingTitle)}</div>
+          <div class="convo-preview">${c.last.mine?'<span class="msg-you">You:</span> ':''}${esc(c.last.text)}</div>
         </div>
-      </div>`;}).join('')
-      : `<div class="empty">${inboxFilter==='sent'
-          ? "You haven't messaged any sellers yet."
-          : inboxFilter==='received'
-            ? "No one has messaged you yet."
-            : "No messages yet. Message a seller, or wait for a buyer to reach you."}</div>`}
+        ${c.unread?`<span class="convo-dot">${c.unread}</span>`:''}
+      </div>`).join('')
+      : `<div class="empty">No conversations yet. Message a seller from any listing to start one.</div>`}
   </main>`;
 }
 function setInboxFilter(k){ inboxFilter = k; renderInbox(document.getElementById('app')); }
@@ -1566,30 +1654,130 @@ function openMessage(listingId){
     setAuthNote('Create a free account to message this seller.');
     return;
   }
-  msgTargetListing = allListings.find(x=>x.id===listingId);
-  document.getElementById('msgText').value='';
+  const l = allListings.find(x=>x.id===listingId);
+  if(!l) return;
+  openChat(l.seller, listingId);
+}
+function openChat(peerId, listingId){
+  if(!currentUser){ openAuth('signup'); return; }
+  chatPeerId = peerId; chatListingId = listingId;
+  document.getElementById('msgText').value = '';
   openModal('msgOverlay');
+  renderChat();
+  markChatRead();
+  if(chatPoll) clearInterval(chatPoll);
+  chatPoll = setInterval(refreshChat, 6000);
+}
+function closeChat(){
+  closeModal('msgOverlay');
+  if(chatPoll){ clearInterval(chatPoll); chatPoll = null; }
+  chatPeerId = null; chatListingId = null;
+  if(currentRoute==='inbox') renderInbox(document.getElementById('app'));
+}
+function chatMessages(){
+  return inbox
+    .filter(m => m.listingId===chatListingId && (m.from===chatPeerId || m.to===chatPeerId))
+    .sort((a,b)=>a.date-b.date);
+}
+function renderChat(){
+  const msgs = chatMessages();
+  const prof = sellerProfiles[chatPeerId];
+  const peerName = (prof && prof.name) || (msgs.find(m=>!m.mine)||{}).fromName || 'Seller';
+  const listing  = allListings.find(x=>x.id===chatListingId);
+
+  document.getElementById('chatPeer').innerHTML =
+    `${avatarHTML(chatPeerId, peerName, 34)}<span class="chat-peer-name">${esc(peerName)}</span>`;
+
+  document.getElementById('chatListing').innerHTML = listing
+    ? `<img src="${cldUrl(listing.thumb||'','w_120,c_fill,q_auto,f_auto')}" alt="">
+       <div class="cl-body">
+         <div class="cl-title">${esc(listing.title)}</div>
+         <div class="cl-price">${fmtPrice(listing.price)}</div>
+       </div>
+       <button class="veh-btn" onclick="closeChat(); openDetail('${listing.id}')">View</button>`
+    : '';
+
+  let lastDay = '';
+  const html = msgs.map(m=>{
+    const d = new Date(m.date).toDateString();
+    let sep = '';
+    if(d !== lastDay){ lastDay = d; sep = `<div class="chat-day">${dayLabel(m.date)}</div>`; }
+    return sep + `<div class="bubble-row ${m.mine?'me':'them'}">
+      <div class="bubble">${esc(m.text)}<span class="bubble-time">${clockTime(m.date)}</span></div>
+    </div>`;
+  }).join('');
+
+  const scroll = document.getElementById('chatScroll');
+  scroll.innerHTML = html || `<div class="chat-empty">Say hello \u2014 ask if it's still available.</div>`;
+  scroll.scrollTop = scroll.scrollHeight;
+}
+function dayLabel(ts){
+  const d = new Date(ts), now = new Date();
+  const same = d.toDateString() === now.toDateString();
+  if(same) return 'Today';
+  const y = new Date(now.getTime()-86400000);
+  if(d.toDateString() === y.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString('en-PH',{day:'numeric',month:'short',year:'numeric'});
+}
+function clockTime(ts){
+  return new Date(ts).toLocaleTimeString('en-PH',{hour:'numeric',minute:'2-digit'});
+}
+async function markChatRead(){
+  const ids = chatMessages().filter(m=>!m.read && !m.mine && String(m.id).indexOf('local-')!==0).map(m=>m.id);
+  chatMessages().forEach(m=>{ if(!m.mine) m.read = true; });
+  updateInboxBadge();
+  if(ids.length) await sb.from('messages').update({read:true}).in('id', ids);
+}
+async function refreshChat(){
+  if(!currentUser || !chatPeerId) return;
+  const { data } = await sb.from('messages').select('*')
+    .or('to_user.eq.'+currentUser.username+',from_user.eq.'+currentUser.username)
+    .order('created_at',{ascending:false});
+  if(!data) return;
+  inbox = data.map(rowToMessage);
+  renderChat();
+  markChatRead();
+}
+function growCompose(el){
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+function composeKey(e){
+  if(e.key === 'Enter' && !e.shiftKey && window.innerWidth > 760){
+    e.preventDefault();
+    e.target.form.requestSubmit();
+  }
 }
 async function sendMessage(e){
   e.preventDefault();
-  const text = document.getElementById('msgText').value.trim();
-  if(!text || !msgTargetListing) return false;
+  const box = document.getElementById('msgText');
+  const text = box.value.trim();
+  if(!text || !chatPeerId || !chatListingId) return false;
+  const listing = allListings.find(x=>x.id===chatListingId);
+
+  box.value = ''; growCompose(box);
+  const optimistic = {
+    id: 'local-'+Date.now(), from: currentUser.username, fromName: currentUser.name,
+    to: chatPeerId, listingId: chatListingId,
+    listingTitle: listing ? listing.title : '', text,
+    date: Date.now(), read: true, mine: true
+  };
+  inbox.unshift(optimistic);
+  renderChat();
+
   const { error } = await sb.from('messages').insert({
-    to_user: msgTargetListing.seller,
+    to_user: chatPeerId,
     from_user: currentUser.username,
     from_name: currentUser.name,
-    listing_id: msgTargetListing.id,
-    listing_title: msgTargetListing.title,
+    listing_id: chatListingId,
+    listing_title: listing ? listing.title : '',
     body: text
   });
-  if(error){ dbFail(error, 'Message not sent'); return false; }
-  inbox.unshift({
-    id: 'local-'+Date.now(), from: currentUser.username, fromName: currentUser.name,
-    to: msgTargetListing.seller, listingId: msgTargetListing.id,
-    listingTitle: msgTargetListing.title, text, date: Date.now(), read: true, mine: true
-  });
-  toast('Message sent to '+msgTargetListing.sellerName);
-  closeModal('msgOverlay');
+  if(error){
+    inbox = inbox.filter(m=>m.id!==optimistic.id);
+    renderChat();
+    dbFail(error, 'Message not sent');
+  }
   return false;
 }
 
