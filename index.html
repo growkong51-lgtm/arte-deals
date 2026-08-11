@@ -265,7 +265,13 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .err-msg{background:rgba(224,18,48,0.12); border:1px solid rgba(224,18,48,0.4); color:#ffb3bd; font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:12px;}
 
 /* image uploader */
+.spec-block{margin:16px 0 4px;}
+.spec-block h4{font-family:Rajdhani,sans-serif; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; font-weight:700;}
+.spec-block ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px;}
+.spec-block li{position:relative; padding-left:16px; font-size:13.5px; color:var(--silver); line-height:1.45;}
+.spec-block li::before{content:''; position:absolute; left:0; top:8px; width:5px; height:5px; border-radius:50%; background:var(--red-2);}
 .uploader{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+@media(max-width:520px){.uploader{grid-template-columns:repeat(3,1fr);}}
 .up-slot{
   aspect-ratio:1; border:1.5px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden; background:rgba(255,255,255,0.02); color:var(--muted); font-size:22px;
@@ -406,44 +412,80 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
     <div class="modal-body">
       <div id="postErr"></div>
       <form id="postForm" onsubmit="return handlePost(event)">
-        <div class="field">
-          <label>Photos (up to 4)</label>
-          <div class="uploader" id="uploader"></div>
-        </div>
-        <div class="field">
-          <label>Title</label>
-          <input type="text" id="pTitle" placeholder="2021 BMW M4 Competition" required>
+        <div class="two-col">
+          <div class="field">
+            <label>Brand</label>
+            <input type="text" id="pBrand" placeholder="Hyundai" required>
+          </div>
+          <div class="field">
+            <label>Full Listing Name</label>
+            <input type="text" id="pTitle" placeholder="2026 Hyundai Stargazer 1.5" required>
+          </div>
         </div>
         <div class="two-col">
           <div class="field">
-            <label>Price (USD)</label>
-            <input type="number" id="pPrice" placeholder="54900" min="0" required>
+            <label>Year</label>
+            <input type="number" id="pYear" placeholder="2026" min="1950" max="2100" required>
           </div>
           <div class="field">
-            <label>Category</label>
+            <label>Price (\u20b1)</label>
+            <input type="number" id="pPrice" placeholder="828000" min="0" required>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Transmission</label>
+            <select id="pTransmission" required>
+              <option value="">Select</option>
+              <option>Automatic</option><option>Manual</option><option>CVT</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Fuel Type</label>
+            <select id="pFuel" required>
+              <option value="">Select</option>
+              <option>Gasoline</option><option>Diesel</option><option>Hybrid</option><option>Electric</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Mileage (kms)</label>
+            <input type="number" id="pMileage" placeholder="20000" min="0" required>
+          </div>
+          <div class="field">
+            <label>Body Type</label>
             <select id="pCategory" required>
               <option value="">Select</option>
-              <option>Sedan</option><option>SUV</option><option>Truck</option><option>Coupe</option>
-              <option>Convertible</option><option>Electric</option><option>Exotic</option>
+              <option>Sedan</option><option>Hatchback</option><option>Sportscar</option>
+              <option>SUV</option><option>Family Van</option><option>Pick Up</option>
             </select>
-          </div>
-        </div>
-        <div class="two-col">
-          <div class="field">
-            <label>Condition</label>
-            <select id="pCondition" required>
-              <option value="">Select</option>
-              <option>New</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Salvage</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Location</label>
-            <input type="text" id="pLocation" placeholder="Austin, TX" required>
           </div>
         </div>
         <div class="field">
-          <label>Description</label>
-          <textarea id="pDesc" placeholder="Mileage, trim, history, upgrades..." required></textarea>
+          <label>Location</label>
+          <input type="text" id="pLocation" placeholder="Quezon City, Metro Manila" required>
+        </div>
+        <div class="field">
+          <label>Details / Features \u2014 one per line</label>
+          <textarea id="pDetails" rows="5" placeholder="Smartstream Gasoline
+Android Headunit w/ Apple CarPlay
+Premium Silver Color
+Ending Plate 7
+Thursday Coding" required></textarea>
+        </div>
+        <div class="field">
+          <label>Modifications / Loads \u2014 one per line (optional)</label>
+          <textarea id="pMods" rows="3" placeholder="ARB Steel Roof Rack
+Safari Snorkel"></textarea>
+        </div>
+        <div class="field">
+          <label>Financing (optional)</label>
+          <input type="text" id="pFinancing" placeholder="Downpayment, e.g. \u20b1251,400 (30%)">
+        </div>
+        <div class="field">
+          <label>Photos (up to 8)</label>
+          <div class="uploader" id="uploader"></div>
         </div>
         <button class="btn btn-primary btn-block" type="submit" id="postSubmitBtn">Publish Listing</button>
       </form>
@@ -491,7 +533,8 @@ let currentUser = null;      // {username, name}
 let allListings = [];        // array of listing metadata
 let favorites = [];          // array of ids
 let inbox = [];              // array of messages
-let uploadedImages = [];     // base64 array for post form (max 4)
+let uploadedImages = [];     // base64 array for post form (max 8)
+const MAX_PHOTOS = 8;
 let currentRoute = 'home';
 let searchQuery = '';
 let activeCategory = 'All';
@@ -504,7 +547,7 @@ let msgTargetListing = null;
 let authMode = 'login';
 let pendingRoute = null;
 
-const CATEGORIES = ['All','Sedan','SUV','Truck','Coupe','Convertible','Electric','Exotic'];
+const CATEGORIES = ['All','Sedan','Hatchback','Sportscar','SUV','Family Van','Pick Up'];
 const AVATAR_COLORS = ['#e01230','#7a0612','#3a3d44','#8b8d94','#b30f28'];
 
 /* ================= UTIL ================= */
@@ -515,7 +558,7 @@ function toast(msg){
   wrap.appendChild(t);
   setTimeout(()=>{t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300);}, 2600);
 }
-function fmtPrice(n){ return '$'+Number(n).toLocaleString('en-US'); }
+function fmtPrice(n){ return '\u20b1'+Number(n).toLocaleString('en-PH'); }
 function timeAgo(ts){
   const s = Math.floor((Date.now()-ts)/1000);
   if(s<60) return 'just now';
@@ -540,6 +583,9 @@ function rowToListing(r){
   return {
     id: r.id, title: r.title, price: r.price, category: r.category,
     condition: r.condition, location: r.location, description: r.description,
+    brand: r.brand, year: r.year, transmission: r.transmission, fuel: r.fuel_type,
+    mileage: r.mileage, details: r.details || [], mods: r.modifications || [],
+    financing: r.financing,
     seller: r.seller_id, sellerName: r.seller_name,
     status: r.status, thumb: r.thumb,
     createdAt: new Date(r.created_at).getTime()
@@ -736,7 +782,7 @@ function updateInboxBadge(){
 
 /* ================= LISTINGS DATA ================= */
 async function loadListings(){
-  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
+  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
   allListings = (data || []).map(rowToListing);
 }
@@ -942,18 +988,25 @@ function renderInbox(app){
 /* ---- POST MODAL ---- */
 function openPostModal(listingToEdit){
   editingListingId = listingToEdit ? listingToEdit.id : null;
-  document.getElementById('postModalTitle').textContent = editingListingId ? 'Edit Listing' : 'List Your Vehicle';
-  document.getElementById('postSubmitBtn').textContent = editingListingId ? 'Save Changes' : 'Publish Listing';
+  document.getElementById('postModalTitle').textContent = editingListingId ? 'Edit Vehicle' : 'List Your Vehicle';
+  document.getElementById('postSubmitBtn').textContent = editingListingId ? 'Save Vehicle' : 'Publish Listing';
   document.getElementById('postErr').innerHTML='';
   document.getElementById('postForm').reset();
   uploadedImages = [];
   if(listingToEdit){
-    document.getElementById('pTitle').value = listingToEdit.title;
-    document.getElementById('pPrice').value = listingToEdit.price;
-    document.getElementById('pCategory').value = listingToEdit.category;
-    document.getElementById('pCondition').value = listingToEdit.condition;
-    document.getElementById('pLocation').value = listingToEdit.location;
-    document.getElementById('pDesc').value = listingToEdit.description;
+    const g = id => document.getElementById(id);
+    g('pBrand').value        = listingToEdit.brand || '';
+    g('pTitle').value        = listingToEdit.title || '';
+    g('pYear').value         = listingToEdit.year || '';
+    g('pPrice').value        = listingToEdit.price || '';
+    g('pTransmission').value = listingToEdit.transmission || '';
+    g('pFuel').value         = listingToEdit.fuel || '';
+    g('pMileage').value      = listingToEdit.mileage || '';
+    g('pCategory').value     = listingToEdit.category || '';
+    g('pLocation').value     = listingToEdit.location || '';
+    g('pDetails').value      = (listingToEdit.details || []).join('\n');
+    g('pMods').value         = (listingToEdit.mods || []).join('\n');
+    g('pFinancing').value    = listingToEdit.financing || '';
   }
   renderUploader();
   openModal('postOverlay');
@@ -961,7 +1014,7 @@ function openPostModal(listingToEdit){
 function renderUploader(){
   const wrap = document.getElementById('uploader');
   let html='';
-  for(let i=0;i<4;i++){
+  for(let i=0;i<MAX_PHOTOS;i++){
     if(uploadedImages[i]){
       html += `<div class="up-slot"><img src="${uploadedImages[i]}"><button type="button" class="rm" onclick="removeImg(${i})">✕</button></div>`;
     } else {
@@ -988,48 +1041,61 @@ async function handlePost(e){
     errEl.innerHTML = '<div class="err-msg">Add at least one photo of your vehicle.</div>'; return false;
   }
   const btn = document.getElementById('postSubmitBtn');
+  const label = editingListingId ? 'Save Vehicle' : 'Publish Listing';
   btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
 
-  const title = document.getElementById('pTitle').value.trim();
-  const price = Number(document.getElementById('pPrice').value);
-  const category = document.getElementById('pCategory').value;
-  const condition = document.getElementById('pCondition').value;
-  const location = document.getElementById('pLocation').value.trim();
-  const description = document.getElementById('pDesc').value.trim();
+  const g = id => document.getElementById(id).value.trim();
+  const lines = id => document.getElementById(id).value.split('\n').map(s=>s.trim()).filter(Boolean);
+
+  const row = {
+    brand:        g('pBrand'),
+    title:        g('pTitle'),
+    year:         Number(g('pYear')),
+    price:        Number(g('pPrice')),
+    transmission: g('pTransmission'),
+    fuel_type:    g('pFuel'),
+    mileage:      Number(g('pMileage')),
+    category:     g('pCategory'),
+    location:     g('pLocation'),
+    details:      lines('pDetails'),
+    modifications:lines('pMods'),
+    financing:    g('pFinancing'),
+    condition:    'Used',
+    description:  lines('pDetails').join(' \u00b7 ')
+  };
   const images = uploadedImages.filter(Boolean);
 
   if(editingListingId){
-    const patch = {title, price, category, condition, location, description};
     if(images.length){
-      patch.thumb = await makeThumb(images[0]);
-      patch.images = images;
+      row.thumb = await makeThumb(images[0]);
+      row.images = images;
     }
-    const { error } = await sb.from('listings').update(patch).eq('id', editingListingId);
+    const { error } = await sb.from('listings').update(row).eq('id', editingListingId);
     if(error){
       errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
-      btn.textContent='Save Changes'; btn.disabled=false; return false;
+      btn.textContent=label; btn.disabled=false; return false;
     }
     toast('Listing updated');
   } else {
     if(allListings.filter(l=>l.seller===currentUser.username).length >= ARTE_CONFIG.maxListingsPerUser){
       errEl.innerHTML = '<div class="err-msg">You have reached your limit of '+ARTE_CONFIG.maxListingsPerUser+' active listings.</div>';
-      btn.textContent='Publish Listing'; btn.disabled=false; return false;
+      btn.textContent=label; btn.disabled=false; return false;
     }
-    const thumb = await makeThumb(images[0]);
-    const { error } = await sb.from('listings').insert({
-      title, price, category, condition, location, description,
-      seller_id: currentUser.username, seller_name: currentUser.name,
-      status: 'active', thumb, images
-    });
+    row.seller_id   = currentUser.username;
+    row.seller_name = currentUser.name;
+    row.status      = 'active';
+    row.thumb       = await makeThumb(images[0]);
+    row.images      = images;
+    const { error } = await sb.from('listings').insert(row);
     if(error){
       errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
-      btn.textContent='Publish Listing'; btn.disabled=false; return false;
+      btn.textContent=label; btn.disabled=false; return false;
     }
     toast('Listing published');
   }
 
   await loadListings();
-  btn.disabled=false;
+  btn.textContent=label; btn.disabled=false;
   closeModal('postOverlay');
   editingListingId=null;
   go('my');
@@ -1063,12 +1129,17 @@ function renderDetail(){
       <div class="price red-text">${fmtPrice(l.price)}${l.status==='sold'?' <span style="font-size:14px; color:var(--muted); font-family:Inter;">· SOLD</span>':''}</div>
       <h2>${esc(l.title)}</h2>
       <div class="pill-row">
+        ${l.year?`<div class="pill">${esc(l.year)}</div>`:''}
         <div class="pill">${esc(l.category)}</div>
-        <div class="pill">${esc(l.condition)}</div>
+        ${l.transmission?`<div class="pill">${esc(l.transmission)}</div>`:''}
+        ${l.fuel?`<div class="pill">${esc(l.fuel)}</div>`:''}
+        ${l.mileage?`<div class="pill">${Number(l.mileage).toLocaleString('en-PH')} km</div>`:''}
         <div class="pill">📍 ${esc(l.location)}</div>
         <div class="pill">${timeAgo(l.createdAt)}</div>
       </div>
-      <div class="desc">${esc(l.description)}</div>
+      ${(l.details&&l.details.length)?`<div class="spec-block"><h4>Details</h4><ul>${l.details.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
+      ${(l.mods&&l.mods.length)?`<div class="spec-block"><h4>Modifications / Loads</h4><ul>${l.mods.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
+      ${l.financing?`<div class="spec-block"><h4>Financing</h4><div class="desc" style="margin:0;">${esc(l.financing)}</div></div>`:''}
       <div class="seller-box">
         <div class="avatar" style="background:${avatarColor(l.seller)};">${esc(initials(l.sellerName))}</div>
         <div>
