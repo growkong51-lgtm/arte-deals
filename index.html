@@ -379,6 +379,64 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .err-msg{background:rgba(224,18,48,0.12); border:1px solid rgba(224,18,48,0.4); color:#ffb3bd; font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:12px;}
 
 /* image uploader */
+.fin{margin:26px 0 6px;}
+.fin-eyebrow{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.34em;
+  text-transform:uppercase; color:var(--red-2); margin-bottom:6px;
+}
+.fin-title{font-size:38px; line-height:1; color:#fff; margin:0 0 18px;}
+.fin-intro{font-size:14.5px; line-height:1.7; color:var(--silver); margin:0 0 22px;}
+.calc{padding:22px; border:1px solid var(--line); border-radius:4px; background:rgba(255,255,255,0.035);}
+.calc-title{font-size:22px; color:#fff; margin:0 0 6px;}
+.calc-sub{font-size:14px; line-height:1.55; color:var(--muted); margin:0 0 22px;}
+.calc-label{
+  display:block; font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin:0 0 8px; font-weight:500;
+}
+.calc-box{
+  width:100%; padding:15px 16px; margin-bottom:20px; border-radius:3px;
+  background:rgba(0,0,0,0.45); border:1px solid var(--line); color:#fff;
+  font-size:17px; font-family:Inter,sans-serif; -webkit-appearance:none; appearance:none;
+}
+select.calc-box{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238b8f97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat:no-repeat; background-position:right 16px center; padding-right:44px;
+}
+.calc-box::placeholder{color:#5c6067;}
+.calc-box:focus{outline:none; border-color:var(--red-2);}
+.calc-toggle{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;}
+.calc-tgl{
+  padding:16px 8px; border-radius:3px; cursor:pointer;
+  background:rgba(0,0,0,0.45); border:1px solid var(--line); color:var(--silver-bright);
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; letter-spacing:.06em;
+  text-transform:uppercase; transition:all .16s ease;
+}
+.calc-tgl:hover{border-color:var(--silver);}
+.calc-tgl.active{border-color:var(--red-2); background:rgba(224,18,48,0.14); color:#fff;}
+.calc-result{
+  border:1px solid var(--red-2); border-radius:3px; padding:24px 18px;
+  text-align:center; background:rgba(0,0,0,0.35); margin:4px 0 20px;
+}
+.cr-label{
+  font-size:12.5px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--silver-bright); margin-bottom:10px;
+}
+.cr-value{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:52px; line-height:1;
+  color:var(--red-2); margin-bottom:12px;
+}
+.cr-sub{
+  font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--silver);
+}
+.cr-sub span{color:#fff;}
+.calc-note{font-size:13px; line-height:1.65; color:var(--muted); margin:0;}
+.calc-note b{color:var(--silver-bright);}
+@media(max-width:520px){
+  .fin-title{font-size:30px;}
+  .calc{padding:18px 15px;}
+  .cr-value{font-size:42px;}
+  .calc-tgl{font-size:13.5px; padding:14px 6px;}
+}
 .spec-block{margin:16px 0 4px;}
 .spec-block h4{font-family:Rajdhani,sans-serif; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; font-weight:700;}
 .spec-block ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px;}
@@ -858,6 +916,45 @@ function toast(msg){
   wrap.appendChild(t);
   setTimeout(()=>{t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300);}, 2600);
 }
+/* Flat annual rates by term. Applied silently — never shown in the interface. */
+const CALC_RATES = { 12: 0.1373, 24: 0.1698, 36: 0.1498, 48: 0.1432 };
+
+let downMode = 'pct';
+
+function setDownMode(mode){
+  downMode = mode;
+  document.getElementById('tglPct').classList.toggle('active', mode==='pct');
+  document.getElementById('tglAmt').classList.toggle('active', mode==='amt');
+  document.getElementById('downPct').style.display = mode==='pct' ? 'block' : 'none';
+  document.getElementById('downAmt').style.display = mode==='amt' ? 'block' : 'none';
+  runCalc();
+}
+
+function runCalc(){
+  const priceEl = document.getElementById('cPrice');
+  if(!priceEl) return;
+  const price = Math.max(0, Number(priceEl.value) || 0);
+  const term  = Number(document.getElementById('cTerm').value) || 36;
+
+  let down;
+  if(downMode === 'amt'){
+    down = Math.max(0, Number(document.getElementById('cDownAmt').value) || 0);
+    down = Math.min(down, price);
+  } else {
+    const pct = Number(document.getElementById('cDownPct').value) || 0;
+    down = price * (pct/100);
+  }
+
+  const loan  = Math.max(0, price - down);
+  const rate  = CALC_RATES[term] || 0;
+  const years = term / 12;
+  const monthly = loan > 0 ? (loan * (1 + rate * years)) / term : 0;
+
+  document.getElementById('oDown').textContent    = fmtPrice(Math.round(down));
+  document.getElementById('oLoan').textContent    = fmtPrice(Math.round(loan));
+  document.getElementById('oMonthly').textContent = fmtPrice(Math.round(monthly));
+}
+
 function fmtPrice(n){ return '\u20b1'+Number(n).toLocaleString('en-PH'); }
 function timeAgo(ts){
   const s = Math.floor((Date.now()-ts)/1000);
@@ -1667,7 +1764,7 @@ async function openDetail(id){
   openModal('detailOverlay');
   const { data: imgRow } = await sb.from('listings').select('images').eq('id', id).single();
   currentDetailImages = (imgRow && imgRow.images && imgRow.images.length) ? imgRow.images : (l.thumb?[l.thumb]:[]);
-  setTimeout(attachSwipe, 0);
+  setTimeout(()=>{ attachSwipe(); downMode='pct'; runCalc(); }, 0);
   renderDetail();
 }
 function renderDetail(){
@@ -1713,6 +1810,66 @@ function renderDetail(){
       ${(l.details&&l.details.length)?`<div class="spec-block"><h4>Details</h4><ul>${l.details.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
       ${(l.mods&&l.mods.length)?`<div class="spec-block"><h4>Modifications / Loads</h4><ul>${l.mods.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
       ${l.financing?`<div class="spec-block"><h4>Financing</h4><div class="desc" style="margin:0;">${esc(l.financing)}</div></div>`:''}
+
+      <div class="fin">
+        <div class="fin-eyebrow">Own It Sooner</div>
+        <h3 class="fin-title display">Financing</h3>
+        <p class="fin-intro">
+          Select vehicles are available with in-house installment plans. Terms shown on this
+          page are estimates based on a 30% downpayment \u2014 final approval and rates depend
+          on bank partner and buyer requirements. Reach out and the seller will walk you
+          through the paperwork.
+        </p>
+
+        <div class="calc">
+          <h4 class="calc-title display">Monthly Payment Calculator</h4>
+          <p class="calc-sub">Get a quick estimate \u2014 adjust the numbers to fit your budget.</p>
+
+          <label class="calc-label">Vehicle Price (\u20b1)</label>
+          <input class="calc-box" type="number" id="cPrice" value="${Number(l.price)||''}"
+                 placeholder="e.g. 838000" min="0" step="1000" oninput="runCalc()">
+
+          <label class="calc-label">Term (Months)</label>
+          <select class="calc-box" id="cTerm" onchange="runCalc()">
+            <option value="12">12 Months</option>
+            <option value="24">24 Months</option>
+            <option value="36" selected>36 Months</option>
+            <option value="48">48 Months</option>
+          </select>
+
+          <label class="calc-label">Downpayment</label>
+          <div class="calc-toggle">
+            <button type="button" id="tglPct" class="calc-tgl active" onclick="setDownMode('pct')">Standard %</button>
+            <button type="button" id="tglAmt" class="calc-tgl" onclick="setDownMode('amt')">Flexible Amount</button>
+          </div>
+
+          <div id="downPct">
+            <label class="calc-label">Downpayment Percentage</label>
+            <select class="calc-box" id="cDownPct" onchange="runCalc()">
+              ${[0,10,20,30,40,50,60].map(v=>`<option value="${v}"${v===30?' selected':''}>${v}%</option>`).join('')}
+            </select>
+          </div>
+
+          <div id="downAmt" style="display:none;">
+            <label class="calc-label">Downpayment Amount (\u20b1)</label>
+            <input class="calc-box" type="number" id="cDownAmt" placeholder="e.g. 250000"
+                   min="0" step="1000" oninput="runCalc()">
+          </div>
+
+          <div class="calc-result">
+            <div class="cr-label">Estimated Monthly Payment</div>
+            <div class="cr-value" id="oMonthly">\u20b10</div>
+            <div class="cr-sub">Downpayment: <span id="oDown">\u20b10</span> \u00b7 Loan Amount: <span id="oLoan">\u20b10</span></div>
+          </div>
+
+          <p class="calc-note">
+            <b>Important Notice:</b> The financing figures shown are for estimated financing
+            purposes only and are not the final or official financing computation. Actual
+            monthly amortization may vary depending on the client's approved financing terms.
+            For an exact financing computation, please contact the seller for assistance.
+          </p>
+        </div>
+      </div>
       <div class="seller-box">
         ${avatarHTML(l.seller, l.sellerName, 40)}
         <div>
