@@ -62,8 +62,7 @@ input,select,textarea{font-family:inherit;}
 
 .glass{
   background:rgba(20,20,25,0.55);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
+
   border:1px solid var(--line);
 }
 
@@ -73,7 +72,7 @@ header{
   display:flex; align-items:center; justify-content:space-between;
   padding:6px 22px;
   background:rgba(7,7,10,0.78);
-  backdrop-filter:blur(14px);
+
   border-bottom:1px solid var(--line);
 }
 .brand{display:flex; align-items:center; cursor:pointer; position:relative;}
@@ -316,12 +315,13 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .status-dot.sold{background:var(--muted);}
 .fav-btn{
   position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none;
-  background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; color:#fff;
+  background:rgba(0,0,0,0.62); display:flex; align-items:center; justify-content:center; color:#fff;
   transition:transform .15s ease;
 }
 .fav-btn:hover{transform:scale(1.12);}
 .fav-btn.active{color:var(--red-2);}
 .card .info{padding:12px 14px 14px;}
+.card{content-visibility:auto; contain-intrinsic-size:320px;}
 .card .title{font-size:14.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .card .meta{font-size:12px; color:var(--muted); margin-top:5px; display:flex; align-items:center; gap:5px;}
 .empty{text-align:center; padding:70px 20px; color:var(--muted);}
@@ -332,7 +332,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 
 /* ---------- MODALS ---------- */
 .overlay{
-  position:fixed; inset:0; background:rgba(4,4,6,0.72); backdrop-filter:blur(6px); z-index:900;
+  position:fixed; inset:0; background:rgba(4,4,6,0.86); z-index:900;
   display:flex; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity .2s ease;
 }
 .overlay.show{opacity:1; pointer-events:auto;}
@@ -403,7 +403,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .gal-nav{
   position:absolute; top:50%; transform:translateY(-50%);
   width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,0.18);
-  background:rgba(8,8,10,0.55); backdrop-filter:blur(8px); color:#fff;
+  background:rgba(8,8,10,0.78); color:#fff;
   display:flex; align-items:center; justify-content:center; cursor:pointer;
   transition:background .18s ease, border-color .18s ease, transform .18s ease;
 }
@@ -414,7 +414,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .gal-nav:active{transform:translateY(-50%) scale(0.9);}
 .gal-count{
   position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:999px;
-  background:rgba(8,8,10,0.6); backdrop-filter:blur(8px); color:var(--silver);
+  background:rgba(8,8,10,0.8); color:var(--silver);
   font-family:Rajdhani,sans-serif; font-weight:700; font-size:12px; letter-spacing:.06em;
 }
 .gal-dots{position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px;}
@@ -581,7 +581,7 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
   main{padding:18px 14px 100px;}
   .bottom-nav{
     display:flex; align-items:flex-end; position:fixed; bottom:0; left:0; right:0; z-index:250;
-    background:rgba(9,9,12,0.88); backdrop-filter:blur(20px) saturate(140%);
+    background:rgba(9,9,12,0.97);
     padding:9px 4px calc(10px + env(safe-area-inset-bottom));
     box-shadow:0 -12px 34px rgba(0,0,0,0.55);
   }
@@ -1305,7 +1305,7 @@ function cardHTML(l){
   const img = l.thumb || '';
   return `<div class="card cut-sm" onclick="openDetail('${l.id}')">
     <div class="imgwrap">
-      ${img?`<img src="${img}" alt="${esc(l.title)}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);">No Photo</div>`}
+      ${img?`<img src="${cldUrl(img,'w_600,c_limit,q_auto,f_auto')}" alt="${esc(l.title)}" loading="lazy" decoding="async">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);">No Photo</div>`}
       <div class="price-tag${l.status==='sold'?' muted':''}">${fmtPrice(l.price)}</div>
       ${l.status==='sold'?'<div class="sold-veil"><span class="sold-stamp">Sold</span></div>':''}
       <button class="fav-btn ${isFav?'active':''}" onclick="event.stopPropagation(); toggleFav('${l.id}')">${isFav?'♥':'♡'}</button>
