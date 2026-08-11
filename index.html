@@ -1113,11 +1113,18 @@ async function handlePost(e){
       errEl.innerHTML = '<div class="err-msg">You have reached your limit of '+ARTE_CONFIG.maxListingsPerUser+' active listings.</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    row.seller_id   = currentUser.username;
+    const { data: au } = await sb.auth.getUser();
+    if(!au || !au.user){
+      errEl.innerHTML = '<div class="err-msg">Your session expired. Sign in again, then publish.</div>';
+      btn.textContent=label; btn.disabled=false; return false;
+    }
+    currentUser.username = au.user.id;
+    row.seller_id   = au.user.id;
     row.seller_name = currentUser.name;
     row.status      = 'active';
     row.thumb       = await makeThumb(images[0]);
     row.images      = images;
+    await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name });
     const { error } = await sb.from('listings').insert(row);
     if(error){
       errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
