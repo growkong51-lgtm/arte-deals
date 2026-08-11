@@ -361,6 +361,9 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
   font-size:13px; color:var(--silver); line-height:1.5; margin-bottom:14px;
   padding:10px 12px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.07);
 }
+.auth-forgot{text-align:center; margin-top:12px; font-size:13px;}
+.auth-forgot b{color:var(--silver); cursor:pointer; font-weight:500;}
+.auth-forgot b:hover{color:var(--red-2);}
 .auth-switch{text-align:center; margin-top:14px; font-size:13px; color:var(--muted);}
 .auth-switch b{color:var(--red-2); cursor:pointer;}
 .err-msg{background:rgba(224,18,48,0.12); border:1px solid rgba(224,18,48,0.4); color:#ffb3bd; font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:12px;}
@@ -644,6 +647,7 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
         </div>
         <button class="btn btn-primary btn-block" type="submit" id="authSubmitBtn">Sign In</button>
       </form>
+      <div class="auth-forgot" id="authForgot"><b onclick="sendReset()">Forgot your password?</b></div>
       <div class="auth-switch" id="authSwitch">New to ARTE DEALS? <b onclick="toggleAuthMode()">Create an account</b></div>
     </div>
   </div>
@@ -752,6 +756,29 @@ Safari Snorkel"></textarea>
 </div>
 
 <!-- MESSAGE SELLER MODAL -->
+<div class="overlay auth-top" id="npOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="display">Set a New Password</h3>
+    </div>
+    <div class="modal-body">
+      <div class="auth-note" style="display:block;">Choose a new password for your ARTE DEALS account.</div>
+      <div id="npErr"></div>
+      <form onsubmit="return handleNewPassword(event)">
+        <div class="field">
+          <label>New Password</label>
+          <input type="password" id="npPass" placeholder="At least 6 characters" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <label>Confirm New Password</label>
+          <input type="password" id="npPass2" placeholder="Type it again" autocomplete="new-password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="npBtn">Set New Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <div class="overlay chat-top" id="msgOverlay">
   <div class="modal chat-modal">
     <div class="chat-head">
@@ -993,6 +1020,54 @@ function renderAuthArea(){
     <button class="btn btn-signup btn-sm" onclick="openAuth('signup')">Sign Up</button>`;
   }
 }
+async function sendReset(){
+  const email = document.getElementById('authUser').value.trim().toLowerCase();
+  const errEl = document.getElementById('authErr');
+  if(!email){
+    errEl.innerHTML = '<div class="err-msg">Type your email above first, then tap this again.</div>';
+    return;
+  }
+  setAuthNote('Sending reset link...');
+  const redirect = window.location.origin + window.location.pathname;
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: redirect });
+  if(error){
+    errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
+    setAuthNote('');
+    return;
+  }
+  errEl.innerHTML = '';
+  setAuthNote('Check ' + email + ' for a reset link. It can take a minute, and it may land in spam.');
+}
+
+function openNewPassword(){
+  closeModal('authOverlay');
+  document.getElementById('npErr').innerHTML = '';
+  document.getElementById('npPass').value = '';
+  document.getElementById('npPass2').value = '';
+  openModal('npOverlay');
+}
+async function handleNewPassword(e){
+  e.preventDefault();
+  const errEl = document.getElementById('npErr');
+  const a = document.getElementById('npPass').value;
+  const b = document.getElementById('npPass2').value;
+  errEl.innerHTML = '';
+  if(a.length < 6){ errEl.innerHTML = '<div class="err-msg">Use at least 6 characters.</div>'; return false; }
+  if(a !== b){ errEl.innerHTML = '<div class="err-msg">The two passwords do not match.</div>'; return false; }
+  const btn = document.getElementById('npBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+  const { error } = await sb.auth.updateUser({ password: a });
+  btn.textContent = 'Set New Password'; btn.disabled = false;
+  if(error){ errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>'; return false; }
+  closeModal('npOverlay');
+  toast('Password updated. You are signed in.');
+  await loadSession();
+  await loadListings();
+  await loadUserExtras();
+  go('home');
+  return false;
+}
+
 function setAuthNote(text){
   const el = document.getElementById('authNote');
   if(el){ el.textContent = text || ''; el.style.display = text ? 'block' : 'none'; }
@@ -1011,6 +1086,8 @@ function updateAuthModeUI(){
   document.getElementById('authTitle').textContent = isLogin ? 'Sign In' : 'Create Account';
   document.getElementById('nameField').style.display = isLogin ? 'none' : 'block';
   document.getElementById('authName').required = !isLogin;
+  const fg = document.getElementById('authForgot');
+  if(fg) fg.style.display = isLogin ? 'block' : 'none';
   document.getElementById('authSubmitBtn').textContent = isLogin ? 'Sign In' : 'Create Account';
   document.getElementById('authSwitch').innerHTML = isLogin
     ? `New to ARTE DEALS? <b onclick="toggleAuthMode()">Create an account</b>`
@@ -1507,6 +1584,14 @@ async function handlePost(e){
     }
     toast('Listing updated');
   } else {
+    const dupe = allListings.find(l =>
+      l.seller === currentUser.username &&
+      l.title.trim().toLowerCase() === row.title.trim().toLowerCase()
+    );
+    if(dupe){
+      errEl.innerHTML = '<div class="err-msg">You already have a listing called \u201c'+esc(dupe.title)+'\u201d. Edit that one instead of posting it again.</div>';
+      btn.textContent=label; btn.disabled=false; return false;
+    }
     if(allListings.filter(l=>l.seller===currentUser.username).length >= ARTE_CONFIG.maxListingsPerUser){
       errEl.innerHTML = '<div class="err-msg">You have reached your limit of '+ARTE_CONFIG.maxListingsPerUser+' active listings.</div>';
       btn.textContent=label; btn.disabled=false; return false;
@@ -1525,7 +1610,10 @@ async function handlePost(e){
     await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name });
     const { error } = await sb.from('listings').insert(row);
     if(error){
-      errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
+      const msg = (error.code === '23505')
+        ? 'You already have a listing with this name. Edit that one instead of posting it again.'
+        : error.message;
+      errEl.innerHTML = '<div class="err-msg">'+esc(msg)+'</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
     toast('Listing published');
@@ -1792,6 +1880,7 @@ document.addEventListener('click', (e)=>{
   document.querySelectorAll('.overlay').forEach(ov=>{ if(e.target===ov) closeModal(ov.id); });
 });
 sb.auth.onAuthStateChange((event)=>{
+  if(event==='PASSWORD_RECOVERY'){ openNewPassword(); return; }
   if(event==='SIGNED_OUT' && currentUser){ currentUser=null; favorites=[]; inbox=[]; renderAuthArea(); renderNavs(); go('home'); }
 });
 init();
