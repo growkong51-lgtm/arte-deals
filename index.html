@@ -361,6 +361,16 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
   font-size:13px; color:var(--silver); line-height:1.5; margin-bottom:14px;
   padding:10px 12px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.07);
 }
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:46px; width:100%;}
+.pw-eye{
+  position:absolute; top:50%; right:6px; transform:translateY(-50%);
+  width:34px; height:34px; border:none; background:none; cursor:pointer;
+  color:var(--muted); display:flex; align-items:center; justify-content:center;
+  border-radius:50%; transition:color .18s ease, background .18s ease;
+}
+.pw-eye svg{width:18px; height:18px;}
+.pw-eye:hover{color:var(--silver-bright); background:rgba(255,255,255,0.06);}
 .auth-forgot{text-align:center; margin-top:12px; font-size:13px;}
 .auth-forgot b{color:var(--silver); cursor:pointer; font-weight:500;}
 .auth-forgot b:hover{color:var(--red-2);}
@@ -643,7 +653,10 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
         </div>
         <div class="field">
           <label>Password</label>
+          <div class="pw-wrap">
           <input type="password" id="authPass" placeholder="••••••••" autocomplete="current-password" required>
+          <button type="button" class="pw-eye" onclick="togglePw('authPass', this)" aria-label="Show password"><svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 5.1-5.9"/><path d="M9.9 4.2A9.6 9.6 0 0 1 12 4c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg></button>
+        </div>
         </div>
         <button class="btn btn-primary btn-block" type="submit" id="authSubmitBtn">Sign In</button>
       </form>
@@ -767,11 +780,17 @@ Safari Snorkel"></textarea>
       <form onsubmit="return handleNewPassword(event)">
         <div class="field">
           <label>New Password</label>
+          <div class="pw-wrap">
           <input type="password" id="npPass" placeholder="At least 6 characters" autocomplete="new-password" required>
+          <button type="button" class="pw-eye" onclick="togglePw('npPass', this)" aria-label="Show password"><svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 5.1-5.9"/><path d="M9.9 4.2A9.6 9.6 0 0 1 12 4c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg></button>
+        </div>
         </div>
         <div class="field">
           <label>Confirm New Password</label>
+          <div class="pw-wrap">
           <input type="password" id="npPass2" placeholder="Type it again" autocomplete="new-password" required>
+          <button type="button" class="pw-eye" onclick="togglePw('npPass2', this)" aria-label="Show password"><svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 5.1-5.9"/><path d="M9.9 4.2A9.6 9.6 0 0 1 12 4c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg></button>
+        </div>
         </div>
         <button class="btn btn-primary btn-block" type="submit" id="npBtn">Set New Password</button>
       </form>
@@ -1066,6 +1085,16 @@ async function handleNewPassword(e){
   await loadUserExtras();
   go('home');
   return false;
+}
+
+function togglePw(fieldId, btn){
+  const input = document.getElementById(fieldId);
+  if(!input) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.querySelector('.eye-open').style.display = showing ? 'block' : 'none';
+  btn.querySelector('.eye-shut').style.display = showing ? 'none'  : 'block';
+  btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
 }
 
 function setAuthNote(text){
