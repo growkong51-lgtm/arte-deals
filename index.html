@@ -239,10 +239,34 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
   color:#fff; font-family:'Rajdhani'; font-weight:700; font-size:15px; padding:5px 12px; letter-spacing:.02em;
   box-shadow:0 4px 10px rgba(0,0,0,0.4);
 }
-.sold-tag{
-  position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.75); border:1px solid var(--silver);
-  color:var(--silver-bright); font-size:10.5px; font-weight:800; letter-spacing:.1em; padding:4px 9px;
+.price-tag.muted{background:linear-gradient(135deg,#4a4a52,#2c2c33); box-shadow:none;}
+.sold-veil{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg, rgba(6,6,8,0.55), rgba(6,6,8,0.78));
+  backdrop-filter:grayscale(85%) blur(0.5px);
 }
+.sold-stamp{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; letter-spacing:.28em;
+  text-transform:uppercase; color:var(--silver-bright);
+  padding:7px 16px; border:1px solid rgba(201,204,209,0.55); border-radius:2px;
+  transform:rotate(-7deg); background:rgba(10,10,12,0.35);
+}
+.price-line{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+.detail-info .price.is-sold{color:var(--muted); text-decoration:line-through; text-decoration-thickness:2px;}
+.sold-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--silver-bright);
+  padding:5px 12px; border-radius:999px;
+  border:1px solid rgba(201,204,209,0.4); background:rgba(201,204,209,0.08);
+}
+.sold-badge svg{width:13px; height:13px; color:var(--silver-bright);}
+.status-dot{
+  display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:7px;
+  vertical-align:middle; position:relative; top:-1px;
+}
+.status-dot.active{background:#2ecc71; box-shadow:0 0 6px rgba(46,204,113,0.8);}
+.status-dot.sold{background:var(--muted);}
 .fav-btn{
   position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none;
   background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; color:#fff;
@@ -310,6 +334,31 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .detail-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:0;}
 @media(max-width:720px){.detail-grid{grid-template-columns:1fr;}}
 .detail-gallery{background:#000;}
+.gal-frame{position:relative; touch-action:pan-y;}
+.gal-nav{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,0.18);
+  background:rgba(8,8,10,0.55); backdrop-filter:blur(8px); color:#fff;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.gal-nav svg{width:20px; height:20px;}
+.gal-nav.prev{left:10px;}
+.gal-nav.next{right:10px;}
+.gal-nav:hover{background:rgba(224,18,48,0.85); border-color:transparent;}
+.gal-nav:active{transform:translateY(-50%) scale(0.9);}
+.gal-count{
+  position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:999px;
+  background:rgba(8,8,10,0.6); backdrop-filter:blur(8px); color:var(--silver);
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:12px; letter-spacing:.06em;
+}
+.gal-dots{position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:6px;}
+.gal-dots span{
+  width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.35);
+  cursor:pointer; transition:background .18s ease, width .18s ease;
+}
+.gal-dots span.on{background:var(--red-2); width:18px; border-radius:3px;}
+@media(max-width:520px){ .gal-nav{width:34px; height:34px;} .gal-nav.prev{left:6px;} .gal-nav.next{right:6px;} }
 .detail-main-img{width:100%; aspect-ratio:4/3; object-fit:cover; display:block;}
 .thumb-row{display:flex; gap:6px; padding:8px; overflow-x:auto;}
 .thumb-row img{width:56px; height:56px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid transparent; opacity:.6;}
@@ -324,12 +373,18 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .desc{color:var(--silver); font-size:13.5px; line-height:1.6; white-space:pre-wrap;}
 
 /* my listings / inbox rows */
-.row-card{display:flex; gap:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; align-items:center;}
+.row-card{display:flex; gap:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; align-items:center; flex-wrap:wrap;}
 .row-card img{width:70px; height:56px; object-fit:cover; border-radius:7px; flex-shrink:0;}
 .row-card .rc-body{flex:1; min-width:0;}
 .row-card .rc-title{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.row-card .rc-meta{font-size:12px; color:var(--muted); margin-top:3px;}
+.row-card .rc-meta{font-size:12px; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .row-actions{display:flex; gap:6px; flex-shrink:0;}
+@media(max-width:640px){
+  .row-card .rc-body{flex:1 1 100%; order:2; min-width:0;}
+  .row-card img{order:1;}
+  .row-actions{order:3; flex:1 1 100%; flex-wrap:wrap;}
+  .row-actions .btn{flex:1 1 auto;}
+}
 
 .toast-wrap{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:1200; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .toast{background:rgba(20,20,24,0.95); border:1px solid var(--line); color:#fff; padding:11px 18px; border-radius:9px; font-size:13.5px; box-shadow:0 10px 26px rgba(0,0,0,0.5); animation:toastIn .2s ease;}
@@ -945,8 +1000,8 @@ function cardHTML(l){
   return `<div class="card cut-sm" onclick="openDetail('${l.id}')">
     <div class="imgwrap">
       ${img?`<img src="${img}" alt="${esc(l.title)}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);">No Photo</div>`}
-      <div class="price-tag">${fmtPrice(l.price)}</div>
-      ${l.status==='sold'?'<div class="sold-tag">SOLD</div>':''}
+      <div class="price-tag${l.status==='sold'?' muted':''}">${fmtPrice(l.price)}</div>
+      ${l.status==='sold'?'<div class="sold-veil"><span class="sold-stamp">Sold</span></div>':''}
       <button class="fav-btn ${isFav?'active':''}" onclick="event.stopPropagation(); toggleFav('${l.id}')">${isFav?'♥':'♡'}</button>
     </div>
     <div class="info">
@@ -983,16 +1038,25 @@ function renderMyListings(app){
         <img src="${l.thumb||''}" alt="">
         <div class="rc-body">
           <div class="rc-title">${esc(l.title)}</div>
-          <div class="rc-meta">${fmtPrice(l.price)} · ${l.status==='sold'?'Sold':'Active'} · ${timeAgo(l.createdAt)}</div>
+          <div class="rc-meta"><span class="status-dot ${l.status==='sold'?'sold':'active'}"></span>${l.status==='sold'?'Sold':'Active'} · ${fmtPrice(l.price)} · ${timeAgo(l.createdAt)}</div>
         </div>
         <div class="row-actions">
           <button class="btn btn-ghost btn-sm" onclick="openDetail('${l.id}')">View</button>
+          <button class="btn btn-metal btn-sm" onclick="editListing('${l.id}')">Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="toggleSold('${l.id}')">${l.status==='sold'?'Relist':'Mark Sold'}</button>
           <button class="btn btn-ghost btn-sm" onclick="deleteListing('${l.id}')" style="color:var(--red-2);">Delete</button>
         </div>
       </div>`).join('')
       : `<div class="empty">You haven't listed any vehicles yet.<br><br><button class="btn btn-primary" onclick="openPostModal()">＋ List Your First Vehicle</button></div>`}
   </main>`;
+}
+async function editListing(id){
+  const l = allListings.find(x=>x.id===id);
+  if(!l) return;
+  const { data } = await sb.from('listings').select('images').eq('id', id).single();
+  openPostModal(l);
+  uploadedImages = (data && data.images) ? data.images.slice(0, MAX_PHOTOS) : [];
+  renderUploader();
 }
 async function toggleSold(id){
   const l = allListings.find(x=>x.id===id); if(!l) return;
@@ -1193,6 +1257,7 @@ async function openDetail(id){
   openModal('detailOverlay');
   const { data: imgRow } = await sb.from('listings').select('images').eq('id', id).single();
   currentDetailImages = (imgRow && imgRow.images && imgRow.images.length) ? imgRow.images : (l.thumb?[l.thumb]:[]);
+  setTimeout(attachSwipe, 0);
   renderDetail();
 }
 function renderDetail(){
@@ -1202,11 +1267,29 @@ function renderDetail(){
   const isFav = favorites.includes(l.id);
   body.innerHTML = `<div class="detail-grid">
     <div class="detail-gallery">
-      <img class="detail-main-img" id="mainDetailImg" src="${cldFull(currentDetailImages[currentGalleryIdx]||'')}" alt="">
+      <div class="gal-frame" id="galFrame">
+        <img class="detail-main-img" id="mainDetailImg" src="${cldFull(currentDetailImages[currentGalleryIdx]||'')}" alt="">
+        ${currentDetailImages.length>1?`
+          <button class="gal-nav prev" onclick="stepGallery(-1)" aria-label="Previous photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="gal-nav next" onclick="stepGallery(1)" aria-label="Next photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <div class="gal-count">${currentGalleryIdx+1} / ${currentDetailImages.length}</div>
+          <div class="gal-dots">${currentDetailImages.map((_,i)=>`<span class="${i===currentGalleryIdx?'on':''}" onclick="setGalleryIdx(${i})"></span>`).join('')}</div>
+        `:''}
+      </div>
       ${currentDetailImages.length>1?`<div class="thumb-row">${currentDetailImages.map((im,i)=>`<img src="${cldUrl(im,'w_200,c_fill,q_auto,f_auto')}" class="${i===currentGalleryIdx?'active':''}" onclick="setGalleryIdx(${i})">`).join('')}</div>`:''}
     </div>
     <div class="detail-info">
-      <div class="price red-text">${fmtPrice(l.price)}${l.status==='sold'?' <span style="font-size:14px; color:var(--muted); font-family:Inter;">· SOLD</span>':''}</div>
+      <div class="price-line">
+        <div class="price ${l.status==='sold'?'is-sold':'red-text'}">${fmtPrice(l.price)}</div>
+        ${l.status==='sold'?`<span class="sold-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          Sold
+        </span>`:''}
+      </div>
       <h2>${esc(l.title)}</h2>
       <div class="pill-row">
         ${l.year?`<div class="pill">${esc(l.year)}</div>`:''}
@@ -1229,7 +1312,7 @@ function renderDetail(){
       </div>
       ${isOwner
         ? `<div style="display:flex; gap:8px;">
-             <button class="btn btn-ghost btn-block" onclick="closeModal('detailOverlay'); openPostModal(currentDetailListing);">Edit Listing</button>
+             <button class="btn btn-ghost btn-block" onclick="closeModal('detailOverlay'); editListing(currentDetailListing.id);">Edit Listing</button>
              <button class="btn btn-metal" onclick="toggleSold('${l.id}'); closeModal('detailOverlay');">${l.status==='sold'?'Relist':'Mark Sold'}</button>
            </div>`
         : `<div style="display:flex; gap:8px;">
@@ -1239,7 +1322,36 @@ function renderDetail(){
     </div>
   </div>`;
 }
-function setGalleryIdx(i){ currentGalleryIdx=i; renderDetail(); }
+function setGalleryIdx(i){ currentGalleryIdx=i; renderDetail(); attachSwipe(); }
+function stepGallery(dir){
+  const n = currentDetailImages.length;
+  if(n<2) return;
+  currentGalleryIdx = (currentGalleryIdx + dir + n) % n;
+  renderDetail();
+  attachSwipe();
+}
+function attachSwipe(){
+  const frame = document.getElementById('galFrame');
+  if(!frame || frame.dataset.swipe) return;
+  frame.dataset.swipe = '1';
+  let x0 = null, y0 = null;
+  frame.addEventListener('touchstart', e=>{
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, {passive:true});
+  frame.addEventListener('touchend', e=>{
+    if(x0===null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    const dy = e.changedTouches[0].clientY - y0;
+    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) stepGallery(dx < 0 ? 1 : -1);
+    x0 = null; y0 = null;
+  }, {passive:true});
+}
+document.addEventListener('keydown', e=>{
+  const open = document.getElementById('detailOverlay');
+  if(!open || !open.classList.contains('show')) return;
+  if(e.key==='ArrowLeft')  stepGallery(-1);
+  if(e.key==='ArrowRight') stepGallery(1);
+});
 
 function openMessage(listingId){
   if(!currentUser){ openAuth('login'); return; }
