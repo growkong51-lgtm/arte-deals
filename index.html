@@ -303,6 +303,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 }
 .up-slot img{width:100%; height:100%; object-fit:cover;}
 .up-slot .rm{position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,0.7); color:#fff; border:none; font-size:12px;}
+.up-slot .spinner{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);}
 .up-slot input{position:absolute; inset:0; opacity:0; cursor:pointer;}
 
 /* listing detail */
@@ -560,6 +561,7 @@ let favorites = [];          // array of ids
 let inbox = [];              // array of messages
 let uploadedImages = [];     // base64 array for post form (max 8)
 const MAX_PHOTOS = 8;
+let uploadingCount = 0;
 let currentRoute = 'home';
 let searchQuery = '';
 let activeCategory = 'All';
@@ -626,6 +628,30 @@ function rowToMessage(r){
 function dbFail(e, fallbackMsg){
   console.error(e);
   toast((e && e.message) ? e.message : fallbackMsg);
+}
+
+/* ================= PHOTO HOSTING (CLOUDINARY) ================= */
+/* Photos live on Cloudinary, not in the database. We keep only the URL,
+   so listings stay sharp and the database stays small. */
+function cldUrl(url, transform){
+  if(!url || url.indexOf('/upload/') === -1) return url;   // old base64 photos
+  return url.replace('/upload/', '/upload/' + transform + '/');
+}
+function cldThumb(url){ return cldUrl(url, 'w_800,c_limit,q_auto,f_auto'); }
+function cldFull(url){  return cldUrl(url, 'w_1600,c_limit,q_auto,f_auto'); }
+
+async function uploadToCloudinary(file){
+  const form = new FormData();
+  form.append('file', file);
+  form.append('upload_preset', ARTE_CONFIG.cloudinaryPreset);
+  const res = await fetch('https://api.cloudinary.com/v1_1/'+ARTE_CONFIG.cloudinaryCloud+'/image/upload', {
+    method:'POST', body: form
+  });
+  const data = await res.json();
+  if(!res.ok || !data.secure_url){
+    throw new Error((data.error && data.error.message) || 'Upload failed');
+  }
+  return data.secure_url;
 }
 
 /* ================= IMAGE COMPRESSION ================= */
@@ -1047,8 +1073,10 @@ function renderUploader(){
   const wrap = document.getElementById('uploader');
   let html='';
   for(let i=0;i<MAX_PHOTOS;i++){
-    if(uploadedImages[i]){
-      html += `<div class="up-slot"><img src="${uploadedImages[i]}"><button type="button" class="rm" onclick="removeImg(${i})">✕</button></div>`;
+    if(uploadedImages[i]==='PENDING'){
+      html += `<div class="up-slot"><span class="spinner"></span></div>`;
+    } else if(uploadedImages[i]){
+      html += `<div class="up-slot"><img src="${cldUrl(uploadedImages[i],'w_240,c_fill,q_auto,f_auto')}"><button type="button" class="rm" onclick="removeImg(${i})">✕</button></div>`;
     } else {
       html += `<div class="up-slot">＋<input type="file" accept="image/*" onchange="handleImgSelect(event, ${i})"></div>`;
     }
@@ -1057,19 +1085,27 @@ function renderUploader(){
 }
 async function handleImgSelect(e, idx){
   const file = e.target.files[0]; if(!file) return;
-  toast('Processing photo...');
+  if(file.size > 10*1024*1024){ toast('That photo is over 10MB. Pick a smaller one.'); return; }
+  uploadingCount++;
+  uploadedImages[idx] = 'PENDING';
+  renderUploader();
   try{
-    const dataUrl = await fileToCompressedDataURL(file);
-    uploadedImages[idx] = dataUrl;
-    renderUploader();
-  }catch(err){ toast('Could not process that image'); }
+    const url = await uploadToCloudinary(file);
+    uploadedImages[idx] = url;
+  }catch(err){
+    uploadedImages[idx] = null;
+    uploadedImages = uploadedImages.filter(Boolean);
+    toast(err.message || 'Photo upload failed');
+  }
+  uploadingCount--;
+  renderUploader();
 }
 function removeImg(idx){ uploadedImages[idx]=null; uploadedImages=uploadedImages.filter(Boolean); renderUploader(); }
 
 async function handlePost(e){
   e.preventDefault();
   const errEl = document.getElementById('postErr'); errEl.innerHTML='';
-  if(uploadedImages.filter(Boolean).length===0 && !editingListingId){
+  if(uploadedImages.filter(x=>x && x!=='PENDING').length===0 && !editingListingId){
     errEl.innerHTML = '<div class="err-msg">Add at least one photo of your vehicle.</div>'; return false;
   }
   const btn = document.getElementById('postSubmitBtn');
@@ -1095,11 +1131,16 @@ async function handlePost(e){
     condition:    'Used',
     description:  lines('pDetails').join(' \u00b7 ')
   };
-  const images = uploadedImages.filter(Boolean);
+  const images = uploadedImages.filter(x => x && x !== 'PENDING');
+
+  if(uploadingCount > 0){
+    errEl.innerHTML = '<div class="err-msg">Photos are still uploading. Try again in a moment.</div>';
+    btn.textContent=label; btn.disabled=false; return false;
+  }
 
   if(editingListingId){
     if(images.length){
-      row.thumb = await makeThumb(images[0]);
+      row.thumb = cldThumb(images[0]);
       row.images = images;
     }
     const { error } = await sb.from('listings').update(row).eq('id', editingListingId);
@@ -1122,7 +1163,7 @@ async function handlePost(e){
     row.seller_id   = au.user.id;
     row.seller_name = currentUser.name;
     row.status      = 'active';
-    row.thumb       = await makeThumb(images[0]);
+    row.thumb       = cldThumb(images[0]);
     row.images      = images;
     await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name });
     const { error } = await sb.from('listings').insert(row);
@@ -1161,8 +1202,8 @@ function renderDetail(){
   const isFav = favorites.includes(l.id);
   body.innerHTML = `<div class="detail-grid">
     <div class="detail-gallery">
-      <img class="detail-main-img" id="mainDetailImg" src="${currentDetailImages[currentGalleryIdx]||''}" alt="">
-      ${currentDetailImages.length>1?`<div class="thumb-row">${currentDetailImages.map((im,i)=>`<img src="${im}" class="${i===currentGalleryIdx?'active':''}" onclick="setGalleryIdx(${i})">`).join('')}</div>`:''}
+      <img class="detail-main-img" id="mainDetailImg" src="${cldFull(currentDetailImages[currentGalleryIdx]||'')}" alt="">
+      ${currentDetailImages.length>1?`<div class="thumb-row">${currentDetailImages.map((im,i)=>`<img src="${cldUrl(im,'w_200,c_fill,q_auto,f_auto')}" class="${i===currentGalleryIdx?'active':''}" onclick="setGalleryIdx(${i})">`).join('')}</div>`:''}
     </div>
     <div class="detail-info">
       <div class="price red-text">${fmtPrice(l.price)}${l.status==='sold'?' <span style="font-size:14px; color:var(--muted); font-family:Inter;">· SOLD</span>':''}</div>
