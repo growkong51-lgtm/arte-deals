@@ -42,12 +42,12 @@ body::before{
   z-index:-1;
   pointer-events:none;
   background:
-    radial-gradient(1100px 650px at 14% -8%, rgba(201,204,209,0.05), transparent 60%),
-    radial-gradient(900px 600px at 92% 10%, rgba(201,204,209,0.035), transparent 55%),
-    radial-gradient(700px 500px at 50% 100%, rgba(201,204,209,0.03), transparent 60%),
-    repeating-linear-gradient(115deg, rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 4px),
-    repeating-linear-gradient(25deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 4px),
-    linear-gradient(180deg, var(--black-2) 0%, var(--black) 45%, #050506 100%);
+    radial-gradient(1200px 700px at 14% -8%, rgba(201,204,209,0.13), transparent 62%),
+    radial-gradient(950px 650px at 92% 8%, rgba(201,204,209,0.09), transparent 58%),
+    radial-gradient(750px 550px at 50% 100%, rgba(201,204,209,0.07), transparent 62%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 4px),
+    repeating-linear-gradient(25deg, rgba(255,255,255,0.026) 0px, rgba(255,255,255,0.026) 1px, transparent 1px, transparent 4px),
+    linear-gradient(180deg, var(--black-3) 0%, var(--black-2) 22%, var(--black) 55%, #050506 100%);
 }
 h1,h2,h3,h4,.display{font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.02em; text-transform:uppercase;}
 ::selection{background:var(--red); color:#fff;}
@@ -183,7 +183,7 @@ header{
 .hero::before{
   content:''; position:absolute; inset:0; pointer-events:none;
   background:
-    radial-gradient(650px 420px at 50% -8%, rgba(224,18,48,0.16), transparent 65%),
+    radial-gradient(780px 480px at 50% -10%, rgba(224,18,48,0.34), rgba(224,18,48,0.12) 40%, transparent 70%),
     repeating-linear-gradient(115deg, transparent 0 60px, rgba(224,18,48,0.035) 60px 61px);
 }
 .hero-icon-wrap{position:relative; display:flex; align-items:center; justify-content:center; margin:0 auto 2px; height:120px;}
@@ -245,10 +245,10 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .card{
   position:relative; background:linear-gradient(180deg, var(--black-3), var(--black-2));
   border:1px solid var(--line); overflow:hidden; cursor:pointer;
-  box-shadow:0 10px 24px rgba(0,0,0,0.35), var(--edge-light);
+  box-shadow:0 6px 14px rgba(0,0,0,0.4), 0 18px 40px rgba(0,0,0,0.5), var(--edge-light);
   transition:transform .32s cubic-bezier(.22,1,.36,1), border-color .32s cubic-bezier(.22,1,.36,1), box-shadow .32s cubic-bezier(.22,1,.36,1);
 }
-.card:hover{transform:translateY(-4px); border-color:rgba(224,18,48,0.45); box-shadow:0 22px 46px rgba(0,0,0,0.55), 0 8px 18px rgba(0,0,0,0.35), 0 0 0 1px rgba(224,18,48,0.15), var(--edge-light);}
+.card:hover{transform:translateY(-6px); border-color:rgba(224,18,48,0.45); box-shadow:0 14px 30px rgba(0,0,0,0.55), 0 32px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(224,18,48,0.15), var(--edge-light);}
 .card .imgwrap{position:relative; aspect-ratio:4/3; background:#000; overflow:hidden;}
 .card .imgwrap img{width:100%; height:100%; object-fit:cover; transition:transform .4s ease;}
 .card:hover .imgwrap img{transform:scale(1.06);}
