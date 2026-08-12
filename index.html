@@ -646,6 +646,27 @@ select.calc-box{
 .sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
 .seller-link:hover .sb-arrow{color:var(--red-2);}
 
+/* ---------- sellers directory ---------- */
+.stat-link{cursor:pointer; transition:transform .16s ease;}
+.stat-link:hover{transform:translateY(-2px);}
+.stat-link:hover .lbl{color:var(--red-2);}
+.sellers-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:12px;}
+.seller-tile{
+  display:flex; align-items:center; gap:14px; padding:15px 16px; cursor:pointer;
+  border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+  transition:border-color .18s ease, transform .18s ease, background .18s ease;
+}
+.seller-tile:hover{border-color:rgba(201,204,209,0.34); transform:translateY(-2px); background:rgba(255,255,255,0.06);}
+.stl-body{flex:1; min-width:0;}
+.stl-name{
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:19px;
+  letter-spacing:.015em; color:#fff;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.stl-stats{display:flex; align-items:center; gap:10px; margin-top:4px; font-size:12.5px; color:var(--muted);}
+.stl-stats b{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; color:var(--silver-bright); margin-right:2px;}
+
 /* ---------- seller profile page ---------- */
 .back-link{
   display:inline-flex; align-items:center; gap:6px; margin-bottom:18px; cursor:pointer;
@@ -1704,6 +1725,7 @@ function render(){
   if(currentRoute==='favorites') return renderFavorites(app);
   if(currentRoute==='inbox') return renderInbox(app);
   if(currentRoute==='seller') return renderSellerProfile(app);
+  if(currentRoute==='sellers') return renderSellersList(app);
 }
 
 function renderPostPrompt(){
@@ -1725,7 +1747,7 @@ function renderHome(app){
     </div>
     <div class="stat-row">
       <div><div class="num red-text">${allListings.filter(l=>l.status==='active').length}</div><div class="lbl">Live Listings</div></div>
-      <div><div class="num metal-text">${new Set(allListings.map(l=>l.seller)).size}</div><div class="lbl">Sellers</div></div>
+      <div class="stat-link" onclick="go('sellers')"><div class="num metal-text">${new Set(allListings.map(l=>l.seller)).size}</div><div class="lbl">Sellers</div></div>
       <div><div class="num red-text">${CATEGORIES.length-1}</div><div class="lbl">Categories</div></div>
     </div>
   </section>
@@ -1958,6 +1980,42 @@ function openSeller(id){
   closeModal('detailOverlay');
   viewingSeller = id;
   go('seller');
+}
+
+function renderSellersList(app){
+  const ids = [...new Set(allListings.map(l=>l.seller))];
+  const sellers = ids.map(id=>{
+    const theirs = allListings.filter(l=>l.seller===id);
+    const prof = sellerProfiles[id] || {};
+    return {
+      id,
+      name: prof.name || (theirs[0] && theirs[0].sellerName) || 'Seller',
+      active: theirs.filter(l=>l.status!=='sold').length,
+      sold: theirs.filter(l=>l.status==='sold').length,
+      newest: Math.max(...theirs.map(l=>l.createdAt))
+    };
+  }).sort((a,b)=>b.active-a.active || b.newest-a.newest);
+
+  app.innerHTML = `<main>
+    <button class="back-link" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to listings
+    </button>
+    <div class="section-head"><h2 class="metal-text">Sellers</h2></div>
+    ${sellers.length ? `<div class="sellers-grid">${sellers.map(sl=>`
+      <div class="seller-tile" onclick="openSeller('${sl.id}')">
+        ${avatarHTML(sl.id, sl.name, 62)}
+        <div class="stl-body">
+          <div class="stl-name">${esc(sl.name)}</div>
+          <div class="stl-stats">
+            <span><b>${sl.active}</b> Active</span>
+            ${sl.sold ? `<span class="sp-sep"></span><span><b>${sl.sold}</b> Sold</span>` : ''}
+          </div>
+        </div>
+        <svg class="sb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>`).join('')}</div>`
+      : `<div class="empty">No sellers yet.</div>`}
+  </main>`;
 }
 
 function renderSellerProfile(app){
