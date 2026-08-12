@@ -249,6 +249,23 @@ input, select, textarea{transition:border-color .18s ease, background .18s ease;
 main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap;}
 .section-head h2{font-size:20px; letter-spacing:.03em;}
+.loc-field{position:relative;}
+.loc-suggest{
+  position:absolute; top:100%; left:0; right:0; z-index:30; margin-top:6px;
+  background:#131318; border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.6); overflow:hidden; display:none;
+  max-height:250px; overflow-y:auto;
+}
+.loc-suggest.show{display:block;}
+.loc-item{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:12px 14px; background:none; border:none; cursor:pointer;
+  color:var(--silver-bright); font-size:13.5px; line-height:1.35;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.loc-item:last-child{border-bottom:none;}
+.loc-item svg{width:16px; height:16px; color:var(--red-2); flex-shrink:0;}
+.loc-item:hover{background:rgba(224,18,48,0.12); color:#fff;}
 .filter-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 .select-mini, .filter-row input{
   background:rgba(255,255,255,0.04); border:1px solid var(--line); color:var(--silver);
@@ -1235,9 +1252,11 @@ footer{
             </select>
           </div>
         </div>
-        <div class="field">
+        <div class="field loc-field">
           <label>Location</label>
-          <input type="text" id="pLocation" placeholder="Quezon City, Metro Manila" required>
+          <input type="text" id="pLocation" placeholder="Start typing a city or area..." required
+                 autocomplete="off" oninput="onLocationInput(this.value)" onblur="hideLocSuggest()">
+          <div class="loc-suggest" id="locSuggest"></div>
         </div>
         <div class="field">
           <label>Details / Features — one per line</label>
@@ -1351,6 +1370,8 @@ let currentRoute = 'home';
 let searchQuery = '';
 let activeCategory = 'All';
 let sortBy = 'newest';
+let activeArea = 'All';
+let myCoords = null;
 let editingListingId = null;
 let currentDetailListing = null;
 let currentDetailImages = [];
@@ -1442,6 +1463,62 @@ function sellerTermsHTML(raw){
   }
   if(!out) out = '<div class="st-down"><b>' + esc(String(raw)) + '</b></div>';
   return out;
+}
+
+/* Location search. Suggestions come from MapTiler, restricted to the
+   Philippines, and we keep the coordinates so buyers can sort by distance. */
+let locTimer = null, pickedLoc = null;
+
+function onLocationInput(value){
+  pickedLoc = null;
+  clearTimeout(locTimer);
+  const q = value.trim();
+  if(q.length < 2){ hideLocSuggest(); return; }
+  locTimer = setTimeout(()=>searchPlaces(q), 320);
+}
+
+async function searchPlaces(q){
+  const box = document.getElementById('locSuggest');
+  if(!box) return;
+  try{
+    const url = 'https://api.maptiler.com/geocoding/' + encodeURIComponent(q)
+      + '.json?key=' + ARTE_CONFIG.maptilerKey
+      + '&country=ph&limit=6&language=en';
+    const res = await fetch(url);
+    const data = await res.json();
+    const hits = (data.features || []).filter(f => f.place_name);
+    if(!hits.length){ hideLocSuggest(); return; }
+    box.innerHTML = hits.map((f,i)=>{
+      const label = f.place_name.replace(/, Philippines$/,'');
+      return `<button type="button" class="loc-item" onmousedown="event.preventDefault()"
+                onclick="pickPlace(${i})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+                <span>${esc(label)}</span>
+              </button>`;
+    }).join('');
+    box.dataset.hits = JSON.stringify(hits.map(f=>({
+      name: f.place_name.replace(/, Philippines$/,''),
+      lng: f.center ? f.center[0] : null,
+      lat: f.center ? f.center[1] : null
+    })));
+    box.classList.add('show');
+  }catch(e){ hideLocSuggest(); }
+}
+
+function pickPlace(i){
+  const box = document.getElementById('locSuggest');
+  const hits = JSON.parse(box.dataset.hits || '[]');
+  const hit = hits[i]; if(!hit) return;
+  document.getElementById('pLocation').value = hit.name;
+  pickedLoc = hit;
+  hideLocSuggest();
+}
+
+function hideLocSuggest(){
+  setTimeout(()=>{
+    const box = document.getElementById('locSuggest');
+    if(box) box.classList.remove('show');
+  }, 120);
 }
 
 function runCalc(){
@@ -1574,6 +1651,7 @@ function rowToListing(r){
     condition: r.condition, location: r.location, description: r.description,
     brand: r.brand, year: r.year, transmission: r.transmission, fuel: r.fuel_type,
     mileage: r.mileage, details: r.details || [], mods: r.modifications || [],
+    lat: r.lat, lng: r.lng,
     financing: r.financing,
     seller: r.seller_id, sellerName: r.seller_name,
     status: r.status, thumb: r.thumb,
@@ -2010,7 +2088,7 @@ function updateInboxBadge(){
 
 /* ================= LISTINGS DATA ================= */
 async function loadListings(){
-  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
+  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,lat,lng,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
   allListings = (data || []).map(rowToListing);
   const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen');
@@ -2070,10 +2148,15 @@ function renderHome(app){
     <div class="section-head">
       <h2 class="metal-text">${activeCategory==='All'?'All Listings':esc(activeCategory)}</h2>
       <div class="filter-row">
+        <select class="select-mini" id="areaSel" onchange="setArea(this.value)">
+          <option value="All"${activeArea==='All'?' selected':''}>All Areas</option>
+          ${areaOptions().map(a=>`<option value="${esc(a)}"${activeArea===a?' selected':''}>${esc(a)}</option>`).join('')}
+        </select>
         <select class="select-mini" id="sortSel" onchange="sortBy=this.value; renderGrid();">
           <option value="newest" ${sortBy==='newest'?'selected':''}>Newest</option>
           <option value="price-low" ${sortBy==='price-low'?'selected':''}>Price: Low to High</option>
           <option value="price-high" ${sortBy==='price-high'?'selected':''}>Price: High to Low</option>
+          <option value="near" ${sortBy==='near'?'selected':''}>Nearest to me</option>
         </select>
       </div>
     </div>
@@ -2089,6 +2172,45 @@ function renderCatStrip(){
 function setCategory(c){ activeCategory=c; renderCatStrip(); document.querySelector('main .section-head h2').textContent = c==='All'?'All Listings':c; renderGrid(); }
 function onSearch(v){ searchQuery=v; renderGrid(); }
 
+/* Areas come from the listings themselves, so the list is always real
+   and costs no extra location lookups. */
+function areaOf(l){
+  const parts = String(l.location || '').split(',').map(x=>x.trim()).filter(Boolean);
+  return parts.length ? parts[parts.length-1] : '';
+}
+function areaOptions(){
+  const seen = {};
+  allListings.forEach(l=>{ const a = areaOf(l); if(a) seen[a] = (seen[a]||0)+1; });
+  return Object.keys(seen).sort((a,b)=> seen[b]-seen[a] || a.localeCompare(b));
+}
+function setArea(a){ activeArea = a; renderGrid(); }
+
+function kmBetween(a, b){
+  const R = 6371, toRad = d => d*Math.PI/180;
+  const dLat = toRad(b.lat-a.lat), dLng = toRad(b.lng-a.lng);
+  const x = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+function askForLocation(){
+  if(!navigator.geolocation){ toast('Your browser cannot share a location'); return; }
+  toast('Finding your location...');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      myCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      renderGrid();
+      toast('Sorted by distance from you');
+    },
+    () => {
+      sortBy = 'newest';
+      const sel = document.getElementById('sortSel'); if(sel) sel.value = 'newest';
+      toast('Location not shared \u2014 showing newest instead');
+      renderGrid();
+    },
+    { timeout: 10000 }
+  );
+}
+
 function getFilteredListings(){
   let list = allListings.filter(l=>l.status==='active' || (currentUser && l.seller===currentUser.username));
   if(activeCategory!=='All') list = list.filter(l=>l.category===activeCategory);
@@ -2096,7 +2218,17 @@ function getFilteredListings(){
     const q = searchQuery.trim().toLowerCase();
     list = list.filter(l=> (l.title+' '+l.description+' '+l.location).toLowerCase().includes(q));
   }
-  if(sortBy==='price-low') list = list.slice().sort((a,b)=>a.price-b.price);
+  if(activeArea!=='All') list = list.filter(l=>areaOf(l)===activeArea);
+
+  if(sortBy==='near'){
+    if(!myCoords){ askForLocation(); return list.slice().sort((a,b)=>b.createdAt-a.createdAt); }
+    list = list.slice().sort((a,b)=>{
+      const da = (a.lat && a.lng) ? kmBetween(myCoords, a) : Infinity;
+      const db = (b.lat && b.lng) ? kmBetween(myCoords, b) : Infinity;
+      return da - db;
+    });
+  }
+  else if(sortBy==='price-low') list = list.slice().sort((a,b)=>a.price-b.price);
   else if(sortBy==='price-high') list = list.slice().sort((a,b)=>b.price-a.price);
   else list = list.slice().sort((a,b)=>b.createdAt-a.createdAt);
   return list;
@@ -2115,6 +2247,11 @@ function renderGrid(){
   }
   wrap.innerHTML = list.map(l=>cardHTML(l)).join('');
 }
+function distanceLabel(l){
+  if(!myCoords || !l.lat || !l.lng) return '';
+  const km = kmBetween(myCoords, l);
+  return km < 1 ? ' \u00b7 under 1km' : ' \u00b7 ' + Math.round(km) + 'km away';
+}
 function cardHTML(l){
   const isFav = favorites.includes(l.id);
   const img = l.thumb || '';
@@ -2128,7 +2265,7 @@ function cardHTML(l){
     <div class="info">
       <div class="info-main">
         <div class="title">${esc(l.title)}</div>
-        <div class="meta">📍 ${esc(l.location)} · ${timeAgo(l.createdAt)}</div>
+        <div class="meta">📍 ${esc(l.location)}${distanceLabel(l)} · ${timeAgo(l.createdAt)}</div>
       </div>
       <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
         ${avatarHTML(l.seller, l.sellerName, 30)}
@@ -2636,6 +2773,8 @@ function openPostModal(listingToEdit){
     g('pMileage').value      = listingToEdit.mileage || '';
     g('pCategory').value     = listingToEdit.category || '';
     g('pLocation').value     = listingToEdit.location || '';
+    pickedLoc = (listingToEdit.lat && listingToEdit.lng)
+      ? { name: listingToEdit.location, lat: listingToEdit.lat, lng: listingToEdit.lng } : null;
     g('pDetails').value      = (listingToEdit.details || []).join('\n');
     g('pMods').value         = (listingToEdit.mods || []).join('\n');
     setFinancingFields(listingToEdit.financing);
@@ -2730,6 +2869,8 @@ async function handlePost(e){
     mileage:      Number(g('pMileage')),
     category:     g('pCategory'),
     location:     g('pLocation'),
+    lat:          pickedLoc ? pickedLoc.lat : null,
+    lng:          pickedLoc ? pickedLoc.lng : null,
     details:      lines('pDetails'),
     modifications:lines('pMods'),
     financing:    readFinancingField(),

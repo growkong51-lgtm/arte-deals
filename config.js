@@ -10,6 +10,10 @@ const ARTE_CONFIG = {
   cloudinaryCloud:  'rg0lr69y',
   cloudinaryPreset: 'arte_deals',
 
+  // Location search (MapTiler). Safe to be public, but lock it to your
+  // domain in the MapTiler dashboard so nobody else can spend your quota.
+  maptilerKey: 'r8lLo1jNAdPcZbvsWb55',
+
   // Raise this when the paid tier goes in. The real limit is the
   // listing_cap trigger in the database — change that too.
   maxListingsPerUser: 3
