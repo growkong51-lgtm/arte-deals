@@ -860,6 +860,41 @@ select.calc-box{
   .calc{padding:16px 14px;}
   .fin-title{font-size:26px;}
 }
+/* ---------- admin ---------- */
+.admin-gate{
+  max-width:400px; margin:40px auto; padding:30px 26px; text-align:center;
+  border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+}
+.admin-lock{
+  width:52px; height:52px; margin:0 auto 14px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(224,18,48,0.14); border:1px solid rgba(224,18,48,0.4); color:var(--red-2);
+}
+.admin-lock svg{width:24px; height:24px;}
+.admin-gate h2{font-size:24px; color:#fff; margin:0 0 5px;}
+.admin-gate p{font-size:13px; color:var(--muted); margin:0 0 20px;}
+.admin-gate .field{text-align:left;}
+.admin-head{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:20px; flex-wrap:wrap;}
+.admin-eyebrow{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:.3em;
+  text-transform:uppercase; color:var(--red-2); margin-bottom:2px;
+}
+.admin-title{font-size:32px; color:#fff; margin:0;}
+.admin-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px;}
+.admin-stats div{
+  padding:14px 12px; text-align:center; border:1px solid var(--line); border-radius:10px;
+  background:rgba(255,255,255,0.03);
+}
+.admin-stats b{display:block; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:26px; color:#fff;}
+.admin-stats span{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);}
+.admin-user{display:flex; align-items:center; gap:9px;}
+.admin-user span{color:#fff; font-size:13.5px;}
+.admin-user em{
+  font-style:normal; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--red-2); border:1px solid rgba(224,18,48,0.45); padding:1px 5px; margin-left:4px;
+}
+@media(max-width:520px){ .admin-title{font-size:25px;} }
 .msg-tabs{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
 .msg-tab{
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
@@ -1444,6 +1479,7 @@ function closeModal(id){
 
 /* Someone arriving on a shared link lands straight on that car. */
 async function openFromHash(){
+  if(location.hash === '#admin'){ go('admin'); return true; }
   const m = location.hash.match(/^#car=(.+)$/);
   if(!m) return false;
   const id = decodeURIComponent(m[1]);
@@ -1667,7 +1703,7 @@ async function resendSignupCode(){
 
 async function ensureProfile(user){
   const meta = user.user_metadata || {};
-  const { data: existing } = await sb.from('profiles').select('name,role').eq('id', user.id).single();
+  const { data: existing } = await sb.from('profiles').select('name,role,is_admin').eq('id', user.id).single();
   if(existing && existing.name){
     if(!existing.role){
       await sb.from('profiles').update({ role: meta.role || 'seller' }).eq('id', user.id);
@@ -1684,12 +1720,13 @@ async function loadSession(){
   const { data } = await sb.auth.getSession();
   const user = data && data.session ? data.session.user : null;
   if(user){
-    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role').eq('id', user.id).single();
+    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role,is_admin').eq('id', user.id).single();
     if(!prof || !prof.name){ prof = await ensureProfile(user); }
     currentUser = {
       username: user.id, email: user.email,
       name: prof.name || user.email,
       role: prof.role || 'seller',
+      isAdmin: !!prof.is_admin,
       avatar: prof ? prof.avatar_url : null,
       avatarChanges: prof ? (prof.avatar_changes || 0) : 0
     };
@@ -1855,7 +1892,7 @@ async function handleAuth(e){
       btn.textContent=label; btn.disabled=false; return false;
     }
     const prof = await ensureProfile(data.user);
-    currentUser = { username: data.user.id, email, name: prof.name, role: prof.role };
+    currentUser = { username: data.user.id, email, name: prof.name, role: prof.role, isAdmin: !!prof.is_admin };
     toast('Welcome back, '+currentUser.name+'!');
   }
 
@@ -1925,6 +1962,7 @@ function render(){
   if(currentRoute==='inbox') return renderInbox(app);
   if(currentRoute==='seller') return renderSellerProfile(app);
   if(currentRoute==='sellers') return renderSellersList(app);
+  if(currentRoute==='admin') return renderAdmin(app);
 }
 
 function renderPostPrompt(){
@@ -2187,6 +2225,172 @@ function openSeller(id){
   go('seller');
 }
 
+/* ================= ADMIN ================= */
+let adminTab = 'listings';
+let adminUsers = [];
+
+async function adminSignIn(e){
+  e.preventDefault();
+  const errEl = document.getElementById('adminErr'); errEl.innerHTML = '';
+  const email = document.getElementById('adminEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('adminPass').value;
+  const btn = document.getElementById('adminBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.textContent = 'Sign In'; btn.disabled = false;
+  if(error){
+    errEl.innerHTML = '<div class="err-msg">Incorrect email or password.</div>';
+    return false;
+  }
+  await loadSession();
+  if(!currentUser || !currentUser.isAdmin){
+    errEl.innerHTML = '<div class="err-msg">That account does not have admin access.</div>';
+    return false;
+  }
+  await loadListings();
+  await loadUserExtras();
+  renderAuthArea(); renderNavs();
+  renderAdmin(document.getElementById('app'));
+  return false;
+}
+
+async function loadAdminUsers(){
+  const { data } = await sb.from('profiles').select('id,name,role,is_admin,avatar_url');
+  adminUsers = data || [];
+}
+
+function renderAdmin(app){
+  if(!currentUser || !currentUser.isAdmin){
+    app.innerHTML = `<main>
+      <div class="admin-gate">
+        <div class="admin-lock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </div>
+        <h2 class="display">Admin Access</h2>
+        <p>Sign in with your administrator account.</p>
+        <div id="adminErr"></div>
+        <form onsubmit="return adminSignIn(event)">
+          <div class="field">
+            <label>Admin Email</label>
+            <input type="email" id="adminEmail" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="adminPass" autocomplete="current-password" required>
+              <button type="button" class="pw-eye" onclick="togglePw('adminPass', this)" aria-label="Show password">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-shut" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18.4 18.4 0 0 1 5.1-5.9"/><path d="M9.9 4.2A9.6 9.6 0 0 1 12 4c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg>
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="adminBtn">Sign In</button>
+        </form>
+        <div class="auth-switch"><b onclick="go('home')">Back to the site</b></div>
+      </div>
+    </main>`;
+    return;
+  }
+
+  if(!adminUsers.length) loadAdminUsers().then(()=>renderAdmin(app));
+  const sold = allListings.filter(l=>l.status==='sold').length;
+  app.innerHTML = `<main>
+    <div class="admin-head">
+      <div>
+        <div class="admin-eyebrow">Administrator</div>
+        <h2 class="display admin-title">Control Panel</h2>
+      </div>
+      <button class="veh-btn" onclick="go('home')">View Site</button>
+    </div>
+
+    <div class="admin-stats">
+      <div><b>${allListings.length}</b><span>Listings</span></div>
+      <div><b>${sold}</b><span>Sold</span></div>
+      <div><b>${adminUsers.length}</b><span>Users</span></div>
+    </div>
+
+    <div class="msg-tabs">
+      <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
+      <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+    </div>
+
+    <div id="adminBody">${adminTab==='listings' ? adminListingsHTML() : adminUsersHTML()}</div>
+  </main>`;
+}
+
+function setAdminTab(t){
+  adminTab = t;
+  renderAdmin(document.getElementById('app'));
+  if(t === 'users' && !adminUsers.length){
+    loadAdminUsers().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+function adminListingsHTML(){
+  const rows = allListings.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  if(!rows.length) return '<div class="empty">No listings yet.</div>';
+  return `<div class="veh-scroll"><table class="veh-table">
+    <thead><tr><th>Photo</th><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows.map(l=>`
+      <tr>
+        <td><img class="veh-thumb" src="${cldUrl(l.thumb||'','w_160,c_fill,q_auto,f_auto')}" alt="" onclick="openDetail('${l.id}')"></td>
+        <td class="veh-name" onclick="openDetail('${l.id}')">${esc(l.title)}</td>
+        <td>${esc(l.sellerName||'\u2014')}</td>
+        <td class="veh-price">${fmtPrice(l.price)}</td>
+        <td><span class="veh-status ${l.status==='sold'?'sold':'available'}">${l.status==='sold'?'Sold':'Active'}</span></td>
+        <td><div class="veh-actions">
+          <button class="veh-btn" onclick="toggleSold('${l.id}')">${l.status==='sold'?'Relist':'Mark Sold'}</button>
+          <button class="veh-btn danger" onclick="adminRemove('${l.id}')">Remove</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table></div>`;
+}
+
+function adminUsersHTML(){
+  if(!adminUsers.length) return '<div class="empty">Loading users...</div>';
+  const rows = adminUsers.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  return `<div class="veh-scroll"><table class="veh-table">
+    <thead><tr><th>User</th><th>Role</th><th>Listings</th><th>Actions</th></tr></thead>
+    <tbody>${rows.map(u=>{
+      const count = allListings.filter(l=>l.seller===u.id).length;
+      return `<tr>
+        <td><div class="admin-user">${avatarHTML(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
+        <td><span class="veh-status ${u.role==='buyer'?'available':'sold'}">${u.role==='buyer'?'Buyer':'Seller'}</span></td>
+        <td>${count}</td>
+        <td><div class="veh-actions">
+          <button class="veh-btn" onclick="openSeller('${u.id}')">View</button>
+          <button class="veh-btn" onclick="adminMessage('${u.id}')">Message</button>
+          <button class="veh-btn" onclick="adminToggleRole('${u.id}')">Make ${u.role==='buyer'?'Seller':'Buyer'}</button>
+        </div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+
+async function adminRemove(id){
+  const l = allListings.find(x=>x.id===id);
+  if(!confirm('Remove "'+(l?l.title:'this listing')+'" permanently? The seller is not notified.')) return;
+  const { error } = await sb.from('listings').delete().eq('id', id);
+  if(error){ dbFail(error, 'Could not remove that listing'); return; }
+  allListings = allListings.filter(x=>x.id!==id);
+  toast('Listing removed');
+  renderAdmin(document.getElementById('app'));
+}
+
+async function adminToggleRole(userId){
+  const u = adminUsers.find(x=>x.id===userId); if(!u) return;
+  const next = u.role === 'buyer' ? 'seller' : 'buyer';
+  if(!confirm('Change ' + (u.name||'this user') + ' to a ' + next + ' account?')) return;
+  const { error } = await sb.from('profiles').update({ role: next }).eq('id', userId);
+  if(error){ dbFail(error, 'Could not change that account'); return; }
+  u.role = next;
+  toast('Account updated');
+  renderAdmin(document.getElementById('app'));
+}
+
+function adminMessage(userId){
+  const theirs = allListings.filter(l=>l.seller===userId);
+  openChat(userId, theirs.length ? theirs[0].id : null);
+}
+
 function renderSellersList(app){
   const ids = [...new Set(allListings.map(l=>l.seller))];
   const sellers = ids.map(id=>{
@@ -2275,7 +2479,7 @@ function renderFavorites(app){
 }
 
 /* ---- INBOX ---- */
-function conversationKey(m){ return (m.mine ? m.to : m.from) + '|' + m.listingId; }
+function conversationKey(m){ return (m.mine ? m.to : m.from) + '|' + (m.listingId || 'direct'); }
 function buildConversations(){
   const map = {};
   inbox.forEach(m=>{
@@ -2301,14 +2505,14 @@ function renderInbox(app){
   app.innerHTML = `<main>
     <div class="section-head"><h2 class="metal-text">Messages</h2></div>
     ${convos.length ? convos.map(c=>`
-      <div class="convo-row ${c.unread?'unread':''}" onclick="openChat('${c.peer}','${c.listingId}')">
+      <div class="convo-row ${c.unread?'unread':''}" onclick="openChat('${c.peer}','${c.listingId || 'direct'}')">
         ${avatarHTML(c.peer, c.peerName, 46)}
         <div class="convo-body">
           <div class="convo-top">
             <span class="convo-name">${esc(c.peerName)}</span>
             <span class="convo-time">${timeAgo(c.last.date)}</span>
           </div>
-          <div class="convo-listing">${esc(c.listingTitle)}</div>
+          <div class="convo-listing">${esc(c.listingTitle || 'Direct message')}</div>
           <div class="convo-preview">${c.last.mine?'<span class="msg-you">You:</span> ':''}${esc(c.last.text)}</div>
         </div>
         ${c.unread?`<span class="convo-dot">${c.unread}</span>`:''}
@@ -2701,6 +2905,7 @@ function openMessage(listingId){
   openChat(l.seller, listingId);
 }
 function openChat(peerId, listingId){
+  if(listingId === null || listingId === undefined) listingId = 'direct';
   if(!currentUser){ openAuth('signup'); return; }
   chatPeerId = peerId; chatListingId = listingId;
   document.getElementById('msgText').value = '';
@@ -2718,7 +2923,7 @@ function closeChat(){
 }
 function chatMessages(){
   return inbox
-    .filter(m => m.listingId===chatListingId && (m.from===chatPeerId || m.to===chatPeerId))
+    .filter(m => (m.listingId || 'direct')===chatListingId && (m.from===chatPeerId || m.to===chatPeerId))
     .sort((a,b)=>a.date-b.date);
 }
 function renderChat(){
@@ -2826,8 +3031,8 @@ async function sendMessage(e){
     to_user: chatPeerId,
     from_user: currentUser.username,
     from_name: currentUser.name,
-    listing_id: chatListingId,
-    listing_title: listing ? listing.title : '',
+    listing_id: chatListingId === 'direct' ? null : chatListingId,
+    listing_title: listing ? listing.title : 'Direct message',
     body: text
   });
   if(error){
