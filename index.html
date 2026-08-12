@@ -1393,14 +1393,16 @@ function closeModal(id){
 }
 
 /* Someone arriving on a shared link lands straight on that car. */
-function openFromHash(){
+async function openFromHash(){
   const m = location.hash.match(/^#car=(.+)$/);
-  if(m){
-    const id = decodeURIComponent(m[1]);
-    if(allListings.some(x=>x.id===id)){ openDetail(id, true); return true; }
-    toast('That listing is no longer available');
-    history.replaceState({}, '', location.pathname);
+  if(!m) return false;
+  const id = decodeURIComponent(m[1]);
+  if(allListings.some(x=>x.id===id)){
+    await openDetail(id, true);
+    return true;
   }
+  toast('That listing is no longer available');
+  history.replaceState({}, '', location.pathname);
   return false;
 }
 
@@ -2315,12 +2317,16 @@ async function openDetail(id, skipHash){
   currentDetailListing = l;
   currentGalleryIdx = 0;
   const body = document.getElementById('detailBody');
-  body.innerHTML = `<div class="center-load"><span class="spinner"></span> Loading photos...</div>`;
-  openModal('detailOverlay');
+  const booting = document.getElementById('bootScreen').classList.contains('on');
+  if(!booting){
+    body.innerHTML = `<div class="center-load"><span class="spinner"></span> Loading photos...</div>`;
+    openModal('detailOverlay');
+  }
   const { data: imgRow } = await sb.from('listings').select('images').eq('id', id).single();
   currentDetailImages = (imgRow && imgRow.images && imgRow.images.length) ? imgRow.images : (l.thumb?[l.thumb]:[]);
   setTimeout(()=>{ attachSwipe(); downMode='pct'; runCalc(); }, 0);
   renderDetail();
+  if(booting) openModal('detailOverlay');
 }
 function renderDetail(){
   const l = currentDetailListing;
@@ -2681,8 +2687,8 @@ async function init(){
   await loadListings();
   if(currentUser) await loadUserExtras();
   go('home');
+  await openFromHash();      // a shared link resolves under the loading screen
   await hideBoot(bootStart);
-  openFromHash();
 }
 document.addEventListener('click', (e)=>{
   document.querySelectorAll('.overlay').forEach(ov=>{ if(e.target===ov) closeModal(ov.id); });
