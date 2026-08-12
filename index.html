@@ -702,12 +702,15 @@ select.calc-box{
 .chat-peer-text{display:flex; flex-direction:column; gap:1px; min-width:0;}
 .stl-seen, .convo-seen{margin-top:4px;}
 .pc-seen{margin-top:6px;}
-.cs-av{position:relative; display:inline-flex; flex-shrink:0;}
-.card-seller.is-live .cs-av::after{
-  content:''; position:absolute; right:-1px; bottom:-1px;
-  width:9px; height:9px; border-radius:50%;
-  background:#39d98a; border:2px solid #101014;
+.av-wrap{position:relative; display:inline-flex; flex-shrink:0;}
+.av-wrap::after{
+  content:''; position:absolute; right:0; bottom:0;
+  width:var(--dot,9px); height:var(--dot,9px); border-radius:50%;
+  border:2px solid #101014; display:block;
 }
+.av-wrap.live::after{background:#39d98a; box-shadow:0 0 8px rgba(57,217,138,0.85);}
+.av-wrap.away::after{background:#6b6f77;}
+.av-wrap.none::after{display:none;}
 .sp-seen{margin-top:5px;}
 .sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
 .seller-link:hover .sb-arrow{color:var(--red-2);}
@@ -1514,6 +1517,15 @@ function presenceHTML(userId, cls){
   return `<span class="presence ${p.on?'on':''} ${cls||''}"><i></i>${p.text}</span>`;
 }
 
+/* Avatar with a status dot: green when active, grey when not,
+   nothing at all if they have never signed in. */
+function avatarStatus(userId, name, size){
+  const p = presenceText(userId);
+  const state = !p ? 'none' : (p.on ? 'live' : 'away');
+  return `<span class="av-wrap ${state}" style="--dot:${Math.max(8, Math.round(size*0.3))}px">`
+       + avatarHTML(userId, name, size) + `</span>`;
+}
+
 function avatarHTML(userId, name, size, cls){
   const prof = sellerProfiles[userId];
   const url  = (currentUser && currentUser.username===userId) ? currentUser.avatar : (prof && prof.avatar_url);
@@ -2115,7 +2127,7 @@ function cardHTML(l){
         <div class="meta">📍 ${esc(l.location)} · ${timeAgo(l.createdAt)}</div>
       </div>
       <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
-        ${avatarHTML(l.seller, l.sellerName, 30)}
+        ${avatarStatus(l.seller, l.sellerName, 30)}
         <span class="cs-text">
           <span class="cs-name">${esc(l.sellerName)}</span>
           ${presenceHTML(l.seller, 'tiny')}
@@ -2423,7 +2435,7 @@ function adminUsersHTML(){
     <tbody>${rows.map(u=>{
       const count = allListings.filter(l=>l.seller===u.id).length;
       return `<tr>
-        <td><div class="admin-user">${avatarHTML(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
+        <td><div class="admin-user">${avatarStatus(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
         <td>${presenceHTML(u.id) || '<span class="presence"><i></i>Never signed in</span>'}</td>
         <td><span class="veh-status ${u.role==='buyer'?'available':'sold'}">${u.role==='buyer'?'Buyer':'Seller'}</span></td>
         <td>${count}</td>
@@ -2483,7 +2495,7 @@ function renderSellersList(app){
     <div class="section-head"><h2 class="metal-text">Sellers</h2></div>
     ${sellers.length ? `<div class="sellers-grid">${sellers.map(sl=>`
       <div class="seller-tile" onclick="openSeller('${sl.id}')">
-        ${avatarHTML(sl.id, sl.name, 62)}
+        ${avatarStatus(sl.id, sl.name, 62)}
         <div class="stl-body">
           <div class="stl-name">${esc(sl.name)}</div>
           <div class="stl-stats">
@@ -2515,7 +2527,7 @@ function renderSellerProfile(app){
     </button>
 
     <div class="sp-head">
-      ${avatarHTML(viewingSeller, name, 92)}
+      ${avatarStatus(viewingSeller, name, 92)}
       <div class="sp-body">
         <h2 class="display sp-name">${esc(name)}</h2>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
@@ -2578,7 +2590,7 @@ function renderInbox(app){
     <div class="section-head"><h2 class="metal-text">Messages</h2></div>
     ${convos.length ? convos.map(c=>`
       <div class="convo-row ${c.unread?'unread':''}" onclick="openChat('${c.peer}','${c.listingId || 'direct'}')">
-        ${avatarHTML(c.peer, c.peerName, 46)}
+        ${avatarStatus(c.peer, c.peerName, 46)}
         <div class="convo-body">
           <div class="convo-top">
             <span class="convo-name">${esc(c.peerName)}</span>
@@ -2916,7 +2928,7 @@ function renderDetail(){
         </div>
       </div>`}
       <div class="seller-box seller-link" onclick="openSeller('${l.seller}')">
-        ${avatarHTML(l.seller, l.sellerName, 40)}
+        ${avatarStatus(l.seller, l.sellerName, 40)}
         <div class="sb-body">
           <div class="sb-name">${esc(l.sellerName)}</div>
           <div class="sb-sub">${presenceHTML(l.seller) || 'View seller profile'}</div>
