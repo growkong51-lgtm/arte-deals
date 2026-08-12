@@ -1753,6 +1753,7 @@ async function verifySignupCode(e){
   currentUser = { username: data.user.id, email: otpEmail, name: prof.name, role: prof.role };
   cancelOtp();
   closeModal('authOverlay');
+  startPresence();
   toast('Welcome to ARTE DEALS, ' + currentUser.name + '!');
   renderAuthArea();
   renderNavs();
@@ -1970,6 +1971,7 @@ async function handleAuth(e){
   }
 
   btn.textContent=label; btn.disabled=false;
+  startPresence();
   renderAuthArea();
   renderNavs();
   closeModal('authOverlay');
@@ -1980,6 +1982,8 @@ async function handleAuth(e){
   return false;
 }
 async function logout(){
+  if(seenTimer){ clearInterval(seenTimer); seenTimer = null; }
+  await touchLastSeen();
   await sb.auth.signOut();
   currentUser = null; favorites=[]; inbox=[];
   renderAuthArea();
@@ -2327,6 +2331,7 @@ async function adminSignIn(e){
   }
   await loadListings();
   await loadUserExtras();
+  startPresence();
   renderAuthArea(); renderNavs();
   renderAdmin(document.getElementById('app'));
   return false;
@@ -3185,6 +3190,10 @@ async function init(){
 document.addEventListener('click', (e)=>{
   document.querySelectorAll('.overlay').forEach(ov=>{ if(e.target===ov) closeModal(ov.id); });
 });
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden && currentUser) touchLastSeen();
+});
+
 window.addEventListener('popstate', ()=>{
   const open = document.getElementById('detailOverlay').classList.contains('show');
   if(location.hash.indexOf('#car=') === 0){ openFromHash(); }
