@@ -1613,15 +1613,16 @@ async function verifySignupCode(e){
   const btn = document.getElementById('otpBtn');
   btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
 
-  const { data, error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'email' });
+  // Supabase names this flow 'signup'; older projects answer to 'email'.
+  let { data, error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'signup' });
+  if(error){
+    const second = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'email' });
+    if(!second.error){ data = second.data; error = null; }
+  }
   btn.textContent = 'Verify & Continue'; btn.disabled = false;
 
   if(error){
-    errEl.innerHTML = '<div class="err-msg">'
-      + (error.message && /expired/i.test(error.message)
-          ? 'That code has expired. Tap "Send a new code" below.'
-          : 'That code is not right. Check it and try again.')
-      + '</div>';
+    errEl.innerHTML = '<div class="err-msg">That code did not work. It may have expired, or been used already \u2014 tap "Send a new code" below and use the newest email.</div>';
     return false;
   }
 
