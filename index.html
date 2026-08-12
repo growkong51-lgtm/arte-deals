@@ -688,6 +688,16 @@ select.calc-box{
 .sb-body{flex:1; min-width:0;}
 .sb-name{font-family:'Rajdhani',sans-serif; font-weight:600; font-size:16px; letter-spacing:.015em; color:#fff;}
 .sb-sub{font-size:11.5px; color:var(--muted); margin-top:1px;}
+.presence{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; color:var(--muted);}
+.presence i{
+  width:7px; height:7px; border-radius:50%; background:var(--muted);
+  flex-shrink:0; display:inline-block;
+}
+.presence.on{color:#39d98a;}
+.presence.on i{background:#39d98a; box-shadow:0 0 7px rgba(57,217,138,0.9);}
+.presence.small{font-size:11px;}
+.chat-peer-text{display:flex; flex-direction:column; gap:1px; min-width:0;}
+.sp-seen{margin-top:5px;}
 .sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
 .seller-link:hover .sb-arrow{color:var(--red-2);}
 
@@ -1454,6 +1464,45 @@ function timeAgo(ts){
   return Math.floor(s/86400)+'d ago';
 }
 function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+/* A quiet heartbeat while the tab is open, so "active now" means something. */
+let seenTimer = null;
+async function touchLastSeen(){
+  if(!currentUser) return;
+  await sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.username);
+  const mine = sellerProfiles[currentUser.username];
+  if(mine) mine.last_seen = new Date().toISOString();
+}
+function startPresence(){
+  if(seenTimer) clearInterval(seenTimer);
+  touchLastSeen();
+  seenTimer = setInterval(()=>{ if(!document.hidden) touchLastSeen(); }, 60000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) touchLastSeen(); });
+}
+
+/* How recently someone was here, in words. */
+function presenceText(userId){
+  const prof = sellerProfiles[userId];
+  const iso = (currentUser && currentUser.username===userId)
+    ? new Date().toISOString()
+    : (prof && prof.last_seen);
+  if(!iso) return null;
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if(mins < 0)   return { on:true,  text:'Active now' };
+  if(mins < 3)   return { on:true,  text:'Active now' };
+  if(mins < 60)  return { on:false, text:'Active ' + mins + 'm ago' };
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24)   return { on:false, text:'Active ' + hrs + 'h ago' };
+  const days = Math.floor(hrs/24);
+  if(days === 1) return { on:false, text:'Active yesterday' };
+  if(days < 7)   return { on:false, text:'Active ' + days + 'd ago' };
+  return { on:false, text:'Active a while ago' };
+}
+function presenceHTML(userId, cls){
+  const p = presenceText(userId);
+  if(!p) return '';
+  return `<span class="presence ${p.on?'on':''} ${cls||''}"><i></i>${p.text}</span>`;
+}
+
 function avatarHTML(userId, name, size, cls){
   const prof = sellerProfiles[userId];
   const url  = (currentUser && currentUser.username===userId) ? currentUser.avatar : (prof && prof.avatar_url);
@@ -1735,6 +1784,7 @@ async function loadSession(){
   }
   renderAuthArea();
   renderNavs();
+  if(currentUser) startPresence();
 }
 function renderAuthArea(){
   const el = document.getElementById('authArea');
@@ -1936,7 +1986,7 @@ async function loadListings(){
   const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
   allListings = (data || []).map(rowToListing);
-  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url');
+  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen');
   sellerProfiles = {};
   (profs || []).forEach(pr => { sellerProfiles[pr.id] = pr; });
 }
@@ -2448,6 +2498,7 @@ function renderSellerProfile(app){
       <div class="sp-body">
         <h2 class="display sp-name">${esc(name)}</h2>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
           <span><b>${active}</b> Active</span>
           <span class="sp-sep"></span>
@@ -2846,7 +2897,7 @@ function renderDetail(){
         ${avatarHTML(l.seller, l.sellerName, 40)}
         <div class="sb-body">
           <div class="sb-name">${esc(l.sellerName)}</div>
-          <div class="sb-sub">View seller profile</div>
+          <div class="sb-sub">${presenceHTML(l.seller) || 'View seller profile'}</div>
         </div>
         <svg class="sb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
@@ -2933,7 +2984,11 @@ function renderChat(){
   const listing  = allListings.find(x=>x.id===chatListingId);
 
   document.getElementById('chatPeer').innerHTML =
-    `${avatarHTML(chatPeerId, peerName, 34)}<span class="chat-peer-name">${esc(peerName)}</span>`;
+    `${avatarHTML(chatPeerId, peerName, 34)}
+     <div class="chat-peer-text">
+       <span class="chat-peer-name">${esc(peerName)}</span>
+       ${presenceHTML(chatPeerId, 'small')}
+     </div>`;
 
   document.getElementById('chatListing').innerHTML = listing
     ? `<img src="${cldUrl(listing.thumb||'','w_120,c_fill,q_auto,f_auto')}" alt="">
