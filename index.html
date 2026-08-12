@@ -637,7 +637,41 @@ select.calc-box{
 .detail-info h2{font-family:'Rajdhani',sans-serif; font-weight:600; font-size:26px; line-height:1.22; letter-spacing:.015em; margin-top:8px; text-transform:none;}
 .pill-row{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0;}
 .pill{background:rgba(255,255,255,0.06); border:1px solid var(--line); padding:6px 12px; border-radius:999px; font-size:12px; color:var(--silver);}
-.seller-box{display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; margin:16px 0;}
+.seller-box{display:flex; align-items:center; gap:11px; padding:13px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; margin:16px 0;}
+.seller-link{cursor:pointer; transition:border-color .18s ease, background .18s ease;}
+.seller-link:hover{border-color:rgba(201,204,209,0.34); background:rgba(255,255,255,0.055);}
+.sb-body{flex:1; min-width:0;}
+.sb-name{font-family:'Rajdhani',sans-serif; font-weight:600; font-size:16px; letter-spacing:.015em; color:#fff;}
+.sb-sub{font-size:11.5px; color:var(--muted); margin-top:1px;}
+.sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
+.seller-link:hover .sb-arrow{color:var(--red-2);}
+
+/* ---------- seller profile page ---------- */
+.back-link{
+  display:inline-flex; align-items:center; gap:6px; margin-bottom:18px; cursor:pointer;
+  background:none; border:none; padding:0; color:var(--muted);
+  font-size:12.5px; letter-spacing:.06em; transition:color .18s ease;
+}
+.back-link svg{width:16px; height:16px;}
+.back-link:hover{color:var(--red-2);}
+.sp-head{
+  display:flex; align-items:center; gap:20px; padding:22px 20px; margin-bottom:26px;
+  border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+}
+.sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
+.sp-body{min-width:0;}
+.sp-name{font-size:27px; color:#fff; margin:0; text-transform:none; letter-spacing:.015em;}
+.sp-role{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:3px;}
+.sp-stats{display:flex; align-items:center; gap:12px; margin-top:11px; font-size:13px; color:var(--muted);}
+.sp-stats b{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px; color:#fff; margin-right:3px;}
+.sp-sep{width:1px; height:14px; background:var(--line);}
+.sp-msg{margin-top:14px;}
+@media(max-width:520px){
+  .sp-head{gap:15px; padding:18px 15px;}
+  .sp-name{font-size:22px;}
+  .sp-head .avatar{width:70px !important; height:70px !important; font-size:25px !important;}
+}
 .avatar{width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-family:'Rajdhani'; color:#fff; flex-shrink:0;}
 .desc{color:var(--silver); font-size:13.5px; line-height:1.6; white-space:pre-wrap;}
 
@@ -857,6 +891,10 @@ footer{
   border-top:1px solid var(--line); padding:30px 26px 38px; text-align:left;
   color:var(--muted); font-size:12.5px; line-height:1.85;
 }
+/* the fixed bottom bar would otherwise sit on top of the last lines */
+@media(max-width:860px){
+  footer{padding-bottom:calc(104px + env(safe-area-inset-bottom));}
+}
 .ft-copy{color:var(--silver); font-size:13px; margin-bottom:3px;}
 .ft-line a{color:var(--muted); text-decoration:none; transition:color .18s ease;}
 .ft-line a:hover{color:var(--red-2);}
@@ -926,7 +964,7 @@ footer{
 <div class="bottom-nav" id="bottomNav"></div>
 
 <footer>
-  <div class="ft-copy">&copy; 2023 ARTE DEALS. All rights reserved.</div>
+  <div class="ft-copy">2023 ARTE DEALS. All rights reserved.</div>
   <div class="ft-line">Metro Manila, Makati Philippines</div>
   <div class="ft-line"><a href="mailto:artedeals@gmail.com">artedeals@gmail.com</a></div>
 </footer>
@@ -1665,6 +1703,7 @@ function render(){
   if(currentRoute==='my') return renderMyListings(app);
   if(currentRoute==='favorites') return renderFavorites(app);
   if(currentRoute==='inbox') return renderInbox(app);
+  if(currentRoute==='seller') return renderSellerProfile(app);
 }
 
 function renderPostPrompt(){
@@ -1913,6 +1952,57 @@ async function deleteListing(id){
 }
 
 /* ---- FAVORITES ---- */
+let viewingSeller = null;
+
+function openSeller(id){
+  closeModal('detailOverlay');
+  viewingSeller = id;
+  go('seller');
+}
+
+function renderSellerProfile(app){
+  if(!viewingSeller){ go('home'); return; }
+  const prof = sellerProfiles[viewingSeller] || {};
+  const theirs = allListings.filter(l=>l.seller===viewingSeller)
+                            .sort((a,b)=>b.createdAt-a.createdAt);
+  const name = prof.name || (theirs[0] && theirs[0].sellerName) || 'Seller';
+  const active = theirs.filter(l=>l.status!=='sold').length;
+  const sold   = theirs.filter(l=>l.status==='sold').length;
+  const isMe   = currentUser && currentUser.username === viewingSeller;
+
+  app.innerHTML = `<main>
+    <button class="back-link" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to listings
+    </button>
+
+    <div class="sp-head">
+      ${avatarHTML(viewingSeller, name, 92)}
+      <div class="sp-body">
+        <h2 class="display sp-name">${esc(name)}</h2>
+        <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        <div class="sp-stats">
+          <span><b>${active}</b> Active</span>
+          <span class="sp-sep"></span>
+          <span><b>${sold}</b> Sold</span>
+        </div>
+        ${(!isMe && currentUser) ? `<button class="btn btn-metal btn-sm sp-msg" onclick="messageSellerFromProfile()">Message Seller</button>` : ''}
+      </div>
+    </div>
+
+    <div class="section-head"><h2 class="metal-text">Listings by ${esc(name)}</h2></div>
+    ${theirs.length
+      ? `<div class="grid">${theirs.map(cardHTML).join('')}</div>`
+      : `<div class="empty">This seller has no listings right now.</div>`}
+  </main>`;
+}
+
+function messageSellerFromProfile(){
+  const theirs = allListings.filter(l=>l.seller===viewingSeller);
+  if(!theirs.length){ toast('This seller has no listings to message about'); return; }
+  openChat(viewingSeller, theirs[0].id);
+}
+
 function renderFavorites(app){
   const list = allListings.filter(l=>favorites.includes(l.id));
   app.innerHTML = `<main>
@@ -2248,12 +2338,13 @@ function renderDetail(){
           </p>
         </div>
       </div>`}
-      <div class="seller-box">
+      <div class="seller-box seller-link" onclick="openSeller('${l.seller}')">
         ${avatarHTML(l.seller, l.sellerName, 40)}
-        <div>
-          <div style="font-weight:600; font-size:13.5px;">${esc(l.sellerName)}</div>
-          <div style="font-size:11.5px; color:var(--muted);">Seller</div>
+        <div class="sb-body">
+          <div class="sb-name">${esc(l.sellerName)}</div>
+          <div class="sb-sub">View seller profile</div>
         </div>
+        <svg class="sb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       ${isOwner
         ? `<div style="display:flex; gap:8px;">
