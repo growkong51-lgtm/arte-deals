@@ -697,6 +697,14 @@ select.calc-box{
 .presence.on i{background:#39d98a; box-shadow:0 0 7px rgba(57,217,138,0.9);}
 .presence.small{font-size:11px;}
 .chat-peer-text{display:flex; flex-direction:column; gap:1px; min-width:0;}
+.stl-seen, .convo-seen{margin-top:4px;}
+.pc-seen{margin-top:6px;}
+.cs-av{position:relative; display:inline-flex; flex-shrink:0;}
+.card-seller.is-live .cs-av::after{
+  content:''; position:absolute; right:-1px; bottom:-1px;
+  width:9px; height:9px; border-radius:50%;
+  background:#39d98a; border:2px solid #101014;
+}
 .sp-seen{margin-top:5px;}
 .sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
 .seller-link:hover .sb-arrow{color:var(--red-2);}
@@ -2103,8 +2111,8 @@ function cardHTML(l){
         <div class="title">${esc(l.title)}</div>
         <div class="meta">📍 ${esc(l.location)} · ${timeAgo(l.createdAt)}</div>
       </div>
-      <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
-        ${avatarHTML(l.seller, l.sellerName, 28)}
+      <div class="card-seller ${(presenceText(l.seller)||{}).on ? 'is-live' : ''}" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)} \u2014 ${(presenceText(l.seller)||{}).text || 'seller'}">
+        <span class="cs-av">${avatarHTML(l.seller, l.sellerName, 28)}</span>
         <span class="cs-name">${esc(l.sellerName)}</span>
       </div>
     </div>
@@ -2143,6 +2151,7 @@ function renderMyListings(app){
       <div class="pc-body">
         <div class="pc-name">${esc(currentUser.name)}</div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
+        <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
         <div class="pc-actions">
           ${canChange
             ? `<label class="veh-btn pc-upload">
@@ -2306,8 +2315,12 @@ async function adminSignIn(e){
 }
 
 async function loadAdminUsers(){
-  const { data } = await sb.from('profiles').select('id,name,role,is_admin,avatar_url');
+  const { data } = await sb.from('profiles').select('id,name,role,is_admin,avatar_url,last_seen');
   adminUsers = data || [];
+  adminUsers.forEach(u=>{
+    if(!sellerProfiles[u.id]) sellerProfiles[u.id] = u;
+    else sellerProfiles[u.id].last_seen = u.last_seen;
+  });
 }
 
 function renderAdmin(app){
@@ -2400,11 +2413,12 @@ function adminUsersHTML(){
   if(!adminUsers.length) return '<div class="empty">Loading users...</div>';
   const rows = adminUsers.slice().sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   return `<div class="veh-scroll"><table class="veh-table">
-    <thead><tr><th>User</th><th>Role</th><th>Listings</th><th>Actions</th></tr></thead>
+    <thead><tr><th>User</th><th>Status</th><th>Role</th><th>Listings</th><th>Actions</th></tr></thead>
     <tbody>${rows.map(u=>{
       const count = allListings.filter(l=>l.seller===u.id).length;
       return `<tr>
         <td><div class="admin-user">${avatarHTML(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
+        <td>${presenceHTML(u.id) || '<span class="presence"><i></i>Never signed in</span>'}</td>
         <td><span class="veh-status ${u.role==='buyer'?'available':'sold'}">${u.role==='buyer'?'Buyer':'Seller'}</span></td>
         <td>${count}</td>
         <td><div class="veh-actions">
@@ -2470,6 +2484,7 @@ function renderSellersList(app){
             <span><b>${sl.active}</b> Active</span>
             ${sl.sold ? `<span class="sp-sep"></span><span><b>${sl.sold}</b> Sold</span>` : ''}
           </div>
+          ${presenceHTML(sl.id) ? '<div class="stl-seen">'+presenceHTML(sl.id)+'</div>' : ''}
         </div>
         <svg class="sb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </div>`).join('')}</div>`
@@ -2564,6 +2579,7 @@ function renderInbox(app){
             <span class="convo-time">${timeAgo(c.last.date)}</span>
           </div>
           <div class="convo-listing">${esc(c.listingTitle || 'Direct message')}</div>
+          ${presenceHTML(c.peer) ? '<div class="convo-seen">'+presenceHTML(c.peer)+'</div>' : ''}
           <div class="convo-preview">${c.last.mine?'<span class="msg-you">You:</span> ':''}${esc(c.last.text)}</div>
         </div>
         ${c.unread?`<span class="convo-dot">${c.unread}</span>`:''}
