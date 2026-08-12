@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>ARTE DEALS — Premium Vehicle Marketplace</title>
+<meta name="description" content="The premium marketplace for buying and selling vehicles — real sellers, real listings, zero hassle. Metro Manila, Philippines.">
+
+<!-- How the link looks when shared on Facebook, Messenger, Viber and the rest -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ARTE DEALS">
+<meta property="og:title" content="ARTE DEALS — Premium Vehicle Marketplace">
+<meta property="og:description" content="Browse cars from real sellers across Metro Manila. Financing estimates, direct messaging, zero hassle.">
+<meta property="og:url" content="https://growkong51-lgtm.github.io/arte-deals/">
+<meta property="og:image" content="https://growkong51-lgtm.github.io/arte-deals/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_PH">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ARTE DEALS — Premium Vehicle Marketplace">
+<meta name="twitter:description" content="Browse cars from real sellers across Metro Manila. Financing estimates, direct messaging, zero hassle.">
+<meta name="twitter:image" content="https://growkong51-lgtm.github.io/arte-deals/og-image.png">
+
+<meta name="theme-color" content="#07070a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1366,7 +1385,24 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 function esc(s){ const d=document.createElement('div'); d.textContent=s??''; return d.innerHTML; }
 
 function openModal(id){ document.getElementById(id).classList.add('show'); }
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+  if(id === 'detailOverlay' && location.hash.indexOf('#car=') === 0){
+    history.pushState({}, '', location.pathname + location.search);
+  }
+}
+
+/* Someone arriving on a shared link lands straight on that car. */
+function openFromHash(){
+  const m = location.hash.match(/^#car=(.+)$/);
+  if(m){
+    const id = decodeURIComponent(m[1]);
+    if(allListings.some(x=>x.id===id)){ openDetail(id, true); return true; }
+    toast('That listing is no longer available');
+    history.replaceState({}, '', location.pathname);
+  }
+  return false;
+}
 
 /* ================= BACKEND (SUPABASE) ================= */
 const sb = window.supabase.createClient(ARTE_CONFIG.supabaseUrl, ARTE_CONFIG.supabaseAnonKey);
@@ -2270,9 +2306,12 @@ async function handlePost(e){
 }
 
 /* ---- DETAIL MODAL ---- */
-async function openDetail(id){
+async function openDetail(id, skipHash){
   const l = allListings.find(x=>x.id===id);
   if(!l) return;
+  if(!skipHash && location.hash !== '#car=' + id){
+    history.pushState({car:id}, '', '#car=' + id);
+  }
   currentDetailListing = l;
   currentGalleryIdx = 0;
   const body = document.getElementById('detailBody');
@@ -2643,10 +2682,17 @@ async function init(){
   if(currentUser) await loadUserExtras();
   go('home');
   await hideBoot(bootStart);
+  openFromHash();
 }
 document.addEventListener('click', (e)=>{
   document.querySelectorAll('.overlay').forEach(ov=>{ if(e.target===ov) closeModal(ov.id); });
 });
+window.addEventListener('popstate', ()=>{
+  const open = document.getElementById('detailOverlay').classList.contains('show');
+  if(location.hash.indexOf('#car=') === 0){ openFromHash(); }
+  else if(open){ document.getElementById('detailOverlay').classList.remove('show'); }
+});
+
 sb.auth.onAuthStateChange((event)=>{
   if(event==='PASSWORD_RECOVERY'){ openNewPassword(); return; }
   if(event==='SIGNED_OUT' && currentUser){ currentUser=null; favorites=[]; inbox=[]; renderAuthArea(); renderNavs(); go('home'); }
