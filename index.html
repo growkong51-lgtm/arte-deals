@@ -345,25 +345,24 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .status-dot.active{background:#2ecc71; box-shadow:0 0 6px rgba(46,204,113,0.8);}
 .status-dot.sold{background:var(--muted);}
 .fav-btn{
-  position:absolute; top:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none;
+  position:absolute; bottom:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none;
   background:rgba(0,0,0,0.62); display:flex; align-items:center; justify-content:center; color:#fff;
   transition:transform .15s ease;
 }
 .fav-btn:hover{transform:scale(1.12);}
 .fav-btn.active{color:var(--red-2);}
-.card .info{padding:12px 14px 14px;}
-/* the seller, sitting on the photo where the eye lands last */
+.card .info{padding:12px 14px 14px; display:flex; align-items:center; gap:11px;}
+.card .info-main{flex:1; min-width:0;}
+/* the seller, level with the title and location beside it */
 .card-seller{
-  position:absolute; right:10px; bottom:10px; z-index:2;
-  display:inline-flex; align-items:center; gap:8px; max-width:calc(100% - 20px);
-  padding:5px 12px 5px 5px; border-radius:999px; cursor:pointer;
-  background:rgba(8,8,10,0.82); border:1px solid rgba(255,255,255,0.14);
-  box-shadow:0 4px 14px rgba(0,0,0,0.5);
+  flex-shrink:0; display:inline-flex; align-items:center; gap:7px; max-width:46%;
+  padding:4px 11px 4px 4px; border-radius:999px; cursor:pointer;
+  background:rgba(255,255,255,0.055); border:1px solid var(--line);
   transition:border-color .18s ease, background .18s ease, transform .18s ease;
 }
 .card-seller .avatar{box-shadow:0 0 0 1.5px var(--red-2); flex-shrink:0;}
 .cs-name{
-  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13.5px; letter-spacing:.02em;
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; letter-spacing:.02em;
   line-height:1.2; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .card-seller:hover{background:rgba(224,18,48,0.92); border-color:transparent; transform:translateY(-2px);}
@@ -2010,14 +2009,16 @@ function cardHTML(l){
       <div class="price-tag${l.status==='sold'?' muted':''}">${fmtPrice(l.price)}</div>
       ${l.status==='sold'?'<div class="sold-veil"><span class="sold-stamp">Sold</span></div>':''}
       <button class="fav-btn ${isFav?'active':''}" onclick="event.stopPropagation(); toggleFav('${l.id}')">${isFav?'♥':'♡'}</button>
-      <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
-        ${avatarHTML(l.seller, l.sellerName, 30)}
-        <span class="cs-name">${esc(l.sellerName)}</span>
-      </div>
     </div>
     <div class="info">
-      <div class="title">${esc(l.title)}</div>
-      <div class="meta">📍 ${esc(l.location)} · ${timeAgo(l.createdAt)}</div>
+      <div class="info-main">
+        <div class="title">${esc(l.title)}</div>
+        <div class="meta">📍 ${esc(l.location)} · ${timeAgo(l.createdAt)}</div>
+      </div>
+      <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
+        ${avatarHTML(l.seller, l.sellerName, 28)}
+        <span class="cs-name">${esc(l.sellerName)}</span>
+      </div>
     </div>
   </div>`;
 }
