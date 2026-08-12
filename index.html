@@ -357,6 +357,32 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--red);}
 .field textarea{resize:vertical; min-height:90px;}
 .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+/* ---- role picker on signup ---- */
+.role-pick{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.role-card{
+  display:flex; flex-direction:column; align-items:flex-start; gap:5px;
+  padding:14px 13px; cursor:pointer; text-align:left; border-radius:9px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--line);
+  color:var(--silver); transition:border-color .16s ease, background .16s ease, color .16s ease;
+}
+.role-card svg{width:26px; height:26px; color:var(--muted); margin-bottom:3px; transition:color .16s ease;}
+.role-card .rc-name{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:16px;
+  letter-spacing:.04em; text-transform:uppercase; color:#fff;
+}
+.role-card .rc-sub{font-size:11px; line-height:1.4; color:var(--muted);}
+.role-card:hover{border-color:var(--silver);}
+.role-card.active{border-color:var(--red-2); background:rgba(224,18,48,0.1);}
+.role-card.active svg{color:var(--red-2);}
+@media(max-width:400px){ .role-pick{grid-template-columns:1fr;} .role-card{flex-direction:row; align-items:center; gap:12px;} .role-card svg{margin:0;} }
+
+/* ---- buyer upgrade card ---- */
+.upgrade-card{
+  padding:22px 18px; border:1px solid var(--line); border-radius:10px; margin-bottom:22px;
+  background:linear-gradient(135deg, rgba(224,18,48,0.09), rgba(255,255,255,0.02));
+}
+.upgrade-card h3{font-size:22px; color:#fff; margin:0 0 8px;}
+.upgrade-card p{font-size:13.5px; line-height:1.6; color:var(--silver); margin:0 0 16px; max-width:520px;}
 .auth-note{
   font-size:13px; color:var(--silver); line-height:1.5; margin-bottom:14px;
   padding:10px 12px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.07);
@@ -785,6 +811,21 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
       <div id="authNote" class="auth-note" style="display:none;"></div>
       <div id="authErr"></div>
       <form id="authForm" onsubmit="return handleAuth(event)">
+        <div class="field" id="roleField" style="display:none;">
+          <label>I want to join as</label>
+          <div class="role-pick">
+            <button type="button" class="role-card active" id="roleBuyer" onclick="setRole('buyer')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 11.6a2 2 0 0 0-1.9-1.4h-.4l-1.5-3.4A2 2 0 0 0 15.2 5.6H8.8a2 2 0 0 0-1.8 1.2L5.5 10.2h-.4a2 2 0 0 0-1.9 1.4"/><path d="M3 12v5h2"/><path d="M21 12v5h-2"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></svg>
+              <span class="rc-name">Buyer</span>
+              <span class="rc-sub">Browse, save and message sellers</span>
+            </button>
+            <button type="button" class="role-card" id="roleSeller" onclick="setRole('seller')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 10v9h14v-9"/><path d="M9.5 19v-5h5v5"/></svg>
+              <span class="rc-name">Seller</span>
+              <span class="rc-sub">Everything a buyer can do, plus post cars</span>
+            </button>
+          </div>
+        </div>
         <div class="field" id="nameField" style="display:none;">
           <label>Full Name</label>
           <input type="text" id="authName" placeholder="Alex Rivera">
@@ -1230,14 +1271,17 @@ const ICONS = {
 function renderNavs(){
   const desktop = document.getElementById('navLinks');
   const bottom = document.getElementById('bottomNav');
+  const canSell = !currentUser || currentUser.role !== 'buyer';
   let dTop = `<a onclick="go('home')" data-r="home">${ICONS.home}<span>Browse</span></a>
-    <a onclick="requireAuth('favorites')" data-r="favorites">${ICONS.heart}<span>Saved</span></a>
-    <a onclick="requireAuth('post')" data-r="post">${ICONS.tag}<span>Sell</span></a>`;
+    <a onclick="requireAuth('favorites')" data-r="favorites">${ICONS.heart}<span>Saved</span></a>`;
   let bTop = `<button data-r="home" onclick="go('home')">${ICONS.home}<span>Browse</span></button>
-    <button data-r="favorites" onclick="requireAuth('favorites')">${ICONS.heart}<span>Saved</span></button>
-    <button data-r="post" onclick="requireAuth('post')">${ICONS.tag}<span>Sell</span></button>`;
+    <button data-r="favorites" onclick="requireAuth('favorites')">${ICONS.heart}<span>Saved</span></button>`;
+  if(canSell){
+    dTop += `<a onclick="requireAuth('post')" data-r="post">${ICONS.tag}<span>Sell</span></a>`;
+    bTop += `<button data-r="post" onclick="requireAuth('post')">${ICONS.tag}<span>Sell</span></button>`;
+  }
   if(currentUser){
-    dTop += `<a onclick="requireAuth('my')" data-r="my">${ICONS.garage}<span>My Listings</span></a>
+    dTop += `<a onclick="requireAuth('my')" data-r="my">${ICONS.garage}<span>${currentUser.role==='buyer'?'Account':'My Listings'}</span></a>
     <a onclick="requireAuth('inbox')" data-r="inbox" style="position:relative;">${ICONS.mail}<span>Inbox</span><span class="badge-dot" id="inboxBadge" style="display:none; position:absolute; top:1px; right:0;">0</span></a>`;
     bTop += `<button data-r="inbox" onclick="requireAuth('inbox')">${ICONS.mail}<span>Inbox</span></button>
     <button data-r="my" onclick="requireAuth('my')">${ICONS.garage}<span>Mine</span></button>`;
@@ -1250,10 +1294,11 @@ async function loadSession(){
   const { data } = await sb.auth.getSession();
   const user = data && data.session ? data.session.user : null;
   if(user){
-    const { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes').eq('id', user.id).single();
+    const { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role').eq('id', user.id).single();
     currentUser = {
       username: user.id, email: user.email,
       name: (prof && prof.name) || user.email,
+      role: (prof && prof.role) || 'seller',
       avatar: prof ? prof.avatar_url : null,
       avatarChanges: prof ? (prof.avatar_changes || 0) : 0
     };
@@ -1352,11 +1397,18 @@ function openAuth(mode, redirectRoute){
   updateAuthModeUI();
   openModal('authOverlay');
 }
+let signupRole = 'buyer';
+function setRole(r){
+  signupRole = r;
+  document.getElementById('roleBuyer').classList.toggle('active', r==='buyer');
+  document.getElementById('roleSeller').classList.toggle('active', r==='seller');
+}
 function toggleAuthMode(){ authMode = authMode==='login' ? 'signup' : 'login'; updateAuthModeUI(); }
 function updateAuthModeUI(){
   const isLogin = authMode==='login';
   document.getElementById('authTitle').textContent = isLogin ? 'Sign In' : 'Create Account';
   document.getElementById('nameField').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('roleField').style.display = isLogin ? 'none' : 'block';
   document.getElementById('authName').required = !isLogin;
   const fg = document.getElementById('authForgot');
   if(fg) fg.style.display = isLogin ? 'block' : 'none';
@@ -1390,8 +1442,8 @@ async function handleAuth(e){
       errEl.innerHTML = '<div class="err-msg">Check your email to confirm your account, then sign in.</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    await sb.from('profiles').upsert({ id: data.user.id, name: name || email });
-    currentUser = { username: data.user.id, email, name: name || email };
+    await sb.from('profiles').upsert({ id: data.user.id, name: name || email, role: signupRole });
+    currentUser = { username: data.user.id, email, name: name || email, role: signupRole };
     toast('Welcome to ARTE DEALS, '+currentUser.name+'!');
   } else {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
@@ -1399,8 +1451,9 @@ async function handleAuth(e){
       errEl.innerHTML = '<div class="err-msg">Incorrect email or password.</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    const { data: prof } = await sb.from('profiles').select('name').eq('id', data.user.id).single();
-    currentUser = { username: data.user.id, email, name: (prof && prof.name) || email };
+    const { data: prof } = await sb.from('profiles').select('name,role').eq('id', data.user.id).single();
+    currentUser = { username: data.user.id, email, name: (prof && prof.name) || email,
+                    role: (prof && prof.role) || 'seller' };
     toast('Welcome back, '+currentUser.name+'!');
   }
 
@@ -1583,6 +1636,7 @@ async function toggleFav(id){
 /* ---- MY LISTINGS ---- */
 function renderMyListings(app){
   const mine = allListings.filter(l=>l.seller===currentUser.username).sort((a,b)=>b.createdAt-a.createdAt);
+  const isBuyer = currentUser.role === 'buyer';
   const left = MAX_AVATAR_CHANGES - (currentUser.avatarChanges || 0);
   const canChange = !currentUser.avatar || left > 0;
   app.innerHTML = `<main>
@@ -1590,7 +1644,7 @@ function renderMyListings(app){
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 78)}</div>
       <div class="pc-body">
         <div class="pc-name">${esc(currentUser.name)}</div>
-        <div class="pc-sub">Seller${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
+        <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-actions">
           ${canChange
             ? `<label class="veh-btn pc-upload">
@@ -1604,10 +1658,17 @@ function renderMyListings(app){
         </div>
       </div>
     </div>
+    ${isBuyer ? `
+    <div class="upgrade-card">
+      <h3 class="display">Want to sell a vehicle?</h3>
+      <p>You joined as a buyer. Switch to a seller account any time \u2014 you keep your saved
+         vehicles and messages, and you'll be able to post cars.</p>
+      <button class="btn btn-primary" onclick="becomeSeller()">Become a Seller</button>
+    </div>` : `
     <div class="veh-head">
       <h2 class="display veh-title">Vehicles</h2>
-    </div>
-    ${mine.length ? `
+    </div>`}
+    ${isBuyer ? '' : mine.length ? `
     <div class="veh-scroll">
       <table class="veh-table">
         <thead>
@@ -1658,7 +1719,7 @@ async function handleAvatarSelect(e){
     const url = await uploadToCloudinary(file);
     const nextCount = currentUser.avatar ? used + 1 : used;
     const { error } = await sb.from('profiles')
-      .upsert({ id: currentUser.username, name: currentUser.name, avatar_url: url, avatar_changes: nextCount });
+      .upsert({ id: currentUser.username, name: currentUser.name, role: currentUser.role, avatar_url: url, avatar_changes: nextCount });
     if(error) throw error;
     currentUser.avatar = url;
     currentUser.avatarChanges = nextCount;
@@ -1670,6 +1731,17 @@ async function handleAvatarSelect(e){
   }
   renderMyListings(document.getElementById('app'));
 }
+async function becomeSeller(){
+  if(!confirm('Switch to a seller account? You will be able to post vehicles.')) return;
+  const { error } = await sb.from('profiles')
+    .upsert({ id: currentUser.username, name: currentUser.name, role: 'seller' });
+  if(error){ dbFail(error, 'Could not update your account'); return; }
+  currentUser.role = 'seller';
+  renderNavs();
+  toast('You can now post vehicles');
+  renderMyListings(document.getElementById('app'));
+}
+
 async function editListing(id){
   const l = allListings.find(x=>x.id===id);
   if(!l) return;
@@ -1751,6 +1823,11 @@ function setInboxFilter(k){ inboxFilter = k; renderInbox(document.getElementById
 
 /* ---- POST MODAL ---- */
 function openPostModal(listingToEdit){
+  if(currentUser && currentUser.role === 'buyer'){
+    toast('Switch to a seller account first \u2014 see the Mine tab');
+    go('my');
+    return;
+  }
   editingListingId = listingToEdit ? listingToEdit.id : null;
   document.getElementById('postModalTitle').textContent = editingListingId ? 'Edit Vehicle' : 'List Your Vehicle';
   document.getElementById('postSubmitBtn').textContent = editingListingId ? 'Save Vehicle' : 'Publish Listing';
@@ -1880,7 +1957,7 @@ async function handlePost(e){
     row.status      = 'active';
     row.thumb       = cldThumb(images[0]);
     row.images      = images;
-    await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name });
+    await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name, role: currentUser.role || 'seller' });
     const { error } = await sb.from('listings').insert(row);
     if(error){
       const msg = (error.code === '23505')
