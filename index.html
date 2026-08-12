@@ -1087,7 +1087,7 @@ footer{
           <div class="field">
             <label>Verification Code</label>
             <input type="text" id="otpCode" class="otp-input" inputmode="numeric" autocomplete="one-time-code"
-                   maxlength="6" placeholder="000000" required>
+                   placeholder="000000" required oninput="cleanOtp(this)" onpaste="setTimeout(()=>cleanOtp(this),0)">
           </div>
           <button class="btn btn-primary btn-block" type="submit" id="otpBtn">Verify &amp; Continue</button>
         </form>
@@ -1565,6 +1565,17 @@ function renderNavs(){
 /* With email confirmation on, the profile row can't be written at signup time,
    so the choices made there travel in the account's metadata and land here. */
 let otpEmail = null, otpPass = null;
+
+/* People paste the whole line from the email, so keep only the digits
+   and submit automatically once six of them are in. */
+function cleanOtp(el){
+  const digits = (el.value.match(/\d/g) || []).join('').slice(0,6);
+  if(el.value !== digits) el.value = digits;
+  if(digits.length === 6){
+    const btn = document.getElementById('otpBtn');
+    if(btn && !btn.disabled) btn.closest('form').requestSubmit();
+  }
+}
 
 function showOtpStep(email){
   otpEmail = email;
