@@ -463,6 +463,12 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .auth-modal .field label{font-size:10.5px; letter-spacing:.16em; color:var(--muted);}
 .auth-modal input{padding:13px 15px; font-size:15px;}
 .auth-modal .btn-block{padding:15px; font-size:14px; letter-spacing:.14em; margin-top:4px;}
+.ok-msg{
+  font-size:13px; line-height:1.55; color:var(--silver-bright); margin-bottom:14px;
+  padding:12px 13px; border-left:2px solid #39d98a; background:rgba(57,217,138,0.09);
+}
+.ok-msg b{color:#fff;}
+.ok-msg span{display:block; margin-top:6px; font-size:11.5px; color:var(--muted);}
 .auth-note{
   font-size:13px; color:var(--silver); line-height:1.5; margin-bottom:14px;
   padding:10px 12px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.07);
@@ -1534,15 +1540,33 @@ function renderNavs(){
   bottom.innerHTML = bTop;
   document.querySelectorAll('[data-r]').forEach(el=>el.classList.toggle('active', el.dataset.r===currentRoute));
 }
+/* With email confirmation on, the profile row can't be written at signup time,
+   so the choices made there travel in the account's metadata and land here. */
+async function ensureProfile(user){
+  const meta = user.user_metadata || {};
+  const { data: existing } = await sb.from('profiles').select('name,role').eq('id', user.id).single();
+  if(existing && existing.name){
+    if(!existing.role){
+      await sb.from('profiles').update({ role: meta.role || 'seller' }).eq('id', user.id);
+      existing.role = meta.role || 'seller';
+    }
+    return existing;
+  }
+  const row = { id: user.id, name: meta.name || user.email, role: meta.role || 'seller' };
+  await sb.from('profiles').upsert(row);
+  return row;
+}
+
 async function loadSession(){
   const { data } = await sb.auth.getSession();
   const user = data && data.session ? data.session.user : null;
   if(user){
-    const { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role').eq('id', user.id).single();
+    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role').eq('id', user.id).single();
+    if(!prof || !prof.name){ prof = await ensureProfile(user); }
     currentUser = {
       username: user.id, email: user.email,
-      name: (prof && prof.name) || user.email,
-      role: (prof && prof.role) || 'seller',
+      name: prof.name || user.email,
+      role: prof.role || 'seller',
       avatar: prof ? prof.avatar_url : null,
       avatarChanges: prof ? (prof.avatar_changes || 0) : 0
     };
@@ -1681,16 +1705,24 @@ async function handleAuth(e){
   btn.innerHTML = '<span class="spinner"></span>'; btn.disabled=true;
 
   if(authMode==='signup'){
-    const { data, error } = await sb.auth.signUp({ email, password: pass });
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass,
+      options: {
+        data: { name: name || email, role: signupRole },
+        emailRedirectTo: location.origin + location.pathname
+      }
+    });
     if(error){
       errEl.innerHTML = '<div class="err-msg">'+esc(error.message)+'</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
     if(!data.session){
-      errEl.innerHTML = '<div class="err-msg">Check your email to confirm your account, then sign in.</div>';
+      errEl.innerHTML = '<div class="ok-msg">Almost there \u2014 we sent a confirmation link to <b>'
+        + esc(email) + '</b>. Open it, then sign in.<br><span>Check your spam folder if it does not arrive in a minute. '
+        + 'If you already have an account with this email, just sign in instead.</span></div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    await sb.from('profiles').upsert({ id: data.user.id, name: name || email, role: signupRole });
+    await ensureProfile(data.user);
     currentUser = { username: data.user.id, email, name: name || email, role: signupRole };
     toast('Welcome to ARTE DEALS, '+currentUser.name+'!');
   } else {
@@ -1699,9 +1731,8 @@ async function handleAuth(e){
       errEl.innerHTML = '<div class="err-msg">Incorrect email or password.</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    const { data: prof } = await sb.from('profiles').select('name,role').eq('id', data.user.id).single();
-    currentUser = { username: data.user.id, email, name: (prof && prof.name) || email,
-                    role: (prof && prof.role) || 'seller' };
+    const prof = await ensureProfile(data.user);
+    currentUser = { username: data.user.id, email, name: prof.name, role: prof.role };
     toast('Welcome back, '+currentUser.name+'!');
   }
 
