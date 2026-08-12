@@ -876,11 +876,11 @@ select.calc-box{
 
 /* ---------- boot screen ---------- */
 .boot{
-  position:fixed; inset:0; z-index:2000; display:none;
+  position:fixed; inset:0; z-index:2000; display:flex;
   align-items:center; justify-content:center;
   background:radial-gradient(ellipse at 50% 42%, #16161c 0%, var(--black) 62%);
 }
-.boot.on{display:flex;}
+.boot.off{display:none;}
 .boot.done{animation:bootOut .6s ease forwards;}
 @keyframes bootOut{to{opacity:0; visibility:hidden;}}
 .boot-inner{display:flex; flex-direction:column; align-items:center; gap:22px; padding:0 26px;}
@@ -2317,7 +2317,7 @@ async function openDetail(id, skipHash){
   currentDetailListing = l;
   currentGalleryIdx = 0;
   const body = document.getElementById('detailBody');
-  const booting = document.getElementById('bootScreen').classList.contains('on');
+  const booting = !document.getElementById('bootScreen').classList.contains('off');
   if(!booting){
     body.innerHTML = `<div class="center-load"><span class="spinner"></span> Loading photos...</div>`;
     openModal('detailOverlay');
@@ -2645,7 +2645,7 @@ async function sendMessage(e){
 const BOOT_MIN_MS = 1600;   // long enough for the logo animation to land
 function showBoot(){
   const el = document.getElementById('bootScreen');
-  if(el) el.classList.add('on');
+  if(el) el.classList.remove('off');
   return Date.now();
 }
 function hideBoot(startedAt){
@@ -2656,7 +2656,7 @@ function hideBoot(startedAt){
     const wait = Math.max(0, BOOT_MIN_MS - elapsed);
     setTimeout(()=>{
       el.classList.add('done');
-      setTimeout(()=>{ el.classList.remove('on','done'); resolve(); }, 620);
+      setTimeout(()=>{ el.classList.add('off'); el.classList.remove('done'); resolve(); }, 620);
     }, wait);
   });
 }
