@@ -463,6 +463,10 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .auth-modal .field label{font-size:10.5px; letter-spacing:.16em; color:var(--muted);}
 .auth-modal input{padding:13px 15px; font-size:15px;}
 .auth-modal .btn-block{padding:15px; font-size:14px; letter-spacing:.14em; margin-top:4px;}
+.otp-input{
+  text-align:center; font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:30px; letter-spacing:.42em; text-indent:.42em; padding:15px 10px;
+}
 .ok-msg{
   font-size:13px; line-height:1.55; color:var(--silver-bright); margin-bottom:14px;
   padding:12px 13px; border-left:2px solid #39d98a; background:rgba(57,217,138,0.09);
@@ -1074,6 +1078,24 @@ footer{
         <button class="btn btn-primary btn-block" type="submit" id="authSubmitBtn">Sign In</button>
       </form>
       <div class="auth-forgot" id="authForgot"><b onclick="sendReset()">Forgot your password?</b></div>
+
+      <div id="otpStep" style="display:none;">
+        <div class="ok-msg">We sent a 6-digit code to <b id="otpEmail"></b>. Enter it below to finish.
+          <span>It can take a minute. Check your spam folder if it does not arrive.</span></div>
+        <div id="otpErr"></div>
+        <form onsubmit="return verifySignupCode(event)">
+          <div class="field">
+            <label>Verification Code</label>
+            <input type="text" id="otpCode" class="otp-input" inputmode="numeric" autocomplete="one-time-code"
+                   maxlength="6" placeholder="000000" required>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" id="otpBtn">Verify &amp; Continue</button>
+        </form>
+        <div class="auth-switch">
+          Didn't get it? <b onclick="resendSignupCode()">Send a new code</b>
+        </div>
+        <div class="auth-switch"><b onclick="cancelOtp()">Use a different email</b></div>
+      </div>
       <div class="auth-switch" id="authSwitch">New to ARTE DEALS? <b onclick="toggleAuthMode()">Create an account</b></div>
     </div>
   </div>
@@ -1542,6 +1564,80 @@ function renderNavs(){
 }
 /* With email confirmation on, the profile row can't be written at signup time,
    so the choices made there travel in the account's metadata and land here. */
+let otpEmail = null, otpPass = null;
+
+function showOtpStep(email){
+  otpEmail = email;
+  otpPass  = document.getElementById('authPass').value;
+  document.getElementById('otpEmail').textContent = email;
+  document.getElementById('otpCode').value = '';
+  document.getElementById('otpErr').innerHTML = '';
+  document.getElementById('authForm').style.display   = 'none';
+  document.getElementById('authForgot').style.display = 'none';
+  document.getElementById('authSwitch').style.display = 'none';
+  document.getElementById('authErr').innerHTML = '';
+  document.getElementById('otpStep').style.display = 'block';
+  document.getElementById('authTitle').textContent = 'Check Your Email';
+  const tag = document.getElementById('authTagline');
+  if(tag) tag.textContent = 'One last step to finish your account';
+  setTimeout(()=>document.getElementById('otpCode').focus(), 60);
+}
+
+function cancelOtp(){
+  otpEmail = null; otpPass = null;
+  document.getElementById('otpStep').style.display = 'none';
+  document.getElementById('authForm').style.display   = 'block';
+  document.getElementById('authSwitch').style.display = 'block';
+  updateAuthModeUI();
+}
+
+async function verifySignupCode(e){
+  e.preventDefault();
+  const errEl = document.getElementById('otpErr'); errEl.innerHTML = '';
+  const token = document.getElementById('otpCode').value.replace(/\D/g,'');
+  if(token.length !== 6){
+    errEl.innerHTML = '<div class="err-msg">Enter the 6-digit code from your email.</div>';
+    return false;
+  }
+  const btn = document.getElementById('otpBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+
+  const { data, error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'email' });
+  btn.textContent = 'Verify & Continue'; btn.disabled = false;
+
+  if(error){
+    errEl.innerHTML = '<div class="err-msg">'
+      + (error.message && /expired/i.test(error.message)
+          ? 'That code has expired. Tap "Send a new code" below.'
+          : 'That code is not right. Check it and try again.')
+      + '</div>';
+    return false;
+  }
+
+  const prof = await ensureProfile(data.user);
+  currentUser = { username: data.user.id, email: otpEmail, name: prof.name, role: prof.role };
+  cancelOtp();
+  closeModal('authOverlay');
+  toast('Welcome to ARTE DEALS, ' + currentUser.name + '!');
+  renderAuthArea();
+  renderNavs();
+  await loadListings();
+  await loadUserExtras();
+  go(pendingRoute || 'home');
+  pendingRoute = null;
+  return false;
+}
+
+async function resendSignupCode(){
+  if(!otpEmail) return;
+  const errEl = document.getElementById('otpErr');
+  errEl.innerHTML = '<div class="ok-msg">Sending a new code...</div>';
+  const { error } = await sb.auth.resend({ type: 'signup', email: otpEmail });
+  errEl.innerHTML = error
+    ? '<div class="err-msg">' + esc(error.message) + '</div>'
+    : '<div class="ok-msg">New code sent to <b>' + esc(otpEmail) + '</b>.</div>';
+}
+
 async function ensureProfile(user){
   const meta = user.user_metadata || {};
   const { data: existing } = await sb.from('profiles').select('name,role').eq('id', user.id).single();
@@ -1659,6 +1755,8 @@ function setAuthNote(text){
 }
 function openAuth(mode, redirectRoute){
   authMode = mode; pendingRoute = redirectRoute || null;
+  const otp = document.getElementById('otpStep');
+  if(otp && otp.style.display === 'block') cancelOtp();
   document.getElementById('authErr').innerHTML='';
   setAuthNote('');
   document.getElementById('authForm').reset();
@@ -1708,8 +1806,7 @@ async function handleAuth(e){
     const { data, error } = await sb.auth.signUp({
       email, password: pass,
       options: {
-        data: { name: name || email, role: signupRole },
-        emailRedirectTo: location.origin + location.pathname
+        data: { name: name || email, role: signupRole }
       }
     });
     if(error){
@@ -1717,10 +1814,9 @@ async function handleAuth(e){
       btn.textContent=label; btn.disabled=false; return false;
     }
     if(!data.session){
-      errEl.innerHTML = '<div class="ok-msg">Almost there \u2014 we sent a confirmation link to <b>'
-        + esc(email) + '</b>. Open it, then sign in.<br><span>Check your spam folder if it does not arrive in a minute. '
-        + 'If you already have an account with this email, just sign in instead.</span></div>';
-      btn.textContent=label; btn.disabled=false; return false;
+      btn.textContent=label; btn.disabled=false;
+      showOtpStep(email);
+      return false;
     }
     await ensureProfile(data.user);
     currentUser = { username: data.user.id, email, name: name || email, role: signupRole };
