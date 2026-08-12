@@ -807,7 +807,7 @@ select.calc-box{
 .boot-inner{display:flex; flex-direction:column; align-items:center; gap:22px; padding:0 26px;}
 .boot-logo{
   width:min(230px, 62vw); height:auto; display:block;
-  animation:bootLogo 1.1s cubic-bezier(.16,.8,.3,1) both;
+  animation:bootLogo 1.35s cubic-bezier(.16,.8,.3,1) both;
 }
 @keyframes bootLogo{
   from{opacity:0; transform:translateY(10px) scale(.94); filter:blur(4px);}
@@ -848,7 +848,16 @@ select.calc-box{
 .sk-line.w70{width:70%;}
 .sk-line.w40{width:40%; height:9px; margin-bottom:0;}
 
-footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; color:var(--muted); font-size:12px;}
+footer{
+  border-top:1px solid var(--line); padding:30px 22px 34px; text-align:center;
+  color:var(--muted); font-size:12.5px; line-height:1.7;
+}
+.ft-copy{color:var(--silver); font-size:13px; margin-bottom:6px;}
+.ft-line{display:flex; align-items:center; justify-content:center; gap:9px; flex-wrap:wrap;}
+.ft-line a{color:var(--muted); text-decoration:none; transition:color .18s ease;}
+.ft-line a:hover{color:var(--red-2);}
+.ft-dot{opacity:.5;}
+@media(max-width:520px){ .ft-line{gap:6px;} .ft-dot{display:none;} .ft-line span, .ft-line a{flex:0 0 100%;} }
 
 @media(max-width:760px){
   .nav-links{display:none;}
@@ -914,7 +923,14 @@ footer{border-top:1px solid var(--line); padding:26px 22px; text-align:center; c
 
 <div class="bottom-nav" id="bottomNav"></div>
 
-<footer>ARTE DEALS — Premium Vehicle Marketplace. Every listing, live and persistent.</footer>
+<footer>
+  <div class="ft-copy">&copy; 2023 ARTE DEALS. All rights reserved.</div>
+  <div class="ft-line">
+    <span>Metro Manila, Makati Philippines</span>
+    <span class="ft-dot">&bull;</span>
+    <a href="tel:+639942146949">0994-214-6949</a>
+  </div>
+</footer>
 
 <!-- AUTH MODAL -->
 <div class="overlay auth-top" id="authOverlay">
@@ -2433,15 +2449,23 @@ async function sendMessage(e){
 }
 
 /* ================= LOADING ================= */
+const BOOT_MIN_MS = 1600;   // long enough for the logo animation to land
 function showBoot(){
   const el = document.getElementById('bootScreen');
   if(el) el.classList.add('on');
+  return Date.now();
 }
-function hideBoot(){
-  const el = document.getElementById('bootScreen');
-  if(!el) return;
-  el.classList.add('done');
-  setTimeout(()=>{ el.classList.remove('on','done'); }, 620);
+function hideBoot(startedAt){
+  return new Promise(resolve=>{
+    const el = document.getElementById('bootScreen');
+    if(!el){ resolve(); return; }
+    const elapsed = Date.now() - (startedAt || 0);
+    const wait = Math.max(0, BOOT_MIN_MS - elapsed);
+    setTimeout(()=>{
+      el.classList.add('done');
+      setTimeout(()=>{ el.classList.remove('on','done'); resolve(); }, 620);
+    }, wait);
+  });
 }
 
 /* A ghost of the real layout, so the page has shape before the data lands. */
@@ -2465,12 +2489,12 @@ function skeletonHome(){
 /* ================= INIT ================= */
 async function init(){
   document.getElementById('app').innerHTML = skeletonHome();
-  showBoot();
+  const bootStart = showBoot();
   await loadSession();
   await loadListings();
   if(currentUser) await loadUserExtras();
   go('home');
-  hideBoot();
+  await hideBoot(bootStart);
 }
 document.addEventListener('click', (e)=>{
   document.querySelectorAll('.overlay').forEach(ov=>{ if(e.target===ov) closeModal(ov.id); });
