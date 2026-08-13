@@ -1255,6 +1255,20 @@ select.calc-box{
   background:rgba(255,255,255,0.03);
 }
 .slot-bar.full{border-color:rgba(224,18,48,0.45); background:rgba(224,18,48,0.07);}
+.slot-bar.is-pro{
+  position:relative; overflow:hidden;
+  border-color:rgba(201,162,39,0.55);
+  background:linear-gradient(145deg, #17130a 0%, #241c0c 48%, #16120a 100%);
+  box-shadow:0 2px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(253,240,180,0.14);
+}
+.slot-bar.is-pro .slot-text{color:#b99b46;}
+.slot-bar.is-pro .slot-text b{color:#f6e6a8;}
+.slot-bar.is-pro::after{
+  content:''; position:absolute; top:0; left:-70%; width:38%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(253,240,180,0.16), transparent);
+  transform:skewX(-18deg); animation:ppShine 4.5s ease-in-out infinite; pointer-events:none;
+}
+@media(prefers-reduced-motion:reduce){ .slot-bar.is-pro::after{display:none;} }
 .slot-text{font-size:13px; color:var(--muted);}
 .slot-text b{color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px;}
 .slot-text span{display:block; font-size:11.5px; margin-top:3px;}
@@ -2734,7 +2748,7 @@ function renderMyListings(app){
       </div>
     </div>
     ${(!isBuyer && cycleInfo()) ? `
-    <div class="slot-bar ${cycleInfo().left===0?'full':''}">
+    <div class="slot-bar ${currentUser.isPro?'is-pro':''} ${cycleInfo().left===0?'full':''}">
       <div class="slot-text">
         <b>${cycleInfo().used} of ${cycleInfo().cap}</b> listing slots used
 
