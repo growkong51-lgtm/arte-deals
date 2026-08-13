@@ -811,20 +811,26 @@ select.calc-box{
 }
 .sp-avatar{flex-shrink:0;}
 .pc-top, .sp-top{
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex; align-items:flex-start; justify-content:space-between;
   gap:12px; width:100%;
 }
 .pc-top .pc-name, .sp-top .sp-name{min-width:0;}
+/* Nudge the plaque down so its top edge meets the cap height of the name,
+   not the invisible top of the text line. */
+.pc-top .pro-plaque{margin-top:4px;}
+.sp-top .pro-plaque{margin-top:3px;}
 
 /* A PRO seller's photo carries a gold ring wherever it appears. */
 .avatar.gold{
   box-shadow:0 0 0 2px #c9a227, 0 0 10px rgba(201,162,39,0.55) !important;
 }
 @media(max-width:620px){
-  .pro-plaque{padding:4px 9px 4px 6px; gap:5px;}
-  .pp-mark{width:15px; height:15px;}
-  .pp-text b{font-size:8.5px; letter-spacing:.14em;}
-  .pp-text i{font-size:12px; letter-spacing:.1em;}
+  .pro-plaque{padding:7px 13px 7px 9px; gap:8px;}
+  .pp-mark{width:20px; height:20px;}
+  .pp-text b{font-size:8.5px; letter-spacing:.28em;}
+  .pp-text i{font-size:16px; letter-spacing:.16em;}
+  .pc-top .pro-plaque{margin-top:3px;}
+  .sp-top .pro-plaque{margin-top:2px;}
 }
 .sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
 .sp-head.is-pro .avatar{
@@ -1069,23 +1075,23 @@ select.calc-box{
 /* The full membership plaque, shown on profiles. */
 .pro-plaque{
   position:relative; overflow:hidden; flex-shrink:0;
-  display:inline-flex; align-items:center; gap:7px;
-  padding:5px 12px 5px 8px; border-radius:5px;
+  display:inline-flex; align-items:center; gap:9px;
+  padding:8px 16px 8px 11px; border-radius:6px;
   background:linear-gradient(145deg, #17130a 0%, #241c0c 48%, #16120a 100%);
   border:1px solid transparent;
   background-clip:padding-box;
   box-shadow:0 0 0 1px rgba(201,162,39,0.55), 0 6px 20px rgba(0,0,0,0.55),
              inset 0 1px 0 rgba(253,240,180,0.16);
 }
-.pp-mark{width:17px; height:17px; flex-shrink:0; filter:drop-shadow(0 1px 4px rgba(201,162,39,0.5));}
-.pp-text{display:inline-flex; align-items:baseline; gap:5px; line-height:1; white-space:nowrap;}
+.pp-mark{width:23px; height:23px; flex-shrink:0; filter:drop-shadow(0 2px 5px rgba(201,162,39,0.5));}
+.pp-text{display:flex; flex-direction:column; line-height:1; white-space:nowrap;}
 .pp-text b{
-  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:10px;
-  letter-spacing:.2em; text-transform:uppercase; color:#b99b46;
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:9.5px;
+  letter-spacing:.34em; text-transform:uppercase; color:#b99b46; margin-bottom:3px;
 }
 .pp-text i{
   font-style:normal; font-family:'Rajdhani',sans-serif; font-weight:700;
-  font-size:14px; letter-spacing:.14em;
+  font-size:18px; letter-spacing:.2em;
   background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 42%,#b8891f 68%,#f6e6a8 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:#e8c45a;
@@ -3510,28 +3516,42 @@ function proPlaqueHTML(){
         <stop stop-color="#fdf0b4"/><stop offset="0.5" stop-color="#e8c45a"/><stop offset="1" stop-color="#a8781a"/>
       </linearGradient></defs>
     </svg>
-    <span class="pp-text"><b>ARTE DEALS</b> <i>PRO</i></span>
+    <span class="pp-text"><b>ARTE DEALS</b><i>PRO</i></span>
     <span class="pp-shine"></span>
   </span>`;
 }
 
 /* WhatsApp needs a full international number with no plus or spaces.
    Philippine numbers arrive in several shapes, so normalise them all. */
-/* Viber's Android deep links are unreliable and often show a bogus
-   "app needs an update" message, so we try the app and always leave the
-   number on the clipboard as a fallback. */
+/* Opening Viber straight from the browser.
+   iOS handles the viber:// scheme fine. Android Chrome often refuses it and
+   shows a bogus "app needs an update" message, but it does honour an Android
+   intent link, which names the Viber package directly. If neither lands, the
+   number goes on the clipboard so the tap is never wasted. */
 function openViber(num){
   const pretty = '+' + num;
-  const copy = () => {
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const target = isAndroid
+    ? 'intent://chat?number=%2B' + num + '#Intent;scheme=viber;package=com.viber.voip;end'
+    : 'viber://chat?number=%2B' + num;
+
+  let left = false;
+  const onHide = () => { if(document.hidden) left = true; };
+  document.addEventListener('visibilitychange', onHide);
+
+  try{ window.location.href = target; }catch(e){}
+
+  // Still here a moment later means the app never opened.
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange', onHide);
+    if(left || document.hidden) return;
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(pretty).catch(()=>{});
+      toast('Viber did not open \u2014 number ' + pretty + ' copied');
+    } else {
+      toast('Viber number: ' + pretty);
     }
-  };
-  copy();
-  toast('Viber number ' + pretty + ' copied');
-  const t = setTimeout(()=>{}, 0);
-  try{ window.location.href = 'viber://chat?number=%2B' + num; }catch(e){}
-  clearTimeout(t);
+  }, 1400);
 }
 
 function phPhone(raw){
