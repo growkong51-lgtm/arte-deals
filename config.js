@@ -14,7 +14,22 @@ const ARTE_CONFIG = {
   // domain in the MapTiler dashboard so nobody else can spend your quota.
   maptilerKey: 'r8lLo1jNAdPcZbvsWb55',
 
-  // Raise this when the paid tier goes in. The real limit is the
-  // listing_cap trigger in the database — change that too.
-  maxListingsPerUser: 3
+  /* ---------- Subscriptions ----------
+     Fill in your own GCash details below. They only ever appear on the
+     upgrade screen, to a signed-in seller who is ready to pay.
+     For the QR: put your image in this same folder on GitHub, named
+     exactly gcash-qr.png. Leave gcashQr blank to show no image.
+     Leave gcashNumber blank to show the QR on its own. */
+  gcashName:   'MJM',
+  gcashNumber: '',
+  gcashQr:     'gcash-qr.png',
+
+  proPrice:        79,     // what they pay this month
+  proPriceRegular: 129,    // shown struck through beside it
+
+  // Listing caps per 2-week cycle. The database enforces these too —
+  // if you change them here, change enforce_listing_cap in Supabase as well.
+  maxListingsFree: 3,
+  maxListingsPro:  6,
+  cycleDays:       14
 };

@@ -900,6 +900,108 @@ select.calc-box{
   .fin-title{font-size:26px;}
 }
 /* ---------- admin ---------- */
+/* ---------- PRO ---------- */
+.pro-badge{
+  display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:9.5px; letter-spacing:.16em; padding:2px 7px; vertical-align:middle;
+  color:#0d0d10; background:linear-gradient(135deg,#f5d76e,#c9a227);
+  border-radius:3px; margin-left:5px;
+}
+.pro-badge.mini{font-size:8px; padding:1px 5px; margin-left:4px;}
+.pro-badge.big{font-size:13px; padding:5px 14px; letter-spacing:.2em; margin:0 0 12px;}
+.up-hero{text-align:center; padding:12px 0 26px;}
+.up-eyebrow{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11.5px; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--red-2); margin-bottom:6px;
+}
+.up-title{font-size:40px; color:#fff; margin:0 0 10px;}
+.up-sub{font-size:14px; color:var(--silver); max-width:460px; margin:0 auto; line-height:1.6;}
+.up-note{font-size:12px; color:var(--muted); line-height:1.6; margin:12px 0 0;}
+.plan-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:30px;}
+.plan{
+  padding:22px 18px; border:1px solid var(--line); border-radius:12px;
+  background:rgba(255,255,255,0.03); position:relative;
+}
+.plan.pro{border-color:rgba(201,162,39,0.55); background:linear-gradient(160deg, rgba(201,162,39,0.09), rgba(255,255,255,0.02));}
+.plan-name{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--silver-bright); margin-bottom:8px;
+}
+.plan-price{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:32px; color:#fff; margin-bottom:16px;}
+.plan-price small{font-size:13px; color:var(--muted); font-weight:600;}
+.plan-price .was{
+  display:block; font-size:15px; color:var(--muted);
+  text-decoration:line-through; font-weight:600; margin-bottom:-2px;
+}
+.plan ul{list-style:none; margin:0 0 14px; padding:0; display:flex; flex-direction:column; gap:9px;}
+.plan li{position:relative; padding-left:20px; font-size:13px; color:var(--silver); line-height:1.45;}
+.plan li::before{content:'\2014'; position:absolute; left:0; color:var(--red-2); font-weight:700;}
+.plan.pro li::before{color:#e0bb43;}
+.plan-current, .plan-note{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);}
+.plan.pro .plan-note{color:#e0bb43;}
+.pay-card{padding:20px 18px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,0.03);}
+.pay-step{display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:var(--silver); margin-bottom:14px; line-height:1.5;}
+.pay-step b{
+  flex-shrink:0; width:22px; height:22px; border-radius:50%; background:var(--red-2); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+}
+.gcash-box{
+  display:flex; align-items:center; gap:16px; padding:16px; margin-bottom:18px;
+  border:1px solid var(--line); border-radius:10px; background:rgba(0,0,0,0.35);
+}
+.qr-fallback{
+  flex:1; font-size:13px; line-height:1.6; color:var(--silver);
+  padding:12px 14px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.08);
+}
+.qr-fallback a{color:var(--red-2); text-decoration:none;}
+.qr-fallback a:hover{text-decoration:underline;}
+.gcash-box.qr-only{flex-direction:column; text-align:center;}
+.gcash-box.qr-only .gcash-qr{width:210px; height:210px;}
+.gcash-qr{width:132px; height:132px; object-fit:contain; border-radius:8px; background:#fff; padding:6px; flex-shrink:0;}
+.gc-label{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);}
+.gc-name{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:19px; color:#fff; margin:3px 0 2px;}
+.gc-number{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:22px; color:var(--red-2); letter-spacing:.04em;}
+.pay-row{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:13px 15px; border:1px solid var(--line); border-radius:10px; margin-bottom:9px;
+  background:rgba(255,255,255,0.03);
+}
+.pay-ref{font-size:13.5px; color:#fff;}
+.pay-date{font-size:11.5px; color:var(--muted); margin-top:2px;}
+.pro-active{
+  text-align:center; padding:26px 20px; margin-bottom:26px;
+  border:1px solid rgba(201,162,39,0.5); border-radius:12px;
+  background:linear-gradient(160deg, rgba(201,162,39,0.12), rgba(255,255,255,0.02));
+}
+.pro-active h2{font-size:26px; color:#fff; margin:0 0 8px;}
+.pro-active p{font-size:13.5px; color:var(--silver); margin:0; line-height:1.6;}
+.pro-until{font-size:12px !important; color:var(--muted) !important; margin-top:6px !important;}
+.pro-links{display:flex; gap:9px; margin-top:11px; flex-wrap:wrap;}
+.pro-link{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
+  text-transform:uppercase; text-decoration:none; color:var(--silver-bright);
+  padding:7px 15px; border:1px solid var(--line); border-radius:999px;
+  background:rgba(255,255,255,0.04); transition:all .16s ease;
+}
+.pro-link:hover{color:#fff; border-color:var(--red-2); background:rgba(224,18,48,0.15);}
+.slot-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  padding:14px 16px; margin-bottom:20px; border:1px solid var(--line); border-radius:10px;
+  background:rgba(255,255,255,0.03);
+}
+.slot-bar.full{border-color:rgba(224,18,48,0.45); background:rgba(224,18,48,0.07);}
+.slot-text{font-size:13px; color:var(--muted);}
+.slot-text b{color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px;}
+.slot-text span{display:block; font-size:11.5px; margin-top:3px;}
+.msg-tab span{
+  display:inline-block; min-width:17px; padding:0 5px; margin-left:5px; border-radius:9px;
+  background:var(--red-2); color:#fff; font-size:10px; line-height:17px; text-align:center;
+}
+@media(max-width:560px){
+  .plan-grid{grid-template-columns:1fr;}
+  .up-title{font-size:32px;}
+  .gcash-box{flex-direction:column; text-align:center;}
+}
 .admin-gate{
   max-width:400px; margin:40px auto; padding:30px 26px; text-align:center;
   border:1px solid var(--line); border-radius:12px;
@@ -1649,7 +1751,7 @@ function rowToListing(r){
     condition: r.condition, location: r.location, description: r.description,
     brand: r.brand, year: r.year, transmission: r.transmission, fuel: r.fuel_type,
     mileage: r.mileage, details: r.details || [], mods: r.modifications || [],
-    lat: r.lat, lng: r.lng,
+    lat: r.lat, lng: r.lng, expiresAt: r.expires_at ? new Date(r.expires_at).getTime() : null,
     financing: r.financing,
     seller: r.seller_id, sellerName: r.seller_name,
     status: r.status, thumb: r.thumb,
@@ -1869,13 +1971,18 @@ async function loadSession(){
   const { data } = await sb.auth.getSession();
   const user = data && data.session ? data.session.user : null;
   if(user){
-    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role,is_admin').eq('id', user.id).single();
+    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role,is_admin,is_pro,pro_until,cycle_start,messenger,viber').eq('id', user.id).single();
     if(!prof || !prof.name){ prof = await ensureProfile(user); }
     currentUser = {
       username: user.id, email: user.email,
       name: prof.name || user.email,
       role: prof.role || 'seller',
       isAdmin: !!prof.is_admin,
+      isPro: !!prof.is_pro && (!prof.pro_until || new Date(prof.pro_until) > new Date()),
+      proUntil: prof.pro_until,
+      cycleStart: prof.cycle_start,
+      messenger: prof.messenger || '',
+      viber: prof.viber || '',
       avatar: prof ? prof.avatar_url : null,
       avatarChanges: prof ? (prof.avatar_changes || 0) : 0
     };
@@ -2086,10 +2193,11 @@ function updateInboxBadge(){
 
 /* ================= LISTINGS DATA ================= */
 async function loadListings(){
-  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,lat,lng,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
+  const { data, error } = await sb.from('listings').select('id,title,price,category,condition,location,description,brand,year,transmission,fuel_type,mileage,details,modifications,financing,lat,lng,expires_at,seller_id,seller_name,status,thumb,created_at').order('created_at',{ascending:false});
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
-  allListings = (data || []).map(rowToListing);
-  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen');
+  const now = Date.now();
+  allListings = (data || []).map(rowToListing).filter(l => !l.expiresAt || l.expiresAt > now);
+  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen,is_pro,pro_until,messenger,viber');
   sellerProfiles = {};
   (profs || []).forEach(pr => { sellerProfiles[pr.id] = pr; });
 }
@@ -2116,6 +2224,7 @@ function render(){
   if(currentRoute==='seller') return renderSellerProfile(app);
   if(currentRoute==='sellers') return renderSellersList(app);
   if(currentRoute==='admin') return renderAdmin(app);
+  if(currentRoute==='upgrade') return renderUpgrade(app);
 }
 
 function renderPostPrompt(){
@@ -2268,7 +2377,7 @@ function cardHTML(l){
       <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
         ${avatarHTML(l.seller, l.sellerName, 30)}
         <span class="cs-text">
-          <span class="cs-name">${esc(l.sellerName)}</span>
+          <span class="cs-name">${esc(l.sellerName)}${proOf(l.seller)?' <span class="pro-badge mini">PRO</span>':''}</span>
           ${presenceHTML(l.seller, 'tiny')}
         </span>
       </div>
@@ -2322,6 +2431,15 @@ function renderMyListings(app){
         </div>
       </div>
     </div>
+    ${(!isBuyer && cycleInfo()) ? `
+    <div class="slot-bar ${cycleInfo().left===0?'full':''}">
+      <div class="slot-text">
+        <b>${cycleInfo().used} of ${cycleInfo().cap}</b> listing slots used
+        ${currentUser.isPro ? '<span class="pro-badge">PRO</span>' : ''}
+        <span>Resets ${cycleEndLabel()}</span>
+      </div>
+      ${currentUser.isPro ? '' : '<button class="btn btn-primary btn-sm" onclick="go(\'upgrade\')">Go PRO</button>'}
+    </div>` : ''}
     ${isBuyer ? `
     <div class="upgrade-card">
       <h3 class="display">Want to sell a vehicle?</h3>
@@ -2406,6 +2524,37 @@ async function becomeSeller(){
   renderMyListings(document.getElementById('app'));
 }
 
+/* Where a seller stands in their own 2-week cycle. */
+function proOf(userId){
+  const prof = sellerProfiles[userId];
+  if(!prof) return false;
+  return !!prof.is_pro && (!prof.pro_until || new Date(prof.pro_until) > new Date());
+}
+
+function cycleInfo(){
+  if(!currentUser) return null;
+  const cap = currentUser.isPro ? ARTE_CONFIG.maxListingsPro : ARTE_CONFIG.maxListingsFree;
+  const span = ARTE_CONFIG.cycleDays * 86400000;
+  let start = currentUser.cycleStart ? new Date(currentUser.cycleStart).getTime() : null;
+  if(start && Date.now() >= start + span) start = null;      // last cycle has run out
+  const used = start
+    ? allListings.filter(l => l.seller === currentUser.username && l.createdAt >= start).length
+    : 0;
+  return {
+    cap, used,
+    left: Math.max(0, cap - used),
+    start,
+    end: start ? start + span : null,
+    isPro: currentUser.isPro
+  };
+}
+
+function cycleEndLabel(){
+  const c = cycleInfo();
+  if(!c || !c.end) return 'when you post your first vehicle';
+  return new Date(c.end).toLocaleDateString('en-PH', { day:'numeric', month:'long' });
+}
+
 async function editListing(id){
   const l = allListings.find(x=>x.id===id);
   if(!l) return;
@@ -2444,6 +2593,7 @@ function openSeller(id){
 /* ================= ADMIN ================= */
 let adminTab = 'listings';
 let adminUsers = [];
+let pendingPayments = [];
 
 async function adminSignIn(e){
   e.preventDefault();
@@ -2515,6 +2665,7 @@ function renderAdmin(app){
   }
 
   if(!adminUsers.length) loadAdminUsers().then(()=>renderAdmin(app));
+  if(!pendingPayments.length) loadPayments().then(()=>renderAdmin(app));
   const sold = allListings.filter(l=>l.status==='sold').length;
   app.innerHTML = `<main>
     <div class="admin-head">
@@ -2534,9 +2685,12 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+      <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
     </div>
 
-    <div id="adminBody">${adminTab==='listings' ? adminListingsHTML() : adminUsersHTML()}</div>
+    <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
+                        : adminTab==='users' ? adminUsersHTML()
+                        : adminPaymentsHTML()}</div>
   </main>`;
 }
 
@@ -2546,6 +2700,57 @@ function setAdminTab(t){
   if(t === 'users' && !adminUsers.length){
     loadAdminUsers().then(()=>renderAdmin(document.getElementById('app')));
   }
+  if(t === 'payments'){
+    loadPayments().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+async function loadPayments(){
+  const { data } = await sb.from('payments').select('*').order('created_at',{ascending:false}).limit(100);
+  pendingPayments = data || [];
+}
+
+function adminPaymentsHTML(){
+  if(!pendingPayments.length) return '<div class="empty">No payment requests yet.</div>';
+  return `<div class="veh-scroll"><table class="veh-table">
+    <thead><tr><th>Seller</th><th>Reference</th><th>Amount</th><th>Sent</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${pendingPayments.map(pm=>`
+      <tr>
+        <td class="veh-name" onclick="openSeller('${pm.user_id}')">${esc(pm.user_name||'Unknown')}</td>
+        <td>${esc(pm.reference)}</td>
+        <td class="veh-price">\u20b1${pm.amount||''}</td>
+        <td>${new Date(pm.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</td>
+        <td><span class="veh-status ${pm.status==='approved'?'available':pm.status==='pending'?'':'sold'}">${pm.status}</span></td>
+        <td><div class="veh-actions">
+          ${pm.status==='pending' ? `
+            <button class="veh-btn" onclick="approvePayment('${pm.id}','${pm.user_id}')">Approve</button>
+            <button class="veh-btn danger" onclick="rejectPayment('${pm.id}')">Reject</button>
+          ` : `<button class="veh-btn" onclick="adminMessage('${pm.user_id}')">Message</button>`}
+        </div></td>
+      </tr>`).join('')}</tbody></table></div>`;
+}
+
+async function approvePayment(paymentId, userId){
+  if(!confirm('Confirm this GCash payment and activate PRO for a month?')) return;
+  const until = new Date(); until.setMonth(until.getMonth() + 1);
+  const a = await sb.from('profiles').update({ is_pro: true, pro_until: until.toISOString() }).eq('id', userId);
+  if(a.error){ dbFail(a.error, 'Could not activate PRO'); return; }
+  const b = await sb.from('payments').update({ status: 'approved' }).eq('id', paymentId);
+  if(b.error){ dbFail(b.error, 'PRO is on, but the record did not update'); }
+  const prof = sellerProfiles[userId];
+  if(prof){ prof.is_pro = true; prof.pro_until = until.toISOString(); }
+  toast('PRO activated');
+  await loadPayments();
+  renderAdmin(document.getElementById('app'));
+}
+
+async function rejectPayment(paymentId){
+  if(!confirm('Reject this payment request?')) return;
+  const { error } = await sb.from('payments').update({ status: 'rejected' }).eq('id', paymentId);
+  if(error){ dbFail(error, 'Could not update that'); return; }
+  toast('Request rejected');
+  await loadPayments();
+  renderAdmin(document.getElementById('app'));
 }
 
 function adminListingsHTML(){
@@ -2613,6 +2818,162 @@ function adminMessage(userId){
   openChat(userId, theirs.length ? theirs[0].id : null);
 }
 
+/* ================= ARTE DEALS PRO ================= */
+function renderUpgrade(app){
+  if(!currentUser){ openAuth('login'); go('home'); return; }
+  const c = cycleInfo() || { cap: ARTE_CONFIG.maxListingsFree, used:0, left:0 };
+  const q = ARTE_CONFIG.gcashQr;
+
+  app.innerHTML = `<main>
+    <button class="back-link" onclick="go('my')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Back
+    </button>
+
+    ${currentUser.isPro ? `
+      <div class="pro-active">
+        <span class="pro-badge big">PRO</span>
+        <h2 class="display">You're on ARTE DEALS PRO</h2>
+        <p>${c.left} of ${c.cap} listing slots left this cycle. Your slots reset on <b>${cycleEndLabel()}</b>.</p>
+        ${currentUser.proUntil ? `<p class="pro-until">Subscription runs until ${new Date(currentUser.proUntil).toLocaleDateString('en-PH',{day:'numeric',month:'long',year:'numeric'})}</p>` : ''}
+      </div>
+      <div class="section-head"><h2 class="metal-text">Your Contact Links</h2></div>
+      <p class="up-note">PRO sellers can show a Messenger and Viber link on their profile, so buyers can reach you directly.</p>
+      <div class="calc">
+        <label class="calc-label">Messenger link or username</label>
+        <input class="calc-box" id="proMessenger" placeholder="m.me/yourname" value="${esc(currentUser.messenger||'')}">
+        <label class="calc-label">Viber number</label>
+        <input class="calc-box" id="proViber" placeholder="09XX XXX XXXX" value="${esc(currentUser.viber||'')}">
+        <button class="btn btn-primary btn-block" onclick="saveProLinks()">Save Contact Links</button>
+      </div>
+    ` : `
+      <div class="up-hero">
+        <div class="up-eyebrow">You've used all ${c.cap} slots</div>
+        <h2 class="display up-title">Go PRO</h2>
+        <p class="up-sub">Your free slots reset on <b>${cycleEndLabel()}</b>. Or upgrade now and post more today.</p>
+      </div>
+
+      <div class="plan-grid">
+        <div class="plan">
+          <div class="plan-name">Standard</div>
+          <div class="plan-price">Free</div>
+          <ul>
+            <li>${ARTE_CONFIG.maxListingsFree} listings per 2 weeks</li>
+            <li>8 photos per listing</li>
+            <li>Buyer messaging</li>
+          </ul>
+          <div class="plan-current">Your current plan</div>
+        </div>
+        <div class="plan pro">
+          <span class="pro-badge">PRO</span>
+          <div class="plan-name">ARTE DEALS PRO</div>
+          <div class="plan-price">
+            <span class="was">\u20b1${ARTE_CONFIG.proPriceRegular}</span>
+            \u20b1${ARTE_CONFIG.proPrice}<small>/month</small>
+          </div>
+          <ul>
+            <li><b>${ARTE_CONFIG.maxListingsPro} listings</b> per 2 weeks</li>
+            <li>8 photos per listing</li>
+            <li>Buyer messaging</li>
+            <li>PRO badge on your profile</li>
+            <li>Messenger &amp; Viber links for buyers</li>
+          </ul>
+          <div class="plan-note">Launch price this month</div>
+        </div>
+      </div>
+
+      <div class="section-head"><h2 class="metal-text">How to Subscribe</h2></div>
+      <div class="pay-card">
+        <div class="pay-step"><b>1</b> Send \u20b1${ARTE_CONFIG.proPrice} by GCash to the account below.</div>
+        <div class="gcash-box ${q && !ARTE_CONFIG.gcashNumber ? 'qr-only' : ''}">
+          ${q ? `<img class="gcash-qr" src="${q}" alt="GCash QR" onerror="qrFailed(this)">` : ''}
+          ${(ARTE_CONFIG.gcashName || ARTE_CONFIG.gcashNumber) ? `
+            <div class="gcash-info">
+              <div class="gc-label">GCash Account</div>
+              ${ARTE_CONFIG.gcashName ? `<div class="gc-name">${esc(ARTE_CONFIG.gcashName)}</div>` : ''}
+              ${ARTE_CONFIG.gcashNumber ? `<div class="gc-number">${esc(ARTE_CONFIG.gcashNumber)}</div>` : ''}
+            </div>` : `
+            <div class="gcash-info"><div class="gc-label">Scan to pay with GCash</div></div>`}
+        </div>
+        <div class="pay-step"><b>2</b> Enter the GCash reference number from your receipt.</div>
+        <div id="payErr"></div>
+        <input class="calc-box" id="payRef" placeholder="e.g. 1234 567 890123" inputmode="numeric">
+        <button class="btn btn-primary btn-block" id="payBtn" onclick="submitPayment()">Submit for Approval</button>
+        <p class="up-note">We check payments manually, usually within a few hours. You'll get a message here once your PRO is active.</p>
+      </div>
+
+      <div id="payHistory"></div>
+    `}
+  </main>`;
+
+  if(!currentUser.isPro) loadMyPayments();
+}
+
+/* The QR is the only payment detail on show, so if it fails to load
+   the seller gets a way to reach you rather than a dead end. */
+function qrFailed(img){
+  const box = img.parentNode;
+  img.remove();
+  box.classList.remove('qr-only');
+  if(box.querySelector('.qr-fallback')) return;
+  const note = document.createElement('div');
+  note.className = 'qr-fallback';
+  note.innerHTML = 'QR code unavailable right now.<br>'
+    + 'Message us at <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a> '
+    + 'for payment details and we\u2019ll sort it out.';
+  box.appendChild(note);
+}
+
+async function loadMyPayments(){
+  const { data } = await sb.from('payments').select('*')
+    .eq('user_id', currentUser.username).order('created_at',{ascending:false}).limit(5);
+  const box = document.getElementById('payHistory');
+  if(!box || !data || !data.length) return;
+  box.innerHTML = `<div class="section-head"><h2 class="metal-text">Your Requests</h2></div>
+    ${data.map(pm=>`
+      <div class="pay-row">
+        <div>
+          <div class="pay-ref">Ref ${esc(pm.reference)}</div>
+          <div class="pay-date">${new Date(pm.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</div>
+        </div>
+        <span class="veh-status ${pm.status==='approved'?'available':pm.status==='rejected'?'sold':''}">${pm.status}</span>
+      </div>`).join('')}`;
+}
+
+async function submitPayment(){
+  const errEl = document.getElementById('payErr'); errEl.innerHTML = '';
+  const ref = document.getElementById('payRef').value.trim();
+  if(ref.length < 6){
+    errEl.innerHTML = '<div class="err-msg">Enter the reference number from your GCash receipt.</div>';
+    return;
+  }
+  const btn = document.getElementById('payBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+  const { error } = await sb.from('payments').insert({
+    user_id: currentUser.username,
+    user_name: currentUser.name,
+    reference: ref,
+    amount: ARTE_CONFIG.proPrice
+  });
+  btn.textContent = 'Submit for Approval'; btn.disabled = false;
+  if(error){ dbFail(error, 'Could not send that'); return; }
+  document.getElementById('payRef').value = '';
+  errEl.innerHTML = '<div class="ok-msg">Sent. We\u2019ll activate your PRO once the payment is confirmed.</div>';
+  loadMyPayments();
+}
+
+async function saveProLinks(){
+  const messenger = document.getElementById('proMessenger').value.trim();
+  const viber = document.getElementById('proViber').value.trim();
+  const { error } = await sb.from('profiles').update({ messenger, viber }).eq('id', currentUser.username);
+  if(error){ dbFail(error, 'Could not save your links'); return; }
+  currentUser.messenger = messenger;
+  currentUser.viber = viber;
+  const mine = sellerProfiles[currentUser.username];
+  if(mine){ mine.messenger = messenger; mine.viber = viber; }
+  toast('Contact links saved');
+}
+
 function renderSellersList(app){
   const ids = [...new Set(allListings.map(l=>l.seller))];
   const sellers = ids.map(id=>{
@@ -2650,6 +3011,19 @@ function renderSellersList(app){
   </main>`;
 }
 
+function proContactHTML(userId){
+  const prof = sellerProfiles[userId] || {};
+  const bits = [];
+  if(prof.messenger){
+    const url = prof.messenger.startsWith('http') ? prof.messenger : 'https://m.me/' + prof.messenger.replace(/^m\.me\//,'');
+    bits.push(`<a class="pro-link" href="${esc(url)}" target="_blank" rel="noopener">Messenger</a>`);
+  }
+  if(prof.viber){
+    bits.push(`<a class="pro-link" href="viber://chat?number=${encodeURIComponent(prof.viber.replace(/\s/g,''))}">Viber</a>`);
+  }
+  return bits.length ? `<div class="pro-links">${bits.join('')}</div>` : '';
+}
+
 function renderSellerProfile(app){
   if(!viewingSeller){ go('home'); return; }
   const prof = sellerProfiles[viewingSeller] || {};
@@ -2670,7 +3044,8 @@ function renderSellerProfile(app){
       ${avatarHTML(viewingSeller, name, 92)}
       <div class="sp-body">
         <h2 class="display sp-name">${esc(name)}</h2>
-        <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        <div class="sp-role">Seller${isMe?' \u00b7 You':''}${proOf(viewingSeller)?' <span class="pro-badge">PRO</span>':''}</div>
+        ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
           <span><b>${active}</b> Active</span>
@@ -2753,6 +3128,10 @@ function openPostModal(listingToEdit){
     toast('Switch to a seller account first \u2014 see the Mine tab');
     go('my');
     return;
+  }
+  if(!listingToEdit){
+    const c = cycleInfo();
+    if(c && c.left <= 0){ go('upgrade'); return; }
   }
   editingListingId = listingToEdit ? listingToEdit.id : null;
   document.getElementById('postModalTitle').textContent = editingListingId ? 'Edit Vehicle' : 'List Your Vehicle';
@@ -2902,9 +3281,12 @@ async function handlePost(e){
       errEl.innerHTML = '<div class="err-msg">You already have a listing called \u201c'+esc(dupe.title)+'\u201d. Edit that one instead of posting it again.</div>';
       btn.textContent=label; btn.disabled=false; return false;
     }
-    if(allListings.filter(l=>l.seller===currentUser.username).length >= ARTE_CONFIG.maxListingsPerUser){
-      errEl.innerHTML = '<div class="err-msg">You have reached your limit of '+ARTE_CONFIG.maxListingsPerUser+' active listings.</div>';
-      btn.textContent=label; btn.disabled=false; return false;
+    const cyc = cycleInfo();
+    if(cyc && cyc.left <= 0){
+      closeModal('postOverlay');
+      btn.textContent=label; btn.disabled=false;
+      go('upgrade');
+      return false;
     }
     const { data: au } = await sb.auth.getUser();
     if(!au || !au.user){
@@ -2920,6 +3302,12 @@ async function handlePost(e){
     await sb.from('profiles').upsert({ id: au.user.id, name: currentUser.name, role: currentUser.role || 'seller' });
     const { error } = await sb.from('listings').insert(row);
     if(error){
+      if(String(error.message||'').indexOf('LISTING_CAP_REACHED') !== -1){
+        closeModal('postOverlay');
+        btn.textContent=label; btn.disabled=false;
+        go('upgrade');
+        return false;
+      }
       const msg = (error.code === '23505')
         ? 'You already have a listing with this name. Edit that one instead of posting it again.'
         : error.message;
@@ -3074,7 +3462,7 @@ function renderDetail(){
       <div class="seller-box seller-link" onclick="openSeller('${l.seller}')">
         ${avatarHTML(l.seller, l.sellerName, 40)}
         <div class="sb-body">
-          <div class="sb-name">${esc(l.sellerName)}</div>
+          <div class="sb-name">${esc(l.sellerName)}${proOf(l.seller)?' <span class="pro-badge">PRO</span>':''}</div>
           <div class="sb-sub">${presenceHTML(l.seller) || 'View seller profile'}</div>
         </div>
         <svg class="sb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
