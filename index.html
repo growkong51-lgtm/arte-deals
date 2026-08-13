@@ -766,7 +766,7 @@ select.calc-box{
 .av-wrap.live::after{background:#39d98a; box-shadow:0 0 8px rgba(57,217,138,0.85);}
 .av-wrap.away::after{background:#6b6f77;}
 .av-wrap.none::after{display:none;}
-.sp-seen{margin-top:5px;}
+.sp-seen{margin-top:6px;}
 .sb-arrow{width:17px; height:17px; color:var(--muted); flex-shrink:0;}
 .seller-link:hover .sb-arrow{color:var(--red-2);}
 
@@ -810,15 +810,14 @@ select.calc-box{
   background:linear-gradient(135deg, rgba(201,162,39,0.08), rgba(255,255,255,0.015));
 }
 .sp-avatar{flex-shrink:0;}
-.pc-top, .sp-top{
-  display:flex; align-items:flex-start; justify-content:space-between;
-  gap:12px; width:100%;
-}
-.pc-top .pc-name, .sp-top .sp-name{min-width:0;}
-/* Nudge the plaque down so its top edge meets the cap height of the name,
-   not the invisible top of the text line. */
-.pc-top .pro-plaque{margin-top:4px;}
-.sp-top .pro-plaque{margin-top:3px;}
+.pc-top, .sp-top{position:relative; width:100%;}
+.pc-top .pc-name, .sp-top .sp-name{padding-right:160px;}
+/* The plaque sits over its row rather than inside it, so the row stays as
+   tall as the name and nothing below it gets pushed down. Its top edge
+   meets the cap height of the name, not the invisible top of the text line. */
+.pc-top .pro-plaque, .sp-top .pro-plaque{position:absolute; right:0;}
+.pc-top .pro-plaque{top:4px;}
+.sp-top .pro-plaque{top:3px;}
 
 /* A PRO seller's photo carries a gold ring wherever it appears. */
 .avatar.gold{
@@ -829,8 +828,9 @@ select.calc-box{
   .pp-mark{width:20px; height:20px;}
   .pp-text b{font-size:8.5px; letter-spacing:.28em;}
   .pp-text i{font-size:16px; letter-spacing:.16em;}
-  .pc-top .pro-plaque{margin-top:3px;}
-  .sp-top .pro-plaque{margin-top:2px;}
+  .pc-top .pc-name, .sp-top .sp-name{padding-right:134px;}
+  .pc-top .pro-plaque{top:3px;}
+  .sp-top .pro-plaque{top:2px;}
 }
 .sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
 .sp-head.is-pro .avatar{
@@ -839,7 +839,7 @@ select.calc-box{
 .sp-body{min-width:0; flex:1;}
 .sp-name{font-size:27px; color:#fff; margin:0; text-transform:none; letter-spacing:.015em;}
 .sp-role{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:3px;}
-.sp-stats{display:flex; align-items:center; gap:12px; margin-top:11px; font-size:13px; color:var(--muted);}
+.sp-stats{display:flex; align-items:center; gap:12px; margin-top:10px; font-size:13px; color:var(--muted);}
 .sp-stats b{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px; color:#fff; margin-right:3px;}
 .sp-sep{width:1px; height:14px; background:var(--line);}
 .sp-msg{margin-top:14px;}
@@ -1190,7 +1190,7 @@ select.calc-box{
 .pro-active h2{font-size:26px; color:#fff; margin:0 0 8px;}
 .pro-active p{font-size:13.5px; color:var(--silver); margin:0; line-height:1.6;}
 .pro-until{font-size:12px !important; color:var(--muted) !important; margin-top:6px !important;}
-.pro-links{display:flex; gap:9px; margin-top:11px; flex-wrap:wrap;}
+.pro-links{display:flex; gap:8px; margin-top:9px; flex-wrap:wrap;}
 .pro-link{
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
   text-transform:uppercase; text-decoration:none; color:var(--silver-bright);
