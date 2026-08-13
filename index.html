@@ -2678,7 +2678,8 @@ function renderMyListings(app){
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
         <div class="pc-name">${esc(currentUser.name)}</div>
-        <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
+        <div class="pc-sub">${isBuyer?'Buyer':'Seller'}</div>
+        ${currentUser.isPro ? proContactHTML(currentUser.username) : ''}
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
         ${currentUser.isPro ? proPlaqueHTML() : ''}
         <div class="pc-actions">
