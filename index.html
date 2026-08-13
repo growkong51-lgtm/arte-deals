@@ -811,7 +811,9 @@ select.calc-box{
 }
 .sp-avatar{flex-shrink:0;}
 .profile-card, .sp-head{position:relative;}
-.corner-plaque{position:absolute; top:14px; right:14px; z-index:2;}
+.corner-plaque{position:absolute; right:16px; z-index:2;}
+.profile-card .corner-plaque{top:11px;}
+.sp-head .corner-plaque{top:14px;}
 .corner-plaque .pro-plaque{margin-top:0;}
 /* keep the name clear of it */
 .profile-card.is-pro .pc-body, .sp-head.is-pro .sp-body{padding-right:152px;}
@@ -821,7 +823,9 @@ select.calc-box{
   box-shadow:0 0 0 2px #c9a227, 0 0 10px rgba(201,162,39,0.55) !important;
 }
 @media(max-width:620px){
-  .corner-plaque{top:11px; right:11px;}
+  .corner-plaque{right:13px;}
+  .profile-card .corner-plaque{top:12px;}
+  .sp-head .corner-plaque{top:13px;}
   .corner-plaque .pro-plaque{padding:6px 11px 6px 8px; gap:7px;}
   .corner-plaque .pp-mark{width:18px; height:18px;}
   .corner-plaque .pp-text b{font-size:8px; letter-spacing:.26em; margin-bottom:2px;}
