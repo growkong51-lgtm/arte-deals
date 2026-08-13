@@ -17,12 +17,13 @@ const ARTE_CONFIG = {
   /* ---------- Subscriptions ----------
      Fill in your own GCash details below. They only ever appear on the
      upgrade screen, to a signed-in seller who is ready to pay.
-     For the QR: put your image in this same folder on GitHub, named
-     exactly gcash-qr.png. Leave gcashQr blank to show no image.
+     For the QR: put your image in this same folder on GitHub and make
+     gcashQr below match the filename exactly, including the extension.
+     Leave gcashQr blank to show no image.
      Leave gcashNumber blank to show the QR on its own. */
   gcashName:   'MJM',
   gcashNumber: '',
-  gcashQr:     'gcash-qr.png',
+  gcashQr:     'gcash-qr.jpg',
 
   proPrice:        79,     // what they pay this month
   proPriceRegular: 129,    // shown struck through beside it
