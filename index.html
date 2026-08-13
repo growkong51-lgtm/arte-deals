@@ -1019,22 +1019,50 @@ select.calc-box{
   .report-card .veh-actions{width:100%;}
   .report-card .veh-btn{flex:1 1 auto;}
 }
+/* Compact mark, for listings and browse cards where space is tight. */
 .pro-badge{
   display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700;
-  font-size:9.5px; letter-spacing:.16em; padding:2px 7px; vertical-align:middle;
-  color:#0d0d10; background:linear-gradient(135deg,#f5d76e,#c9a227);
-  border-radius:3px; margin-left:5px;
+  font-size:9.5px; letter-spacing:.18em; padding:2.5px 8px; vertical-align:middle;
+  color:#2a1e00; border-radius:3px; margin-left:6px;
+  background:linear-gradient(150deg,#fdf0b4 0%,#e8c45a 42%,#c9a227 58%,#f2dc95 100%);
+  box-shadow:0 1px 5px rgba(201,162,39,0.45);
 }
-/* Beside a name, PRO reads as part of the name itself \u2014 same size,
-   brushed gold rather than a chip. */
-.pro-gold{
-  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1em;
-  letter-spacing:.14em; margin-left:.4em; white-space:nowrap;
-  background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 38%,#b8891f 62%,#f2dc95 100%);
+.pro-badge.mini{font-size:8px; padding:1.5px 6px; letter-spacing:.14em; margin-left:5px;}
+
+/* The full membership plaque, shown on profiles. */
+.pro-plaque{
+  position:relative; overflow:hidden;
+  display:inline-flex; align-items:center; gap:10px; margin-top:12px;
+  padding:9px 18px 9px 13px; border-radius:6px;
+  background:linear-gradient(145deg, #17130a 0%, #241c0c 48%, #16120a 100%);
+  border:1px solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 0 0 1px rgba(201,162,39,0.55), 0 6px 20px rgba(0,0,0,0.55),
+             inset 0 1px 0 rgba(253,240,180,0.16);
+}
+.pp-mark{width:26px; height:26px; flex-shrink:0; filter:drop-shadow(0 2px 5px rgba(201,162,39,0.5));}
+.pp-text{display:flex; flex-direction:column; line-height:1;}
+.pp-text b{
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:9.5px;
+  letter-spacing:.34em; text-transform:uppercase; color:#b99b46; margin-bottom:3px;
+}
+.pp-text i{
+  font-style:normal; font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:20px; letter-spacing:.2em;
+  background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 42%,#b8891f 68%,#f6e6a8 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:#e8c45a;
-  text-shadow:0 1px 2px rgba(0,0,0,0.4);
 }
+.pp-shine{
+  position:absolute; top:0; left:-70%; width:45%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(253,240,180,0.22), transparent);
+  transform:skewX(-18deg); animation:ppShine 4.5s ease-in-out infinite;
+}
+@keyframes ppShine{
+  0%, 65% {left:-70%;}
+  85%,100%{left:140%;}
+}
+@media(prefers-reduced-motion:reduce){ .pp-shine{display:none;} }
 .pro-badge.mini{font-size:8px; padding:1px 5px; margin-left:4px;}
 .pro-badge.big{font-size:13px; padding:5px 14px; letter-spacing:.2em; margin:0 0 12px;}
 .up-hero{text-align:center; padding:12px 0 26px;}
@@ -1127,6 +1155,23 @@ select.calc-box{
   background:rgba(255,255,255,0.04); transition:all .16s ease;
 }
 .pro-link:hover{color:#fff; border-color:var(--red-2); background:rgba(224,18,48,0.15);}
+.links-card{
+  padding:20px 18px; margin-bottom:22px; border-radius:12px;
+  border:1px solid rgba(201,162,39,0.4);
+  background:linear-gradient(160deg, rgba(201,162,39,0.08), rgba(255,255,255,0.02));
+}
+.lc-head h3{font-size:20px; color:#fff; margin:0 0 4px;}
+.lc-head p{font-size:12.5px; color:var(--muted); margin:0 0 16px; line-height:1.55;}
+.lc-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:12px; margin-bottom:16px;}
+.lc-field label{
+  display:block; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:6px; font-weight:600;
+}
+.lc-field input{
+  width:100%; padding:12px 14px; border-radius:8px; font-size:14px;
+  background:rgba(0,0,0,0.35); border:1px solid var(--line); color:#fff;
+}
+.lc-field input:focus{outline:none; border-color:#c9a227;}
 .slot-bar{
   display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   padding:14px 16px; margin-bottom:20px; border:1px solid var(--line); border-radius:10px;
@@ -2142,7 +2187,7 @@ async function loadSession(){
   const { data } = await sb.auth.getSession();
   const user = data && data.session ? data.session.user : null;
   if(user){
-    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role,is_admin,is_pro,pro_until,cycle_start,messenger,viber').eq('id', user.id).single();
+    let { data: prof } = await sb.from('profiles').select('name,avatar_url,avatar_changes,role,is_admin,is_pro,pro_until,cycle_start,messenger,viber,whatsapp').eq('id', user.id).single();
     if(!prof || !prof.name){ prof = await ensureProfile(user); }
     currentUser = {
       username: user.id, email: user.email,
@@ -2154,6 +2199,7 @@ async function loadSession(){
       cycleStart: prof.cycle_start,
       messenger: prof.messenger || '',
       viber: prof.viber || '',
+      whatsapp: prof.whatsapp || '',
       avatar: prof ? prof.avatar_url : null,
       avatarChanges: prof ? (prof.avatar_changes || 0) : 0
     };
@@ -2368,7 +2414,7 @@ async function loadListings(){
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
   const now = Date.now();
   allListings = (data || []).map(rowToListing).filter(l => !l.expiresAt || l.expiresAt > now);
-  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen,is_pro,pro_until,messenger,viber');
+  const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen,is_pro,pro_until,messenger,viber,whatsapp');
   sellerProfiles = {};
   (profs || []).forEach(pr => { sellerProfiles[pr.id] = pr; });
 }
@@ -2586,9 +2632,10 @@ function renderMyListings(app){
     <div class="profile-card">
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 78)}</div>
       <div class="pc-body">
-        <div class="pc-name">${esc(currentUser.name)}${currentUser.isPro?' <span class="pro-gold">PRO</span>':''}</div>
+        <div class="pc-name">${esc(currentUser.name)}</div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
+        ${currentUser.isPro ? proPlaqueHTML() : ''}
         <div class="pc-actions">
           ${canChange
             ? `<label class="veh-btn pc-upload">
@@ -2610,6 +2657,28 @@ function renderMyListings(app){
         <span>Resets ${cycleEndLabel()}</span>
       </div>
       ${currentUser.isPro ? '' : '<button class="btn btn-primary btn-sm" onclick="go(\'upgrade\')">Go PRO</button>'}
+    </div>` : ''}
+    ${(!isBuyer && currentUser.isPro) ? `
+    <div class="links-card">
+      <div class="lc-head">
+        <h3 class="display">Your Contact Links <span class="pro-gold">PRO</span></h3>
+        <p>Buyers see these on your profile, so they can reach you directly.</p>
+      </div>
+      <div class="lc-grid">
+        <div class="lc-field">
+          <label>Messenger</label>
+          <input id="proMessenger" placeholder="m.me/yourname" value="${esc(currentUser.messenger||'')}">
+        </div>
+        <div class="lc-field">
+          <label>Viber</label>
+          <input id="proViber" placeholder="09XX XXX XXXX" value="${esc(currentUser.viber||'')}">
+        </div>
+        <div class="lc-field">
+          <label>WhatsApp</label>
+          <input id="proWhatsapp" placeholder="09XX XXX XXXX" value="${esc(currentUser.whatsapp||'')}">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveProLinks()">Save Contact Links</button>
     </div>` : ''}
     ${isBuyer ? `
     <div class="upgrade-card">
@@ -3120,15 +3189,7 @@ function renderUpgrade(app){
         <p>${c.left} of ${c.cap} listing slots left this cycle. Your slots reset on <b>${cycleEndLabel()}</b>.</p>
         ${currentUser.proUntil ? `<p class="pro-until">Subscription runs until ${new Date(currentUser.proUntil).toLocaleDateString('en-PH',{day:'numeric',month:'long',year:'numeric'})}</p>` : ''}
       </div>
-      <div class="section-head"><h2 class="metal-text">Your Contact Links</h2></div>
-      <p class="up-note">PRO sellers can show a Messenger and Viber link on their profile, so buyers can reach you directly.</p>
-      <div class="calc">
-        <label class="calc-label">Messenger link or username</label>
-        <input class="calc-box" id="proMessenger" placeholder="m.me/yourname" value="${esc(currentUser.messenger||'')}">
-        <label class="calc-label">Viber number</label>
-        <input class="calc-box" id="proViber" placeholder="09XX XXX XXXX" value="${esc(currentUser.viber||'')}">
-        <button class="btn btn-primary btn-block" onclick="saveProLinks()">Save Contact Links</button>
-      </div>
+      <p class="up-note">Your contact links are on your <b onclick="go('my')" style="color:var(--red-2); cursor:pointer;">account page</b>.</p>
     ` : `
       <div class="up-hero">
         <div class="up-eyebrow">You've used all ${c.cap} slots</div>
@@ -3349,13 +3410,16 @@ async function submitPayment(){
 
 async function saveProLinks(){
   const messenger = document.getElementById('proMessenger').value.trim();
-  const viber = document.getElementById('proViber').value.trim();
-  const { error } = await sb.from('profiles').update({ messenger, viber }).eq('id', currentUser.username);
+  const viber     = document.getElementById('proViber').value.trim();
+  const whatsapp  = document.getElementById('proWhatsapp').value.trim();
+  const { error } = await sb.from('profiles')
+    .update({ messenger, viber, whatsapp }).eq('id', currentUser.username);
   if(error){ dbFail(error, 'Could not save your links'); return; }
   currentUser.messenger = messenger;
   currentUser.viber = viber;
+  currentUser.whatsapp = whatsapp;
   const mine = sellerProfiles[currentUser.username];
-  if(mine){ mine.messenger = messenger; mine.viber = viber; }
+  if(mine){ mine.messenger = messenger; mine.viber = viber; mine.whatsapp = whatsapp; }
   toast('Contact links saved');
 }
 
@@ -3396,6 +3460,20 @@ function renderSellersList(app){
   </main>`;
 }
 
+/* The membership plaque: emblem, wordmark, and PRO on a gold frame. */
+function proPlaqueHTML(){
+  return `<span class="pro-plaque">
+    <svg class="pp-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M24 6 43 40H30.5L24 27.5 17.5 40H5z" fill="url(#goldgrad)"/>
+      <defs><linearGradient id="goldgrad" x1="24" y1="6" x2="24" y2="40">
+        <stop stop-color="#fdf0b4"/><stop offset="0.5" stop-color="#e8c45a"/><stop offset="1" stop-color="#a8781a"/>
+      </linearGradient></defs>
+    </svg>
+    <span class="pp-text"><b>ARTE DEALS</b><i>PRO</i></span>
+    <span class="pp-shine"></span>
+  </span>`;
+}
+
 function proContactHTML(userId){
   const prof = sellerProfiles[userId] || {};
   const bits = [];
@@ -3405,6 +3483,10 @@ function proContactHTML(userId){
   }
   if(prof.viber){
     bits.push(`<a class="pro-link" href="viber://chat?number=${encodeURIComponent(prof.viber.replace(/\s/g,''))}">Viber</a>`);
+  }
+  if(prof.whatsapp){
+    const num = prof.whatsapp.replace(/[^0-9]/g,'').replace(/^0/, '63');
+    bits.push(`<a class="pro-link" href="https://wa.me/${num}" target="_blank" rel="noopener">WhatsApp</a>`);
   }
   return bits.length ? `<div class="pro-links">${bits.join('')}</div>` : '';
 }
@@ -3428,8 +3510,9 @@ function renderSellerProfile(app){
     <div class="sp-head">
       ${avatarHTML(viewingSeller, name, 92)}
       <div class="sp-body">
-        <h2 class="display sp-name">${esc(name)}${proOf(viewingSeller)?' <span class="pro-gold">PRO</span>':''}</h2>
+        <h2 class="display sp-name">${esc(name)}</h2>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
