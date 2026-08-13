@@ -323,7 +323,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 }
 .pc-body{min-width:0; flex:1;}
 .pc-name{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:22px; color:#fff; line-height:1.15;}
-.pc-sub{font-size:12.5px; color:var(--muted); margin-top:5px; word-break:break-word;}
+.pc-sub{display:flex; align-items:center; flex-wrap:wrap; gap:12px; font-size:12.5px; color:var(--muted); margin-top:5px;}
 .pc-actions{display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap;}
 .pc-upload{position:relative; overflow:hidden; display:inline-block;}
 .pc-upload input{position:absolute; inset:0; opacity:0; cursor:pointer;}
@@ -757,6 +757,7 @@ select.calc-box{
 .chat-peer-text{display:flex; flex-direction:column; gap:1px; min-width:0;}
 .stl-seen, .convo-seen{margin-top:4px;}
 .pc-seen{margin-top:16px;}
+.sp-role .presence{letter-spacing:.03em; text-transform:none;}
 .av-wrap{position:relative; display:inline-flex; flex-shrink:0;}
 .av-wrap::after{
   content:''; position:absolute; right:0; bottom:0;
@@ -838,7 +839,7 @@ select.calc-box{
 }
 .sp-body{min-width:0; flex:1;}
 .sp-name{font-size:27px; color:#fff; margin:0; text-transform:none; letter-spacing:.015em;}
-.sp-role{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:5px;}
+.sp-role{display:flex; align-items:center; flex-wrap:wrap; gap:12px; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:5px;}
 .sp-stats{display:flex; align-items:center; gap:12px; margin-top:10px; font-size:13px; color:var(--muted);}
 .sp-stats b{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px; color:#fff; margin-right:3px;}
 .sp-sep{width:1px; height:14px; background:var(--line);}
@@ -2678,9 +2679,11 @@ function renderMyListings(app){
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
         <div class="pc-name">${esc(currentUser.name)}</div>
-        <div class="pc-sub">${isBuyer?'Buyer':'Seller'}</div>
+        <div class="pc-sub">
+          <span>${isBuyer?'Buyer':'Seller'}</span>
+          <span class="presence on"><i></i>Active now</span>
+        </div>
         ${currentUser.isPro ? proContactHTML(currentUser.username) : ''}
-        <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
         ${currentUser.isPro ? proPlaqueHTML() : ''}
         <div class="pc-actions">
           ${canChange
@@ -3600,10 +3603,12 @@ function renderSellerProfile(app){
       <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
         <h2 class="display sp-name">${esc(name)}</h2>
-        <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        <div class="sp-role">
+          <span>Seller${isMe?' \u00b7 You':''}</span>
+          ${presenceHTML(viewingSeller)}
+        </div>
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
-        ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
           <span><b>${active}</b> Active</span>
           <span class="sp-sep"></span>
