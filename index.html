@@ -817,9 +817,18 @@ select.calc-box{
 .sp-body, .pc-body{position:relative;}
 .sp-body > .pro-plaque, .pc-body > .pro-plaque{position:absolute; right:0; top:3px;}
 .sp-name, .pc-name{padding-right:158px;}
+/* The name and the Seller line share the badge's exact height and spread to
+   its top and bottom, so the name sits level with ARTE DEALS and the Seller
+   line sits level with PRO \u2014 without touching the badge itself. */
+.id-block.has-badge{
+  min-height:47px; display:flex; flex-direction:column; justify-content:space-between;
+}
+.id-block.has-badge .pc-name, .id-block.has-badge .sp-name{line-height:1.05;}
+.id-block.has-badge .pc-sub, .id-block.has-badge .sp-role{margin-top:0;}
 @media(max-width:620px){
   .sp-body > .pro-plaque, .pc-body > .pro-plaque{top:2px;}
   .sp-name, .pc-name{padding-right:132px;}
+  .id-block.has-badge{min-height:41px;}
 }
 
 /* A PRO seller's photo carries a gold ring wherever it appears. */
@@ -1191,7 +1200,7 @@ select.calc-box{
 .pro-active h2{font-size:26px; color:#fff; margin:0 0 8px;}
 .pro-active p{font-size:13.5px; color:var(--silver); margin:0; line-height:1.6;}
 .pro-until{font-size:12px !important; color:var(--muted) !important; margin-top:6px !important;}
-.pro-links{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;}
+.pro-links{display:flex; gap:8px; margin-top:16px; margin-left:0; padding-left:0; flex-wrap:wrap;}
 .pro-link{
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
   text-transform:uppercase; text-decoration:none; color:var(--silver-bright);
@@ -2678,10 +2687,12 @@ function renderMyListings(app){
     <div class="profile-card${currentUser.isPro?' is-pro':''}">
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
-        <div class="pc-name">${esc(currentUser.name)}</div>
-        <div class="pc-sub">
-          <span>${isBuyer?'Buyer':'Seller'}</span>
-          <span class="presence on"><i></i>Active now</span>
+        <div class="id-block${currentUser.isPro?' has-badge':''}">
+          <div class="pc-name">${esc(currentUser.name)}</div>
+          <div class="pc-sub">
+            <span>${isBuyer?'Buyer':'Seller'}</span>
+            <span class="presence on"><i></i>Active now</span>
+          </div>
         </div>
         ${currentUser.isPro ? proContactHTML(currentUser.username) : ''}
         ${currentUser.isPro ? proPlaqueHTML() : ''}
@@ -3602,10 +3613,12 @@ function renderSellerProfile(app){
     <div class="sp-head${proOf(viewingSeller)?' is-pro':''}">
       <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
-        <h2 class="display sp-name">${esc(name)}</h2>
-        <div class="sp-role">
-          <span>Seller${isMe?' \u00b7 You':''}</span>
-          ${presenceHTML(viewingSeller)}
+        <div class="id-block${proOf(viewingSeller)?' has-badge':''}">
+          <h2 class="display sp-name">${esc(name)}</h2>
+          <div class="sp-role">
+            <span>Seller${isMe?' \u00b7 You':''}</span>
+            ${presenceHTML(viewingSeller)}
+          </div>
         </div>
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
