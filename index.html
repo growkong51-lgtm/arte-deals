@@ -325,7 +325,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 @media(max-width:520px){ .profile-card{gap:14px; padding:14px;} .pc-name{font-size:19px;} }
 .veh-head{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:20px; flex-wrap:wrap;}
 .veh-title{font-size:34px; letter-spacing:.01em; margin:0; color:#fff;}
-.veh-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,0.02);}
+.veh-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,0.02);}
 .veh-table{width:100%; border-collapse:collapse; min-width:760px;}
 .veh-table th{
   text-align:left; padding:14px 16px; font-family:'Rajdhani',sans-serif; font-weight:700;
@@ -354,7 +354,40 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 }
 .veh-btn:hover{color:#fff; border-color:var(--silver);}
 .veh-btn.danger:hover{color:#fff; background:var(--red-2); border-color:var(--red-2);}
-@media(max-width:640px){ .veh-title{font-size:26px;} }
+@media(max-width:640px){
+  .veh-title{font-size:26px;}
+
+  /* Rows become their own little cards, so nothing needs swiping. */
+  .veh-scroll{overflow-x:visible; border:none; background:none; border-radius:0;}
+  .veh-table{min-width:0; width:100%; display:block;}
+  .veh-table thead{display:none;}
+  .veh-table tbody, .veh-table tr, .veh-table td{display:block; width:auto;}
+  .veh-table tr{
+    border:1px solid var(--line); border-radius:10px; margin-bottom:11px;
+    padding:13px 14px; background:rgba(255,255,255,0.03);
+  }
+  .veh-table tbody tr:hover{background:rgba(255,255,255,0.03);}
+  .veh-table td{
+    border:none; padding:6px 0; display:flex; align-items:center;
+    justify-content:space-between; gap:14px; text-align:right;
+  }
+  .veh-table td::before{
+    content:attr(data-l); flex-shrink:0; text-align:left;
+    font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .veh-table td[data-l="Photo"]{justify-content:space-between;}
+  .veh-thumb{width:82px; height:58px;}
+  .veh-name{min-width:0; text-align:right;}
+  .veh-table td[data-l="Actions"]{
+    display:block; padding-top:12px; margin-top:6px;
+    border-top:1px solid rgba(255,255,255,0.07);
+  }
+  .veh-table td[data-l="Actions"]::before{display:none;}
+  .veh-actions{flex-wrap:wrap; gap:7px;}
+  .veh-actions .veh-btn{flex:1 1 auto;}
+  .admin-user{justify-content:flex-end;}
+}
 .status-dot{
   display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:7px;
   vertical-align:middle; position:relative; top:-1px;
@@ -901,22 +934,59 @@ select.calc-box{
 }
 /* ---------- admin ---------- */
 /* ---------- PRO ---------- */
-.report-row{margin-top:18px; text-align:center;}
+.report-row{
+  margin-top:22px; padding-top:16px; text-align:center;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
 .report-link{
   display:inline-flex; align-items:center; gap:7px; cursor:pointer;
-  background:none; border:none; padding:6px 10px; color:var(--muted); font-size:12.5px;
-  transition:color .18s ease;
+  padding:8px 16px; border-radius:999px;
+  background:transparent; border:1px solid transparent;
+  color:var(--muted); font-size:12px; letter-spacing:.05em;
+  transition:color .18s ease, border-color .18s ease, background .18s ease;
 }
-.report-link svg{width:15px; height:15px;}
-.report-link:hover{color:var(--red-2);}
-.reason-list{display:flex; flex-direction:column; gap:8px;}
+.report-link svg{width:14px; height:14px; opacity:.85;}
+.report-link:hover{
+  color:var(--silver-bright); border-color:var(--line); background:rgba(255,255,255,0.04);
+}
+.report-link:active{transform:scale(.98);}
+
+.report-subject{
+  padding:12px 14px; margin-bottom:20px; border-radius:9px;
+  background:rgba(255,255,255,0.035); border:1px solid var(--line);
+}
+.rp-label{
+  display:block; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:3px;
+}
+.rp-title{
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:16px;
+  letter-spacing:.015em; color:#fff; line-height:1.3;
+}
+
+.reason-list{display:flex; flex-direction:column; gap:7px;}
 .reason{
-  text-align:left; padding:12px 14px; cursor:pointer; border-radius:8px;
-  background:rgba(255,255,255,0.03); border:1px solid var(--line);
-  color:var(--silver); font-size:13.5px; transition:all .16s ease;
+  display:flex; align-items:center; gap:11px; width:100%;
+  text-align:left; padding:12px 14px; cursor:pointer; border-radius:9px;
+  background:rgba(255,255,255,0.025); border:1px solid var(--line);
+  color:var(--silver); font-size:13.5px; line-height:1.35;
+  transition:border-color .16s ease, background .16s ease, color .16s ease;
 }
-.reason:hover{border-color:var(--silver); color:#fff;}
-.reason.active{border-color:var(--red-2); background:rgba(224,18,48,0.12); color:#fff;}
+.rs-tick{
+  flex-shrink:0; width:19px; height:19px; border-radius:50%;
+  border:1.5px solid rgba(201,204,209,0.32);
+  display:flex; align-items:center; justify-content:center;
+  color:transparent; transition:all .16s ease;
+}
+.rs-tick svg{width:11px; height:11px;}
+.rs-text{min-width:0;}
+.reason:hover{border-color:rgba(201,204,209,0.34); background:rgba(255,255,255,0.05); color:#fff;}
+.reason.active{
+  border-color:var(--red-2); background:rgba(224,18,48,0.1); color:#fff;
+}
+.reason.active .rs-tick{
+  background:var(--red-2); border-color:var(--red-2); color:#fff;
+}
 .report-card{
   padding:15px 16px; margin-bottom:11px; border:1px solid var(--line);
   border-radius:10px; background:rgba(255,255,255,0.03);
@@ -936,8 +1006,19 @@ select.calc-box{
   font-size:13px; color:var(--silver); line-height:1.55; margin-top:9px;
   padding:9px 12px; border-left:2px solid var(--line); background:rgba(0,0,0,0.25);
 }
-.rc-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-wrap:wrap;}
-.rc-by{font-size:11.5px; color:var(--muted);}
+.rc-foot{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-top:13px; padding-top:12px; flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,0.07);
+}
+.rc-by{font-size:11.5px; color:var(--muted); flex:1 1 auto; min-width:0;}
+.report-card .veh-actions{flex-wrap:wrap; gap:7px;}
+.report-card .veh-btn{padding:8px 12px; font-size:11px;}
+@media(max-width:560px){
+  .rc-foot{flex-direction:column; align-items:stretch;}
+  .report-card .veh-actions{width:100%;}
+  .report-card .veh-btn{flex:1 1 auto;}
+}
 .pro-badge{
   display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700;
   font-size:9.5px; letter-spacing:.16em; padding:2px 7px; vertical-align:middle;
@@ -1459,7 +1540,10 @@ Safari Snorkel"></textarea>
       <button class="modal-close" onclick="closeModal('reportOverlay')">✕</button>
     </div>
     <div class="modal-body">
-      <p class="up-note" id="reportSubject" style="margin:0 0 16px;"></p>
+      <div class="report-subject">
+        <span class="rp-label">Reporting</span>
+        <span class="rp-title" id="reportSubject"></span>
+      </div>
       <div id="reportErr"></div>
       <div class="field">
         <label>What's wrong with it?</label>
@@ -2538,13 +2622,13 @@ function renderMyListings(app){
         <tbody>
           ${mine.map(l=>`
           <tr>
-            <td><img class="veh-thumb" src="${cldUrl(l.thumb||'','w_160,c_fill,q_auto,f_auto')}" alt="" onclick="openDetail('${l.id}')"></td>
-            <td class="veh-name" onclick="openDetail('${l.id}')">${esc(l.title)}</td>
-            <td>${esc(l.brand||'\u2014')}</td>
-            <td class="veh-price">${fmtPrice(l.price)}</td>
-            <td>${esc(l.year||'\u2014')}</td>
-            <td><span class="veh-status ${l.status==='sold'?'sold':'available'}">${l.status==='sold'?'Sold':'Available'}</span></td>
-            <td>
+            <td data-l="Photo"><img class="veh-thumb" src="${cldUrl(l.thumb||'','w_160,c_fill,q_auto,f_auto')}" alt="" onclick="openDetail('${l.id}')"></td>
+            <td class="veh-name" data-l="Name" onclick="openDetail('${l.id}')">${esc(l.title)}</td>
+            <td data-l="Brand">${esc(l.brand||'\u2014')}</td>
+            <td class="veh-price" data-l="Price">${fmtPrice(l.price)}</td>
+            <td data-l="Year">${esc(l.year||'\u2014')}</td>
+            <td data-l="Status"><span class="veh-status ${l.status==='sold'?'sold':'available'}">${l.status==='sold'?'Sold':'Available'}</span></td>
+            <td data-l="Actions">
               <div class="veh-actions">
                 <button class="veh-btn" onclick="editListing('${l.id}')">Edit</button>
                 <button class="veh-btn" onclick="toggleSold('${l.id}')">${l.status==='sold'?'Mark Available':'Mark Sold'}</button>
@@ -2905,12 +2989,12 @@ function adminPaymentsHTML(){
     <thead><tr><th>Seller</th><th>Reference</th><th>Amount</th><th>Sent</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>${pendingPayments.map(pm=>`
       <tr>
-        <td class="veh-name" onclick="openSeller('${pm.user_id}')">${esc(pm.user_name||'Unknown')}</td>
-        <td>${esc(pm.reference)}</td>
-        <td class="veh-price">\u20b1${pm.amount||''}</td>
-        <td>${new Date(pm.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</td>
-        <td><span class="veh-status ${pm.status==='approved'?'available':pm.status==='pending'?'':'sold'}">${pm.status}</span></td>
-        <td><div class="veh-actions">
+        <td class="veh-name" data-l="Seller" onclick="openSeller('${pm.user_id}')">${esc(pm.user_name||'Unknown')}</td>
+        <td data-l="Reference">${esc(pm.reference)}</td>
+        <td class="veh-price" data-l="Amount">\u20b1${pm.amount||''}</td>
+        <td data-l="Sent">${new Date(pm.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</td>
+        <td data-l="Status"><span class="veh-status ${pm.status==='approved'?'available':pm.status==='pending'?'':'sold'}">${pm.status}</span></td>
+        <td data-l="Actions"><div class="veh-actions">
           ${pm.status==='pending' ? `
             <button class="veh-btn" onclick="approvePayment('${pm.id}','${pm.user_id}')">Approve</button>
             <button class="veh-btn danger" onclick="rejectPayment('${pm.id}')">Reject</button>
@@ -2949,12 +3033,12 @@ function adminListingsHTML(){
     <thead><tr><th>Photo</th><th>Listing</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>${rows.map(l=>`
       <tr>
-        <td><img class="veh-thumb" src="${cldUrl(l.thumb||'','w_160,c_fill,q_auto,f_auto')}" alt="" onclick="openDetail('${l.id}')"></td>
-        <td class="veh-name" onclick="openDetail('${l.id}')">${esc(l.title)}</td>
-        <td>${esc(l.sellerName||'\u2014')}</td>
-        <td class="veh-price">${fmtPrice(l.price)}</td>
-        <td><span class="veh-status ${l.status==='sold'?'sold':'available'}">${l.status==='sold'?'Sold':'Active'}</span></td>
-        <td><div class="veh-actions">
+        <td data-l="Photo"><img class="veh-thumb" src="${cldUrl(l.thumb||'','w_160,c_fill,q_auto,f_auto')}" alt="" onclick="openDetail('${l.id}')"></td>
+        <td class="veh-name" data-l="Listing" onclick="openDetail('${l.id}')">${esc(l.title)}</td>
+        <td data-l="Seller">${esc(l.sellerName||'\u2014')}</td>
+        <td class="veh-price" data-l="Price">${fmtPrice(l.price)}</td>
+        <td data-l="Status"><span class="veh-status ${l.status==='sold'?'sold':'available'}">${l.status==='sold'?'Sold':'Active'}</span></td>
+        <td data-l="Actions"><div class="veh-actions">
           <button class="veh-btn" onclick="toggleSold('${l.id}')">${l.status==='sold'?'Relist':'Mark Sold'}</button>
           <button class="veh-btn danger" onclick="adminRemove('${l.id}')">Remove</button>
         </div></td>
@@ -2969,11 +3053,11 @@ function adminUsersHTML(){
     <tbody>${rows.map(u=>{
       const count = allListings.filter(l=>l.seller===u.id).length;
       return `<tr>
-        <td><div class="admin-user">${avatarStatus(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
-        <td>${presenceHTML(u.id) || '<span class="presence"><i></i>Never signed in</span>'}</td>
-        <td><span class="veh-status ${u.role==='buyer'?'available':'sold'}">${u.role==='buyer'?'Buyer':'Seller'}</span></td>
-        <td>${count}</td>
-        <td><div class="veh-actions">
+        <td data-l="User"><div class="admin-user">${avatarStatus(u.id, u.name||'User', 30)}<span>${esc(u.name||'Unnamed')}${u.is_admin?' <em>admin</em>':''}</span></div></td>
+        <td data-l="Status">${presenceHTML(u.id) || '<span class="presence"><i></i>Never signed in</span>'}</td>
+        <td data-l="Role"><span class="veh-status ${u.role==='buyer'?'available':'sold'}">${u.role==='buyer'?'Buyer':'Seller'}</span></td>
+        <td data-l="Listings">${count}</td>
+        <td data-l="Actions"><div class="veh-actions">
           <button class="veh-btn" onclick="openSeller('${u.id}')">View</button>
           <button class="veh-btn" onclick="adminMessage('${u.id}')">Message</button>
           <button class="veh-btn" onclick="adminToggleRole('${u.id}')">Make ${u.role==='buyer'?'Seller':'Buyer'}</button>
@@ -3175,7 +3259,12 @@ function openReport(listingId){
   document.getElementById('reportErr').innerHTML = '';
   document.getElementById('reportNote').value = '';
   document.getElementById('reasonList').innerHTML = REPORT_REASONS.map((r,i)=>
-    `<button type="button" class="reason" onclick="pickReason(${i})">${esc(r)}</button>`).join('');
+    `<button type="button" class="reason" onclick="pickReason(${i})">
+       <span class="rs-tick">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+       </span>
+       <span class="rs-text">${esc(r)}</span>
+     </button>`).join('');
   openModal('reportOverlay');
 }
 
@@ -3747,7 +3836,7 @@ function renderDetail(){
       </div>`}
       <div class="report-row">
         <button class="report-link" onclick="openReport('${l.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4h11l-1.5 3.5L15 11H4"/><path d="M4 4v17"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
           Report this listing
         </button>
       </div>
