@@ -901,6 +901,43 @@ select.calc-box{
 }
 /* ---------- admin ---------- */
 /* ---------- PRO ---------- */
+.report-row{margin-top:18px; text-align:center;}
+.report-link{
+  display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+  background:none; border:none; padding:6px 10px; color:var(--muted); font-size:12.5px;
+  transition:color .18s ease;
+}
+.report-link svg{width:15px; height:15px;}
+.report-link:hover{color:var(--red-2);}
+.reason-list{display:flex; flex-direction:column; gap:8px;}
+.reason{
+  text-align:left; padding:12px 14px; cursor:pointer; border-radius:8px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--line);
+  color:var(--silver); font-size:13.5px; transition:all .16s ease;
+}
+.reason:hover{border-color:var(--silver); color:#fff;}
+.reason.active{border-color:var(--red-2); background:rgba(224,18,48,0.12); color:#fff;}
+.report-card{
+  padding:15px 16px; margin-bottom:11px; border:1px solid var(--line);
+  border-radius:10px; background:rgba(255,255,255,0.03);
+}
+.report-card.open{border-color:rgba(224,18,48,0.4); background:rgba(224,18,48,0.05);}
+.rc-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px;}
+.rc-reason{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--red-2);
+}
+.rc-date{font-size:11.5px; color:var(--muted);}
+.rc-listing b{color:#fff; font-size:14.5px; cursor:pointer;}
+.rc-listing b:hover{color:var(--red-2);}
+.rc-listing b.gone{color:var(--muted); text-decoration:line-through; cursor:default;}
+.rc-listing span{font-size:12.5px; color:var(--muted); margin-left:6px;}
+.rc-note{
+  font-size:13px; color:var(--silver); line-height:1.55; margin-top:9px;
+  padding:9px 12px; border-left:2px solid var(--line); background:rgba(0,0,0,0.25);
+}
+.rc-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-wrap:wrap;}
+.rc-by{font-size:11.5px; color:var(--muted);}
 .pro-badge{
   display:inline-block; font-family:'Rajdhani',sans-serif; font-weight:700;
   font-size:9.5px; letter-spacing:.16em; padding:2px 7px; vertical-align:middle;
@@ -1415,6 +1452,31 @@ Safari Snorkel"></textarea>
 </div>
 
 <!-- MESSAGE SELLER MODAL -->
+<div class="overlay auth-top" id="reportOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 class="display">Report Listing</h3>
+      <button class="modal-close" onclick="closeModal('reportOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="up-note" id="reportSubject" style="margin:0 0 16px;"></p>
+      <div id="reportErr"></div>
+      <div class="field">
+        <label>What's wrong with it?</label>
+        <div class="reason-list" id="reasonList">
+          ${''}
+        </div>
+      </div>
+      <div class="field">
+        <label>Anything else we should know? (optional)</label>
+        <textarea id="reportNote" rows="3" placeholder="Add any detail that helps us check this"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="reportBtn" onclick="submitReport()">Send Report</button>
+      <p class="up-note">Reports go straight to the ARTE DEALS team. The seller is not told who reported them.</p>
+    </div>
+  </div>
+</div>
+
 <div class="overlay auth-top" id="npOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -2609,6 +2671,7 @@ function openSeller(id){
 let adminTab = 'listings';
 let adminUsers = [];
 let pendingPayments = [];
+let openReports = [];
 
 async function adminSignIn(e){
   e.preventDefault();
@@ -2681,6 +2744,7 @@ function renderAdmin(app){
 
   if(!adminUsers.length) loadAdminUsers().then(()=>renderAdmin(app));
   if(!pendingPayments.length) loadPayments().then(()=>renderAdmin(app));
+  if(!openReports.length) loadReports().then(()=>renderAdmin(app));
   const sold = allListings.filter(l=>l.status==='sold').length;
   app.innerHTML = `<main>
     <div class="admin-head">
@@ -2700,12 +2764,14 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+      <button class="msg-tab ${adminTab==='reports'?'active':''}" onclick="setAdminTab('reports')">Reports${openReports.filter(r=>r.status==='open').length?' <span>'+openReports.filter(r=>r.status==='open').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
       <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
     </div>
 
     <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
                         : adminTab==='users' ? adminUsersHTML()
+                        : adminTab==='reports' ? adminReportsHTML()
                         : adminTab==='settings' ? adminSettingsHTML()
                         : adminPaymentsHTML()}</div>
   </main>`;
@@ -2723,6 +2789,52 @@ function setAdminTab(t){
   if(t === 'settings'){
     loadPayDetails().then(()=>renderAdmin(document.getElementById('app')));
   }
+  if(t === 'reports'){
+    loadReports().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+async function loadReports(){
+  const { data } = await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(100);
+  openReports = data || [];
+}
+
+function adminReportsHTML(){
+  if(!openReports.length) return '<div class="empty">No reports. Quiet is good.</div>';
+  return openReports.map(r=>{
+    const stillUp = allListings.some(l=>l.id===r.listing_id);
+    return `<div class="report-card ${r.status==='open'?'open':''}">
+      <div class="rc-top">
+        <span class="rc-reason">${esc(r.reason)}</span>
+        <span class="rc-date">${new Date(r.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</span>
+      </div>
+      <div class="rc-listing">
+        ${stillUp
+          ? `<b onclick="openDetail('${r.listing_id}')">${esc(r.listing_title||'Listing')}</b>`
+          : `<b class="gone">${esc(r.listing_title||'Listing')} (removed)</b>`}
+        <span>by ${esc(r.seller_name||'unknown')}</span>
+      </div>
+      ${r.note ? `<div class="rc-note">${esc(r.note)}</div>` : ''}
+      <div class="rc-foot">
+        <span class="rc-by">Reported by ${esc(r.reporter_name||'someone')}</span>
+        <div class="veh-actions">
+          ${r.status==='open' ? `
+            ${stillUp ? `<button class="veh-btn danger" onclick="adminRemove('${r.listing_id}')">Remove Listing</button>` : ''}
+            <button class="veh-btn" onclick="adminMessage('${r.seller_id}')">Message Seller</button>
+            <button class="veh-btn" onclick="closeReport('${r.id}')">Mark Handled</button>
+          ` : `<span class="veh-status available">handled</span>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function closeReport(id){
+  const { error } = await sb.from('reports').update({ status:'handled' }).eq('id', id);
+  if(error){ dbFail(error, 'Could not update that report'); return; }
+  toast('Report marked handled');
+  await loadReports();
+  renderAdmin(document.getElementById('app'));
 }
 
 function adminSettingsHTML(){
@@ -3036,6 +3148,66 @@ async function loadPayDetails(){
   payDetails = {};
   (data || []).forEach(r => payDetails[r.key] = r.value || '');
   return payDetails;
+}
+
+const REPORT_REASONS = [
+  'Scam or fraud',
+  'Wrong or misleading details',
+  'Already sold',
+  'Duplicate listing',
+  'Not a real vehicle',
+  'Offensive content',
+  'Something else'
+];
+let reportListingId = null, reportReason = null;
+
+function openReport(listingId){
+  if(!currentUser){
+    closeModal('detailOverlay');
+    openAuth('signup');
+    setAuthNote('Create a free account to report a listing.');
+    return;
+  }
+  const l = allListings.find(x=>x.id===listingId);
+  reportListingId = listingId;
+  reportReason = null;
+  document.getElementById('reportSubject').textContent = l ? l.title : '';
+  document.getElementById('reportErr').innerHTML = '';
+  document.getElementById('reportNote').value = '';
+  document.getElementById('reasonList').innerHTML = REPORT_REASONS.map((r,i)=>
+    `<button type="button" class="reason" onclick="pickReason(${i})">${esc(r)}</button>`).join('');
+  openModal('reportOverlay');
+}
+
+function pickReason(i){
+  reportReason = REPORT_REASONS[i];
+  document.querySelectorAll('#reasonList .reason').forEach((b,n)=>
+    b.classList.toggle('active', n===i));
+}
+
+async function submitReport(){
+  const errEl = document.getElementById('reportErr');
+  if(!reportReason){
+    errEl.innerHTML = '<div class="err-msg">Pick a reason first.</div>';
+    return;
+  }
+  const l = allListings.find(x=>x.id===reportListingId);
+  const btn = document.getElementById('reportBtn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+  const { error } = await sb.from('reports').insert({
+    listing_id: reportListingId,
+    listing_title: l ? l.title : '',
+    seller_id: l ? l.seller : null,
+    seller_name: l ? l.sellerName : '',
+    reporter_id: currentUser.username,
+    reporter_name: currentUser.name,
+    reason: reportReason,
+    note: document.getElementById('reportNote').value.trim()
+  });
+  btn.textContent = 'Send Report'; btn.disabled = false;
+  if(error){ dbFail(error, 'Could not send that report'); return; }
+  closeModal('reportOverlay');
+  toast('Thanks \u2014 we\u2019ll take a look');
 }
 
 async function loadMyPayments(){
@@ -3573,6 +3745,12 @@ function renderDetail(){
           </p>
         </div>
       </div>`}
+      <div class="report-row">
+        <button class="report-link" onclick="openReport('${l.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4h11l-1.5 3.5L15 11H4"/><path d="M4 4v17"/></svg>
+          Report this listing
+        </button>
+      </div>
       <div class="seller-box seller-link" onclick="openSeller('${l.seller}')">
         ${avatarHTML(l.seller, l.sellerName, 40)}
         <div class="sb-body">
