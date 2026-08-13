@@ -321,7 +321,7 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .profile-card.is-pro .pc-avatar .avatar{
   box-shadow:0 0 0 2.5px #c9a227, 0 0 15px rgba(201,162,39,0.5), 0 6px 18px rgba(0,0,0,0.5);
 }
-.pc-body{min-width:0;}
+.pc-body{min-width:0; flex:1;}
 .pc-name{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:22px; color:#fff; line-height:1.15;}
 .pc-sub{font-size:12.5px; color:var(--muted); margin-top:3px; word-break:break-word;}
 .pc-actions{display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;}
@@ -810,34 +810,27 @@ select.calc-box{
   background:linear-gradient(135deg, rgba(201,162,39,0.08), rgba(255,255,255,0.015));
 }
 .sp-avatar{flex-shrink:0;}
-.profile-card, .sp-head{position:relative;}
-.corner-plaque{position:absolute; right:16px; z-index:2;}
-.profile-card .corner-plaque{top:11px;}
-.sp-head .corner-plaque{top:14px;}
-.corner-plaque .pro-plaque{margin-top:0;}
-/* keep the name clear of it */
-.profile-card.is-pro .pc-body, .sp-head.is-pro .sp-body{padding-right:152px;}
+.pc-top, .sp-top{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; width:100%;
+}
+.pc-top .pc-name, .sp-top .sp-name{min-width:0;}
 
 /* A PRO seller's photo carries a gold ring wherever it appears. */
 .avatar.gold{
   box-shadow:0 0 0 2px #c9a227, 0 0 10px rgba(201,162,39,0.55) !important;
 }
 @media(max-width:620px){
-  .corner-plaque{right:13px;}
-  .profile-card .corner-plaque{top:12px;}
-  .sp-head .corner-plaque{top:13px;}
-  .corner-plaque .pro-plaque{padding:6px 11px 6px 8px; gap:7px;}
-  .corner-plaque .pp-mark{width:18px; height:18px;}
-  .corner-plaque .pp-text b{font-size:8px; letter-spacing:.26em; margin-bottom:2px;}
-  .corner-plaque .pp-text i{font-size:14px; letter-spacing:.16em;}
-  .profile-card.is-pro .pc-body, .sp-head.is-pro .sp-body{padding-right:0;}
-  .profile-card.is-pro .pc-name, .sp-head.is-pro .sp-name{padding-right:118px;}
+  .pro-plaque{padding:4px 9px 4px 6px; gap:5px;}
+  .pp-mark{width:15px; height:15px;}
+  .pp-text b{font-size:8.5px; letter-spacing:.14em;}
+  .pp-text i{font-size:12px; letter-spacing:.1em;}
 }
 .sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
 .sp-head.is-pro .avatar{
   box-shadow:0 0 0 2.5px #c9a227, 0 0 16px rgba(201,162,39,0.5), 0 8px 22px rgba(0,0,0,0.55);
 }
-.sp-body{min-width:0;}
+.sp-body{min-width:0; flex:1;}
 .sp-name{font-size:27px; color:#fff; margin:0; text-transform:none; letter-spacing:.015em;}
 .sp-role{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-top:3px;}
 .sp-stats{display:flex; align-items:center; gap:12px; margin-top:11px; font-size:13px; color:var(--muted);}
@@ -1075,24 +1068,24 @@ select.calc-box{
 
 /* The full membership plaque, shown on profiles. */
 .pro-plaque{
-  position:relative; overflow:hidden;
-  display:inline-flex; align-items:center; gap:9px; margin-top:11px;
-  padding:8px 16px 8px 11px; border-radius:6px;
+  position:relative; overflow:hidden; flex-shrink:0;
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 12px 5px 8px; border-radius:5px;
   background:linear-gradient(145deg, #17130a 0%, #241c0c 48%, #16120a 100%);
   border:1px solid transparent;
   background-clip:padding-box;
   box-shadow:0 0 0 1px rgba(201,162,39,0.55), 0 6px 20px rgba(0,0,0,0.55),
              inset 0 1px 0 rgba(253,240,180,0.16);
 }
-.pp-mark{width:23px; height:23px; flex-shrink:0; filter:drop-shadow(0 2px 5px rgba(201,162,39,0.5));}
-.pp-text{display:flex; flex-direction:column; line-height:1;}
+.pp-mark{width:17px; height:17px; flex-shrink:0; filter:drop-shadow(0 1px 4px rgba(201,162,39,0.5));}
+.pp-text{display:inline-flex; align-items:baseline; gap:5px; line-height:1; white-space:nowrap;}
 .pp-text b{
-  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:9.5px;
-  letter-spacing:.34em; text-transform:uppercase; color:#b99b46; margin-bottom:3px;
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:10px;
+  letter-spacing:.2em; text-transform:uppercase; color:#b99b46;
 }
 .pp-text i{
   font-style:normal; font-family:'Rajdhani',sans-serif; font-weight:700;
-  font-size:18px; letter-spacing:.2em;
+  font-size:14px; letter-spacing:.14em;
   background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 42%,#b8891f 68%,#f6e6a8 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:#e8c45a;
@@ -2678,7 +2671,10 @@ function renderMyListings(app){
     <div class="profile-card${currentUser.isPro?' is-pro':''}">
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
-        <div class="pc-name">${esc(currentUser.name)}</div>
+        <div class="pc-top">
+          <div class="pc-name">${esc(currentUser.name)}</div>
+          ${currentUser.isPro ? proPlaqueHTML() : ''}
+        </div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
         <div class="pc-actions">
@@ -2693,7 +2689,6 @@ function renderMyListings(app){
             : `<span class="pc-note locked">No changes left. Your photo is now fixed.</span>`}
         </div>
       </div>
-      ${currentUser.isPro ? '<div class="corner-plaque">'+proPlaqueHTML()+'</div>' : ''}
     </div>
     ${(!isBuyer && cycleInfo()) ? `
     <div class="slot-bar ${cycleInfo().left===0?'full':''}">
@@ -3515,9 +3510,37 @@ function proPlaqueHTML(){
         <stop stop-color="#fdf0b4"/><stop offset="0.5" stop-color="#e8c45a"/><stop offset="1" stop-color="#a8781a"/>
       </linearGradient></defs>
     </svg>
-    <span class="pp-text"><b>ARTE DEALS</b><i>PRO</i></span>
+    <span class="pp-text"><b>ARTE DEALS</b> <i>PRO</i></span>
     <span class="pp-shine"></span>
   </span>`;
+}
+
+/* WhatsApp needs a full international number with no plus or spaces.
+   Philippine numbers arrive in several shapes, so normalise them all. */
+/* Viber's Android deep links are unreliable and often show a bogus
+   "app needs an update" message, so we try the app and always leave the
+   number on the clipboard as a fallback. */
+function openViber(num){
+  const pretty = '+' + num;
+  const copy = () => {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(pretty).catch(()=>{});
+    }
+  };
+  copy();
+  toast('Viber number ' + pretty + ' copied');
+  const t = setTimeout(()=>{}, 0);
+  try{ window.location.href = 'viber://chat?number=%2B' + num; }catch(e){}
+  clearTimeout(t);
+}
+
+function phPhone(raw){
+  let n = String(raw || '').replace(/[^0-9]/g, '');
+  if(!n) return '';
+  if(n.startsWith('63')) return n;              // already 63...
+  if(n.startsWith('0'))  return '63' + n.slice(1);   // 09xx -> 639xx
+  if(n.startsWith('9') && n.length === 10) return '63' + n;  // 9xx -> 639xx
+  return n;
 }
 
 function proContactHTML(userId){
@@ -3528,11 +3551,12 @@ function proContactHTML(userId){
     bits.push(`<a class="pro-link" href="${esc(url)}" target="_blank" rel="noopener">Messenger</a>`);
   }
   if(prof.viber){
-    bits.push(`<a class="pro-link" href="viber://chat?number=${encodeURIComponent(prof.viber.replace(/\s/g,''))}">Viber</a>`);
+    const vn = phPhone(prof.viber);
+    if(vn) bits.push(`<button class="pro-link" onclick="openViber('${vn}')" title="+${vn}">Viber</button>`);
   }
   if(prof.whatsapp){
-    const num = prof.whatsapp.replace(/[^0-9]/g,'').replace(/^0/, '63');
-    bits.push(`<a class="pro-link" href="https://wa.me/${num}" target="_blank" rel="noopener">WhatsApp</a>`);
+    const num = phPhone(prof.whatsapp);
+    if(num) bits.push(`<a class="pro-link" href="https://api.whatsapp.com/send?phone=${num}" target="_blank" rel="noopener">WhatsApp</a>`);
   }
   return bits.length ? `<div class="pro-links">${bits.join('')}</div>` : '';
 }
@@ -3556,7 +3580,10 @@ function renderSellerProfile(app){
     <div class="sp-head${proOf(viewingSeller)?' is-pro':''}">
       <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
-        <h2 class="display sp-name">${esc(name)}</h2>
+        <div class="sp-top">
+          <h2 class="display sp-name">${esc(name)}</h2>
+          ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
+        </div>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
@@ -3567,7 +3594,6 @@ function renderSellerProfile(app){
         </div>
         ${(!isMe && currentUser) ? `<button class="btn btn-metal btn-sm sp-msg" onclick="messageSellerFromProfile()">Message Seller</button>` : ''}
       </div>
-      ${proOf(viewingSeller) ? '<div class="corner-plaque">'+proPlaqueHTML()+'</div>' : ''}
     </div>
 
     <div class="section-head"><h2 class="metal-text">Listings by ${esc(name)}</h2></div>
