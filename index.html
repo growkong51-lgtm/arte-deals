@@ -810,6 +810,17 @@ select.calc-box{
   background:linear-gradient(135deg, rgba(201,162,39,0.08), rgba(255,255,255,0.015));
 }
 .sp-avatar{flex-shrink:0;}
+.corner-plaque{margin-left:auto; align-self:flex-start; flex-shrink:0;}
+.corner-plaque .pro-plaque{margin-top:0;}
+
+/* A PRO seller's photo carries a gold ring wherever it appears. */
+.avatar.gold{
+  box-shadow:0 0 0 2px #c9a227, 0 0 10px rgba(201,162,39,0.55) !important;
+}
+@media(max-width:620px){
+  .corner-plaque{margin-left:0; width:100%; order:3;}
+  .profile-card, .sp-head{flex-wrap:wrap;}
+}
 .sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
 .sp-head.is-pro .avatar{
   box-shadow:0 0 0 2.5px #c9a227, 0 0 16px rgba(201,162,39,0.5), 0 8px 22px rgba(0,0,0,0.55);
@@ -1942,6 +1953,8 @@ function avatarStatus(userId, name, size){
 
 function avatarHTML(userId, name, size, cls){
   const prof = sellerProfiles[userId];
+  const gold = proOf(userId) ? ' gold' : '';
+  cls = (cls || '') + gold;
   const url  = (currentUser && currentUser.username===userId) ? currentUser.avatar : (prof && prof.avatar_url);
   const px   = size || 40;
   const style = `width:${px}px;height:${px}px;font-size:${Math.round(px*0.36)}px;`;
@@ -2613,7 +2626,7 @@ function cardHTML(l){
         <div class="meta">📍 ${esc(l.location)}${distanceLabel(l)} · ${timeAgo(l.createdAt)}</div>
       </div>
       <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
-        ${avatarHTML(l.seller, l.sellerName, 30)}
+        ${avatarHTML(l.seller, l.sellerName, 30, proOf(l.seller)?'gold':'')}
         <span class="cs-text">
           <span class="cs-name">${esc(l.sellerName)}${proOf(l.seller)?' <span class="pro-badge mini">PRO</span>':''}</span>
           ${presenceHTML(l.seller, 'tiny')}
@@ -2651,11 +2664,11 @@ function renderMyListings(app){
   const canChange = !currentUser.avatar || left > 0;
   app.innerHTML = `<main>
     <div class="profile-card${currentUser.isPro?' is-pro':''}">
+      <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
         <div class="pc-name">${esc(currentUser.name)}</div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
-        ${currentUser.isPro ? proPlaqueHTML() : ''}
         <div class="pc-actions">
           ${canChange
             ? `<label class="veh-btn pc-upload">
@@ -2668,7 +2681,7 @@ function renderMyListings(app){
             : `<span class="pc-note locked">No changes left. Your photo is now fixed.</span>`}
         </div>
       </div>
-      <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
+      ${currentUser.isPro ? '<div class="corner-plaque">'+proPlaqueHTML()+'</div>' : ''}
     </div>
     ${(!isBuyer && cycleInfo()) ? `
     <div class="slot-bar ${cycleInfo().left===0?'full':''}">
@@ -3466,7 +3479,7 @@ function renderSellersList(app){
     <div class="section-head"><h2 class="metal-text">Sellers</h2></div>
     ${sellers.length ? `<div class="sellers-grid">${sellers.map(sl=>`
       <div class="seller-tile" onclick="openSeller('${sl.id}')">
-        ${avatarHTML(sl.id, sl.name, 62)}
+        ${avatarHTML(sl.id, sl.name, 62, proOf(sl.id)?'gold':'')}
         <div class="stl-body">
           <div class="stl-name">${esc(sl.name)}</div>
           <div class="stl-stats">
@@ -3529,10 +3542,10 @@ function renderSellerProfile(app){
     </button>
 
     <div class="sp-head${proOf(viewingSeller)?' is-pro':''}">
+      <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
         <h2 class="display sp-name">${esc(name)}</h2>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
-        ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
@@ -3542,7 +3555,7 @@ function renderSellerProfile(app){
         </div>
         ${(!isMe && currentUser) ? `<button class="btn btn-metal btn-sm sp-msg" onclick="messageSellerFromProfile()">Message Seller</button>` : ''}
       </div>
-      <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
+      ${proOf(viewingSeller) ? '<div class="corner-plaque">'+proPlaqueHTML()+'</div>' : ''}
     </div>
 
     <div class="section-head"><h2 class="metal-text">Listings by ${esc(name)}</h2></div>
@@ -3955,7 +3968,7 @@ function renderDetail(){
         </button>
       </div>
       <div class="seller-box seller-link" onclick="openSeller('${l.seller}')">
-        ${avatarHTML(l.seller, l.sellerName, 40)}
+        ${avatarHTML(l.seller, l.sellerName, 40, proOf(l.seller)?'gold':'')}
         <div class="sb-body">
           <div class="sb-name">${esc(l.sellerName)}${proOf(l.seller)?' <span class="pro-badge">PRO</span>':''}</div>
           <div class="sb-sub">${presenceHTML(l.seller) || 'View seller profile'}</div>
