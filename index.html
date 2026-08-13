@@ -810,14 +810,7 @@ select.calc-box{
   background:linear-gradient(135deg, rgba(201,162,39,0.08), rgba(255,255,255,0.015));
 }
 .sp-avatar{flex-shrink:0;}
-.pc-top, .sp-top{position:relative; width:100%;}
-.pc-top .pc-name, .sp-top .sp-name{padding-right:160px;}
-/* The plaque sits over its row rather than inside it, so the row stays as
-   tall as the name and nothing below it gets pushed down. Its top edge
-   meets the cap height of the name, not the invisible top of the text line. */
-.pc-top .pro-plaque, .sp-top .pro-plaque{position:absolute; right:0;}
-.pc-top .pro-plaque{top:4px;}
-.sp-top .pro-plaque{top:3px;}
+.pro-plaque{margin-top:12px;}
 
 /* A PRO seller's photo carries a gold ring wherever it appears. */
 .avatar.gold{
@@ -828,9 +821,7 @@ select.calc-box{
   .pp-mark{width:20px; height:20px;}
   .pp-text b{font-size:8.5px; letter-spacing:.28em;}
   .pp-text i{font-size:16px; letter-spacing:.16em;}
-  .pc-top .pc-name, .sp-top .sp-name{padding-right:134px;}
-  .pc-top .pro-plaque{top:3px;}
-  .sp-top .pro-plaque{top:2px;}
+
 }
 .sp-head .avatar{box-shadow:0 0 0 2px rgba(224,18,48,0.5), 0 8px 22px rgba(0,0,0,0.55);}
 .sp-head.is-pro .avatar{
@@ -1190,7 +1181,7 @@ select.calc-box{
 .pro-active h2{font-size:26px; color:#fff; margin:0 0 8px;}
 .pro-active p{font-size:13.5px; color:var(--silver); margin:0; line-height:1.6;}
 .pro-until{font-size:12px !important; color:var(--muted) !important; margin-top:6px !important;}
-.pro-links{display:flex; gap:8px; margin-top:9px; flex-wrap:wrap;}
+.pro-links{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
 .pro-link{
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em;
   text-transform:uppercase; text-decoration:none; color:var(--silver-bright);
@@ -2677,12 +2668,10 @@ function renderMyListings(app){
     <div class="profile-card${currentUser.isPro?' is-pro':''}">
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
-        <div class="pc-top">
-          <div class="pc-name">${esc(currentUser.name)}</div>
-          ${currentUser.isPro ? proPlaqueHTML() : ''}
-        </div>
+        <div class="pc-name">${esc(currentUser.name)}</div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
+        ${currentUser.isPro ? proPlaqueHTML() : ''}
         <div class="pc-actions">
           ${canChange
             ? `<label class="veh-btn pc-upload">
@@ -3600,11 +3589,9 @@ function renderSellerProfile(app){
     <div class="sp-head${proOf(viewingSeller)?' is-pro':''}">
       <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
-        <div class="sp-top">
-          <h2 class="display sp-name">${esc(name)}</h2>
-          ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
-        </div>
+        <h2 class="display sp-name">${esc(name)}</h2>
         <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
+        ${proOf(viewingSeller) ? proPlaqueHTML() : ''}
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
