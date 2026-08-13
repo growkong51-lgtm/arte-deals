@@ -15,16 +15,8 @@ const ARTE_CONFIG = {
   maptilerKey: 'r8lLo1jNAdPcZbvsWb55',
 
   /* ---------- Subscriptions ----------
-     Fill in your own GCash details below. They only ever appear on the
-     upgrade screen, to a signed-in seller who is ready to pay.
-     For the QR: put your image in this same folder on GitHub and make
-     gcashQr below match the filename exactly, including the extension.
-     Leave gcashQr blank to show no image.
-     Leave gcashNumber blank to show the QR on its own. */
-  gcashName:   'MJM',
-  gcashNumber: '',
-  gcashQr:     'gcash-qr.jpg',
-
+     GCash details are NOT here. They live in the database, visible only to
+     signed-in sellers, and you set them from the admin panel's Settings tab. */
   proPrice:        79,     // what they pay this month
   proPriceRegular: 129,    // shown struck through beside it
 

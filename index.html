@@ -949,6 +949,19 @@ select.calc-box{
   display:flex; align-items:center; gap:16px; padding:16px; margin-bottom:18px;
   border:1px solid var(--line); border-radius:10px; background:rgba(0,0,0,0.35);
 }
+.qr-holder{position:relative; display:inline-block; flex-shrink:0;}
+.qr-stamp{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-8deg);
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; letter-spacing:.06em;
+  white-space:nowrap; padding:4px 10px; border-radius:3px;
+  color:rgba(224,18,48,0.92); background:rgba(255,255,255,0.82);
+  border:1px solid rgba(224,18,48,0.5); pointer-events:none;
+}
+.pay-warn{
+  font-size:12px; line-height:1.6; color:var(--muted); margin:0 0 16px;
+  padding:11px 13px; border-left:2px solid var(--line); background:rgba(255,255,255,0.03);
+}
+.set-qr img{width:150px; height:150px; object-fit:contain; background:#fff; padding:6px; border-radius:8px;}
 .qr-fallback{
   flex:1; font-size:13px; line-height:1.6; color:var(--silver);
   padding:12px 14px; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.08);
@@ -2685,11 +2698,13 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+      <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
       <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
     </div>
 
     <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
                         : adminTab==='users' ? adminUsersHTML()
+                        : adminTab==='settings' ? adminSettingsHTML()
                         : adminPaymentsHTML()}</div>
   </main>`;
 }
@@ -2703,6 +2718,66 @@ function setAdminTab(t){
   if(t === 'payments'){
     loadPayments().then(()=>renderAdmin(document.getElementById('app')));
   }
+  if(t === 'settings'){
+    loadPayDetails().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+function adminSettingsHTML(){
+  const d = payDetails || {};
+  return `<div class="calc">
+    <h4 class="calc-title display">Payment Details</h4>
+    <p class="calc-sub">Only signed-in sellers can see these. They are never in the public files.</p>
+
+    <label class="calc-label">GCash Account Name</label>
+    <input class="calc-box" id="setName" value="${esc(d.gcash_name||'')}" placeholder="e.g. MJM">
+
+    <label class="calc-label">GCash Number (optional \u2014 leave blank to show the QR alone)</label>
+    <input class="calc-box" id="setNumber" value="${esc(d.gcash_number||'')}" placeholder="09XX XXX XXXX">
+
+    <label class="calc-label">GCash QR Code</label>
+    ${d.gcash_qr ? `<div class="set-qr"><img src="${d.gcash_qr}" alt="Current QR"></div>` : '<p class="up-note">No QR uploaded yet.</p>'}
+    <label class="veh-btn pc-upload" style="margin:10px 0 18px; display:inline-block;">
+      ${d.gcash_qr ? 'Replace QR Image' : 'Upload QR Image'}
+      <input type="file" accept="image/*" onchange="handleQrUpload(event)">
+    </label>
+
+    <div id="setErr"></div>
+    <button class="btn btn-primary btn-block" onclick="savePaySettings()">Save Payment Details</button>
+  </div>`;
+}
+
+/* The QR is stored in the database as image data, so it never becomes a
+   public file that bots can find. */
+async function handleQrUpload(e){
+  const file = e.target.files[0]; if(!file) return;
+  if(file.size > 900*1024){ toast('Please use a QR image under 900KB'); return; }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    payDetails = payDetails || {};
+    payDetails.gcash_qr = reader.result;
+    const { error } = await sb.from('app_settings')
+      .upsert({ key:'gcash_qr', value: reader.result, updated_at: new Date().toISOString() });
+    if(error){ dbFail(error, 'Could not save the QR'); return; }
+    toast('QR saved');
+    renderAdmin(document.getElementById('app'));
+  };
+  reader.readAsDataURL(file);
+}
+
+async function savePaySettings(){
+  const name = document.getElementById('setName').value.trim();
+  const number = document.getElementById('setNumber').value.trim();
+  const rows = [
+    { key:'gcash_name',   value:name,   updated_at:new Date().toISOString() },
+    { key:'gcash_number', value:number, updated_at:new Date().toISOString() }
+  ];
+  const { error } = await sb.from('app_settings').upsert(rows);
+  if(error){ dbFail(error, 'Could not save those details'); return; }
+  payDetails = payDetails || {};
+  payDetails.gcash_name = name;
+  payDetails.gcash_number = number;
+  toast('Payment details saved');
 }
 
 async function loadPayments(){
@@ -2885,16 +2960,7 @@ function renderUpgrade(app){
       <div class="section-head"><h2 class="metal-text">How to Subscribe</h2></div>
       <div class="pay-card">
         <div class="pay-step"><b>1</b> Send \u20b1${ARTE_CONFIG.proPrice} by GCash to the account below.</div>
-        <div class="gcash-box ${q && !ARTE_CONFIG.gcashNumber ? 'qr-only' : ''}">
-          ${q ? `<img class="gcash-qr" src="${q}" alt="GCash QR" onerror="qrFailed(this)">` : ''}
-          ${(ARTE_CONFIG.gcashName || ARTE_CONFIG.gcashNumber) ? `
-            <div class="gcash-info">
-              <div class="gc-label">GCash Account</div>
-              ${ARTE_CONFIG.gcashName ? `<div class="gc-name">${esc(ARTE_CONFIG.gcashName)}</div>` : ''}
-              ${ARTE_CONFIG.gcashNumber ? `<div class="gc-number">${esc(ARTE_CONFIG.gcashNumber)}</div>` : ''}
-            </div>` : `
-            <div class="gcash-info"><div class="gc-label">Scan to pay with GCash</div></div>`}
-        </div>
+        <div id="payDetailsBox"><div class="center-load"><span class="spinner"></span> Loading payment details...</div></div>
         <div class="pay-step"><b>2</b> Enter the GCash reference number from your receipt.</div>
         <div id="payErr"></div>
         <input class="calc-box" id="payRef" placeholder="e.g. 1234 567 890123" inputmode="numeric">
@@ -2906,7 +2972,10 @@ function renderUpgrade(app){
     `}
   </main>`;
 
-  if(!currentUser.isPro) loadMyPayments();
+  if(!currentUser.isPro){
+    loadMyPayments();
+    renderPayDetails();
+  }
 }
 
 /* The QR is the only payment detail on show, so if it fails to load
@@ -2922,6 +2991,49 @@ function qrFailed(img){
     + 'Message us at <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a> '
     + 'for payment details and we\u2019ll sort it out.';
   box.appendChild(note);
+}
+
+let payDetails = null;
+
+/* The QR carries the viewer's own name and today's date, so a forwarded
+   screenshot is obviously not theirs. It cannot stop a screenshot —
+   nothing can — but it makes a reused one easy to spot. */
+async function renderPayDetails(){
+  const box = document.getElementById('payDetailsBox');
+  if(!box) return;
+  const d = payDetails || await loadPayDetails();
+  const stamp = currentUser.name + ' \u00b7 ' + new Date().toLocaleDateString('en-PH',{day:'numeric',month:'short',year:'numeric'});
+
+  if(!d.gcash_qr && !d.gcash_number){
+    box.innerHTML = `<div class="qr-fallback">Payment details are not set up yet.<br>
+      Message us at <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a> and we\u2019ll sort it out.</div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="gcash-box ${d.gcash_qr && !d.gcash_number ? 'qr-only' : ''}">
+      ${d.gcash_qr ? `
+        <div class="qr-holder">
+          <img class="gcash-qr" src="${d.gcash_qr}" alt="GCash QR">
+          <span class="qr-stamp">${esc(stamp)}</span>
+        </div>` : ''}
+      <div class="gcash-info">
+        <div class="gc-label">GCash Account</div>
+        ${d.gcash_name ? `<div class="gc-name">${esc(d.gcash_name)}</div>` : ''}
+        ${d.gcash_number ? `<div class="gc-number">${esc(d.gcash_number)}</div>` : ''}
+      </div>
+    </div>
+    <div class="pay-warn">
+      ARTE DEALS will never message you asking for payment. These details only ever
+      appear here, on this page, while you are signed in.
+    </div>`;
+}
+
+async function loadPayDetails(){
+  const { data } = await sb.from('app_settings').select('key,value');
+  payDetails = {};
+  (data || []).forEach(r => payDetails[r.key] = r.value || '');
+  return payDetails;
 }
 
 async function loadMyPayments(){
