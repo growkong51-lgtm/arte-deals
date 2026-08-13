@@ -1025,6 +1025,16 @@ select.calc-box{
   color:#0d0d10; background:linear-gradient(135deg,#f5d76e,#c9a227);
   border-radius:3px; margin-left:5px;
 }
+/* Beside a name, PRO reads as part of the name itself \u2014 same size,
+   brushed gold rather than a chip. */
+.pro-gold{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1em;
+  letter-spacing:.14em; margin-left:.4em; white-space:nowrap;
+  background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 38%,#b8891f 62%,#f2dc95 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e8c45a;
+  text-shadow:0 1px 2px rgba(0,0,0,0.4);
+}
 .pro-badge.mini{font-size:8px; padding:1px 5px; margin-left:4px;}
 .pro-badge.big{font-size:13px; padding:5px 14px; letter-spacing:.2em; margin:0 0 12px;}
 .up-hero{text-align:center; padding:12px 0 26px;}
@@ -2576,7 +2586,7 @@ function renderMyListings(app){
     <div class="profile-card">
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 78)}</div>
       <div class="pc-body">
-        <div class="pc-name">${esc(currentUser.name)}</div>
+        <div class="pc-name">${esc(currentUser.name)}${currentUser.isPro?' <span class="pro-gold">PRO</span>':''}</div>
         <div class="pc-sub">${isBuyer?'Buyer':'Seller'}${currentUser.email?' \u00b7 '+esc(currentUser.email):''}</div>
         <div class="pc-seen"><span class="presence on"><i></i>Active now</span></div>
         <div class="pc-actions">
@@ -2596,7 +2606,7 @@ function renderMyListings(app){
     <div class="slot-bar ${cycleInfo().left===0?'full':''}">
       <div class="slot-text">
         <b>${cycleInfo().used} of ${cycleInfo().cap}</b> listing slots used
-        ${currentUser.isPro ? '<span class="pro-badge">PRO</span>' : ''}
+
         <span>Resets ${cycleEndLabel()}</span>
       </div>
       ${currentUser.isPro ? '' : '<button class="btn btn-primary btn-sm" onclick="go(\'upgrade\')">Go PRO</button>'}
@@ -3418,8 +3428,8 @@ function renderSellerProfile(app){
     <div class="sp-head">
       ${avatarHTML(viewingSeller, name, 92)}
       <div class="sp-body">
-        <h2 class="display sp-name">${esc(name)}</h2>
-        <div class="sp-role">Seller${isMe?' \u00b7 You':''}${proOf(viewingSeller)?' <span class="pro-badge">PRO</span>':''}</div>
+        <h2 class="display sp-name">${esc(name)}${proOf(viewingSeller)?' <span class="pro-gold">PRO</span>':''}</h2>
+        <div class="sp-role">Seller${isMe?' \u00b7 You':''}</div>
         ${proOf(viewingSeller) ? proContactHTML(viewingSeller) : ''}
         ${presenceHTML(viewingSeller) ? '<div class="sp-seen">'+presenceHTML(viewingSeller)+'</div>' : ''}
         <div class="sp-stats">
