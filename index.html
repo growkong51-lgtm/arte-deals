@@ -816,7 +816,7 @@ select.calc-box{
    flow means it never pushes the lines below it down. */
 .sp-body, .pc-body{position:relative;}
 .sp-body > .pro-plaque, .pc-body > .pro-plaque{position:absolute; right:0; top:-6px;}
-.sp-name, .pc-name{padding-right:158px;}
+.sp-name, .pc-name{padding-right:158px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 /* The name and the Seller line share the badge's exact height and spread to
    its top and bottom, so the name sits level with ARTE DEALS and the Seller
    line sits level with PRO \u2014 without touching the badge itself. */
@@ -2726,7 +2726,7 @@ function renderMyListings(app){
       <div class="pc-avatar" id="pcAvatar">${avatarHTML(currentUser.username, currentUser.name, 72)}</div>
       <div class="pc-body">
         <div class="id-block${currentUser.isPro?' has-badge':''}">
-          <div class="pc-name">${esc(currentUser.name)}</div>
+          <div class="pc-name" title="${esc(currentUser.name)}">${esc(currentUser.name)}</div>
           <div class="pc-sub">
             <span>${isBuyer?'Buyer':'Seller'}</span>
             <span class="presence on"><i></i>Active now</span>
@@ -3652,7 +3652,7 @@ function renderSellerProfile(app){
       <div class="sp-avatar">${avatarHTML(viewingSeller, name, 78)}</div>
       <div class="sp-body">
         <div class="id-block${proOf(viewingSeller)?' has-badge':''}">
-          <h2 class="display sp-name">${esc(name)}</h2>
+          <h2 class="display sp-name" title="${esc(name)}">${esc(name)}</h2>
           <div class="sp-role">
             <span>Seller${isMe?' \u00b7 You':''}</span>
             ${presenceHTML(viewingSeller)}
