@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — ARTE DEALS</title>
+<meta name="description" content="The agreement governing use of the ARTE DEALS vehicle marketplace in the Philippines.">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07070a; --panel:rgba(255,255,255,0.03); --line:rgba(201,204,209,0.14);
+  --red:#e01230; --red-2:#ff2d4d;
+  --silver:#c9ccd1; --silver-bright:#f3f4f6; --muted:#8b8d94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--black); color:var(--silver);
+  font-family:Inter,sans-serif; font-size:15px; line-height:1.78;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.top{
+  position:sticky; top:0; z-index:10;
+  border-bottom:1px solid var(--line); padding:18px 26px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  background:rgba(7,7,10,0.96);
+}
+.mark{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:18px;
+  letter-spacing:.22em; text-transform:uppercase; color:#fff; text-decoration:none;
+}
+.mark span{color:var(--red-2);}
+.back{font-size:12.5px; color:var(--muted);}
+.back:hover{color:var(--red-2);}
+
+.hero{
+  border-bottom:1px solid var(--line);
+  padding:56px 26px 44px; text-align:center;
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.09), transparent 62%);
+}
+.eyebrow{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.34em; text-transform:uppercase; color:var(--red-2); margin-bottom:10px;
+}
+h1{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:clamp(34px,7vw,54px);
+  line-height:1.02; color:#fff; letter-spacing:.01em; margin-bottom:14px;
+}
+.lede{max-width:620px; margin:0 auto; font-size:15.5px; color:var(--silver);}
+.meta-row{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-top:22px; flex-wrap:wrap; font-size:11.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.meta-row b{color:var(--silver-bright); font-weight:600;}
+.meta-dot{width:4px; height:4px; border-radius:50%; background:var(--red-2);}
+
+.wrap{max-width:780px; margin:0 auto; padding:44px 26px 100px;}
+
+.toc{
+  padding:22px 24px; margin-bottom:48px;
+  border:1px solid var(--line); border-radius:10px; background:var(--panel);
+}
+.toc h2{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  margin:0 0 14px; border:none; padding:0;
+}
+.toc ol{list-style:none; counter-reset:toc; columns:2; column-gap:30px;}
+.toc li{counter-increment:toc; margin-bottom:8px; break-inside:avoid; font-size:13.5px; padding-left:0;}
+.toc li::before{
+  content:counter(toc,decimal-leading-zero); margin-right:9px; position:static;
+  font-family:Rajdhani,sans-serif; font-weight:700; color:var(--red-2); font-size:11.5px;
+}
+.toc a{color:var(--silver);}
+.toc a:hover{color:#fff;}
+@media(max-width:600px){ .toc ol{columns:1;} }
+
+section{margin-bottom:42px; scroll-margin-top:80px;}
+section h2{
+  display:flex; align-items:baseline; gap:12px;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.16em; text-transform:uppercase; color:#fff;
+  margin-bottom:16px; padding-top:24px; border-top:1px solid var(--line);
+}
+section h2 .n{font-size:12px; color:var(--red-2); letter-spacing:.1em; flex-shrink:0;}
+h3{
+  font-size:14px; font-weight:600; color:var(--silver-bright);
+  margin:22px 0 8px; letter-spacing:.01em;
+}
+p{margin-bottom:14px;}
+ul{margin:0 0 16px; padding:0; list-style:none;}
+ul li{position:relative; padding-left:20px; margin-bottom:9px;}
+ul li::before{content:'—'; position:absolute; left:0; color:var(--red-2); font-weight:700;}
+strong{color:var(--silver-bright); font-weight:600;}
+
+.callout{
+  padding:18px 20px; margin:22px 0; border-radius:8px;
+  border:1px solid rgba(224,18,48,0.34); background:rgba(224,18,48,0.07);
+}
+.callout .ct{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11.5px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--red-2); margin-bottom:7px;
+}
+.callout p:last-child{margin-bottom:0;}
+
+table{width:100%; border-collapse:collapse; margin:8px 0 18px; font-size:13.5px;}
+th{
+  text-align:left; padding:10px 14px 10px 0; color:var(--muted);
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.16em; text-transform:uppercase; border-bottom:1px solid var(--line);
+}
+td{padding:12px 14px 12px 0; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:top;}
+td:first-child{color:var(--silver-bright); white-space:nowrap; padding-right:20px;}
+
+.foot{
+  border-top:1px solid var(--line); padding:30px 26px 40px;
+  color:var(--muted); font-size:12.5px; line-height:1.9;
+}
+.foot a{color:var(--muted);}
+.foot a:hover{color:var(--red-2);}
+.foot-links{margin-top:12px; display:flex; gap:9px; flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="mark" href="index.html">ARTE <span>DEALS</span></a>
+  <a class="back" href="index.html">&larr; Back to listings</a>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Legal Agreement</div>
+  <h1>Terms of Service</h1>
+  <p class="lede">The agreement between you and ARTE DEALS covering how the marketplace works,
+  what each of us is responsible for, and what happens when something goes wrong.</p>
+  <div class="meta-row">
+    <span>Effective <b>15 August 2026</b></span>
+    <span class="meta-dot"></span>
+    <span>Version <b>1.0</b></span>
+    <span class="meta-dot"></span>
+    <span>Republic of the <b>Philippines</b></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#s1">Agreement &amp; Definitions</a></li>
+      <li><a href="#s2">What ARTE DEALS Is</a></li>
+      <li><a href="#s3">Eligibility</a></li>
+      <li><a href="#s4">Accounts &amp; Security</a></li>
+      <li><a href="#s5">Buyer &amp; Seller Roles</a></li>
+      <li><a href="#s6">Listing Rules</a></li>
+      <li><a href="#s7">Listing Cycles &amp; Limits</a></li>
+      <li><a href="#s8">ARTE DEALS PRO</a></li>
+      <li><a href="#s9">Payment &amp; Refunds</a></li>
+      <li><a href="#s10">Placement &amp; Visibility</a></li>
+      <li><a href="#s11">Messaging</a></li>
+      <li><a href="#s12">Prohibited Conduct</a></li>
+      <li><a href="#s13">Reporting &amp; Moderation</a></li>
+      <li><a href="#s14">Your Content</a></li>
+      <li><a href="#s15">Our Intellectual Property</a></li>
+      <li><a href="#s16">Transactions Between Users</a></li>
+      <li><a href="#s17">Suspension &amp; Termination</a></li>
+      <li><a href="#s18">Availability &amp; Third Parties</a></li>
+      <li><a href="#s19">Limitation of Liability</a></li>
+      <li><a href="#s20">Indemnity</a></li>
+      <li><a href="#s21">Disputes &amp; Governing Law</a></li>
+      <li><a href="#s22">Changes to These Terms</a></li>
+      <li><a href="#s23">General Provisions</a></li>
+      <li><a href="#s24">Contact</a></li>
+    </ol>
+  </nav>
+
+  <section id="s1">
+    <h2><span class="n">01</span> Agreement &amp; Definitions</h2>
+    <p>These Terms of Service form a binding agreement between you and ARTE DEALS. By creating
+    an account, posting a listing, sending a message, or otherwise using the site, you confirm
+    that you have read these terms and agree to be bound by them, together with our
+    <a href="privacy.html">Privacy Policy</a>.</p>
+    <p>If you do not agree with any part of this agreement, do not use ARTE DEALS.</p>
+    <h3>1.1 Definitions</h3>
+    <table>
+      <tr><td>Platform</td><td>The ARTE DEALS website and any related pages or services</td></tr>
+      <tr><td>User</td><td>Any person who accesses the Platform, with or without an account</td></tr>
+      <tr><td>Seller</td><td>A User with a Seller account who posts vehicles for sale</td></tr>
+      <tr><td>Buyer</td><td>A User browsing, saving, or enquiring about vehicles</td></tr>
+      <tr><td>Listing</td><td>A vehicle advertisement posted by a Seller</td></tr>
+      <tr><td>Cycle</td><td>The rolling two-week period governing a Seller's listing allowance</td></tr>
+      <tr><td>PRO</td><td>The paid ARTE DEALS PRO subscription</td></tr>
+      <tr><td>We / us</td><td>ARTE DEALS, operating from Metro Manila, Philippines</td></tr>
+    </table>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">02</span> What ARTE DEALS Is</h2>
+    <p>ARTE DEALS is a <strong>listing platform</strong>. We provide the space where people who
+    want to sell vehicles can present them, and where people who want to buy can find them and
+    make contact.</p>
+    <h3>2.1 What we do not do</h3>
+    <ul>
+      <li>We do not own, possess, or take custody of any vehicle listed on the Platform.</li>
+      <li>We do not inspect, appraise, certify, or verify the condition of any vehicle.</li>
+      <li>We do not verify ownership, registration, or the absence of encumbrances.</li>
+      <li>We do not handle payments between Buyers and Sellers, nor hold funds in escrow.</li>
+      <li>We do not arrange transport, delivery, financing, or insurance.</li>
+      <li>We are not an agent, broker, dealer, or representative of any User.</li>
+    </ul>
+    <p>Every sale is a private transaction between a Buyer and a Seller. <strong>ARTE DEALS is
+    not a party to it.</strong></p>
+    <h3>2.2 Financing estimates</h3>
+    <p>Where the Platform shows an estimated monthly amortisation, that figure is
+    <strong>indicative only</strong>. It is generated from illustrative flat rates for
+    convenience and does not constitute a loan offer, a quotation, or approval of financing.
+    Actual terms depend entirely on the financing institution and the applicant's
+    circumstances.</p>
+  </section>
+
+  <section id="s3">
+    <h2><span class="n">03</span> Eligibility</h2>
+    <ul>
+      <li>You must be at least <strong>18 years old</strong> to create an account.</li>
+      <li>You must have the legal capacity to enter into a binding agreement.</li>
+      <li>You must not be barred from using the Platform under any applicable law, nor be a User whose account we have previously terminated.</li>
+    </ul>
+  </section>
+
+  <section id="s4">
+    <h2><span class="n">04</span> Accounts &amp; Security</h2>
+    <h3>4.1 Registration</h3>
+    <p>Creating an account requires a working email address, which you must confirm using the
+    verification code we send. Accounts remain unverified, and unusable, until that code is
+    entered.</p>
+    <h3>4.2 Your responsibility</h3>
+    <ul>
+      <li>Provide accurate registration details and keep them current.</li>
+      <li>Keep your password confidential and use one you do not reuse elsewhere.</li>
+      <li>You are responsible for all activity carried out through your account.</li>
+      <li>Tell us promptly if you believe your account has been accessed by someone else.</li>
+    </ul>
+    <h3>4.3 One person, one account</h3>
+    <p>Additional accounts created to circumvent listing limits, evade a suspension, or
+    artificially inflate activity may be removed without notice.</p>
+    <div class="callout">
+      <div class="ct">Security notice</div>
+      <p>ARTE DEALS will never ask for your password, your verification code, your GCash MPIN,
+      or any one-time PIN. Anyone who does is attempting to defraud you. Report them to us
+      immediately.</p>
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="n">05</span> Buyer &amp; Seller Roles</h2>
+    <p>At sign-up you choose a role, which determines what you can do:</p>
+    <table>
+      <tr><th>Role</th><th>Permitted activity</th></tr>
+      <tr><td>Buyer</td><td>Browse listings, save vehicles, message Sellers</td></tr>
+      <tr><td>Seller</td><td>Everything a Buyer can do, plus post and manage Listings</td></tr>
+    </table>
+    <p>A Buyer may convert to a Seller account at any time from their account page, keeping
+    their saved vehicles and message history.</p>
+  </section>
+
+  <section id="s6">
+    <h2><span class="n">06</span> Listing Rules</h2>
+    <p>By posting a Listing you represent and warrant that:</p>
+    <ul>
+      <li>You own the vehicle, or are genuinely authorised by the owner to offer it for sale.</li>
+      <li>The vehicle exists, is in your possession or control, and is genuinely available.</li>
+      <li>All details — make, model, year, mileage, transmission, fuel type, condition, price and location — are accurate and current.</li>
+      <li>All photographs are of the actual vehicle, are recent, and are yours to use.</li>
+      <li>Any known material defect is disclosed honestly.</li>
+      <li>The vehicle is not stolen, subject to an unresolved encumbrance, or otherwise unlawful to sell.</li>
+    </ul>
+    <h3>6.1 Keeping listings current</h3>
+    <p>Mark a vehicle as sold, or remove the Listing, once it is no longer available. Leaving
+    sold vehicles live wastes Buyers' time and may result in your Listings being removed.</p>
+    <h3>6.2 Duplicates</h3>
+    <p>The same vehicle may not be listed more than once by the same Seller. Duplicate
+    Listings are blocked automatically and may also be removed manually.</p>
+  </section>
+
+  <section id="s7">
+    <h2><span class="n">07</span> Listing Cycles &amp; Limits</h2>
+    <p>Listing allowances run in <strong>two-week Cycles</strong>. A Seller's Cycle begins with
+    their own first Listing, so every Seller receives a full two weeks regardless of when they
+    join.</p>
+    <table>
+      <tr><th>Plan</th><th>Active listings per cycle</th><th>Photos per listing</th></tr>
+      <tr><td>Standard</td><td>3</td><td>8</td></tr>
+      <tr><td>PRO</td><td>6</td><td>8</td></tr>
+    </table>
+    <ul>
+      <li>Deleting a Listing frees the slot, which may be used again within the same Cycle.</li>
+      <li>When a Cycle ends, the allowance resets and Listings from the previous Cycle close.</li>
+      <li>Re-posting a vehicle in a new Cycle consumes a slot in that Cycle.</li>
+    </ul>
+  </section>
+
+  <section id="s8">
+    <h2><span class="n">08</span> ARTE DEALS PRO</h2>
+    <p>PRO is an optional paid subscription for Sellers. It includes:</p>
+    <ul>
+      <li>Six active Listings per Cycle instead of three</li>
+      <li>A PRO badge displayed on the Seller's profile and Listings</li>
+      <li>Contact links (Messenger, Viber, WhatsApp) shown to Buyers on the Seller's profile</li>
+      <li>Increased likelihood of appearing higher in browse results</li>
+    </ul>
+    <h3>8.1 Term</h3>
+    <p>A PRO subscription runs for <strong>one month from the date of activation</strong>.</p>
+    <h3>8.2 No automatic renewal</h3>
+    <p>PRO does <strong>not</strong> renew automatically and no recurring charge is ever made.
+    When the month ends the account reverts to Standard. To continue, the Seller makes a new
+    payment and submits a new reference number.</p>
+    <h3>8.3 Effect of expiry</h3>
+    <p>When PRO expires, the Seller's allowance returns to three Listings per Cycle. Listings
+    already posted are not deleted, but the Seller cannot post beyond the Standard limit until
+    the next Cycle or until PRO is renewed.</p>
+  </section>
+
+  <section id="s9">
+    <h2><span class="n">09</span> Payment &amp; Refunds</h2>
+    <h3>9.1 Price</h3>
+    <p>PRO is priced at <strong>₱129 per month</strong>, offered at a promotional
+    <strong>₱79</strong> during the launch period. Prices are in Philippine Pesos and may
+    change; any change applies only to subscriptions purchased afterwards.</p>
+    <h3>9.2 How payment works</h3>
+    <p>Payment is made by GCash to the account shown on the upgrade page, which is visible only
+    to signed-in Sellers. After paying, the Seller submits the GCash reference number through
+    the Platform. We verify it manually and activate PRO, ordinarily within a few hours.</p>
+    <p>We do not process card payments and never receive your GCash credentials. We receive
+    only the reference number you provide.</p>
+    <h3>9.3 Incorrect or unverifiable payments</h3>
+    <p>A reference number that cannot be matched to a received payment will be rejected and
+    PRO will not be activated. If you believe this is in error, contact us with your proof of
+    payment and we will review it.</p>
+    <h3>9.4 Refunds</h3>
+    <p>Subscription fees are <strong>non-refundable once PRO has been activated</strong>, as
+    the benefit is delivered immediately and in full.</p>
+    <p>We will refund in the following circumstances:</p>
+    <ul>
+      <li>Payment was received but PRO was never activated, and we cannot activate it.</li>
+      <li>A duplicate payment was made in error for the same subscription period.</li>
+      <li>An amount was taken in error through our mistake.</li>
+    </ul>
+    <p>Refund requests should be sent to
+    <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a> with the reference number.
+    Nothing here limits any right you may have under the Consumer Act of the Philippines.</p>
+  </section>
+
+  <section id="s10">
+    <h2><span class="n">10</span> Placement &amp; Visibility</h2>
+    <p>Browse results are ordered by a weighted shuffle that changes on each visit, so that
+    Listings are not permanently ranked by age. PRO Listings carry a heavier weighting and
+    therefore appear near the top more often. Standard Listings continue to appear throughout
+    the results and can rank above PRO Listings.</p>
+    <p><strong>Increased visibility is not a guarantee of views, enquiries, or a sale.</strong>
+    Buyers may also sort results by newest, price, or distance, which disregards weighting
+    entirely.</p>
+  </section>
+
+  <section id="s11">
+    <h2><span class="n">11</span> Messaging</h2>
+    <p>The Platform provides direct messaging between Buyers and Sellers. Messages are stored
+    so that both parties retain their conversation history.</p>
+    <ul>
+      <li>Messages are private between the two participants.</li>
+      <li>Administrators may review messages when investigating a report or a suspected breach of these terms.</li>
+      <li>Do not send passwords, verification codes, card details, or identity documents through the Platform.</li>
+      <li>Harassment, spam, and unsolicited advertising are prohibited.</li>
+    </ul>
+  </section>
+
+  <section id="s12">
+    <h2><span class="n">12</span> Prohibited Conduct</h2>
+    <p>You must not:</p>
+    <ul>
+      <li>Post fraudulent, stolen, misrepresented, or non-existent vehicles.</li>
+      <li>Use the Platform to deceive, defraud, or extract payment under false pretences.</li>
+      <li>Impersonate another person or business, or use another party's photographs or identity.</li>
+      <li>Post unlawful, obscene, discriminatory, or offensive content.</li>
+      <li>Infringe the intellectual property, privacy, or other rights of any person.</li>
+      <li>Harvest, scrape, or collect other Users' information for any purpose.</li>
+      <li>Circumvent listing limits, moderation decisions, or a suspension.</li>
+      <li>Introduce malware, or attempt to disrupt, overload, or gain unauthorised access to the Platform or its underlying services.</li>
+      <li>Use automated means to inflate views, enquiries, or any other metric.</li>
+    </ul>
+  </section>
+
+  <section id="s13">
+    <h2><span class="n">13</span> Reporting &amp; Moderation</h2>
+    <p>Any signed-in User may report a Listing. Reports are reviewed by administrators, and the
+    Seller is not told who submitted them.</p>
+    <p>Following a review we may take any of the following steps: leave the Listing in place,
+    remove it, contact the Seller, restrict the account, or terminate it. We may remove any
+    Listing or account at our discretion, with or without a report, and without prior notice
+    where the circumstances warrant it.</p>
+  </section>
+
+  <section id="s14">
+    <h2><span class="n">14</span> Your Content</h2>
+    <p>You retain ownership of the Listings, photographs, and messages you create.</p>
+    <p>By posting content you grant ARTE DEALS a <strong>non-exclusive, royalty-free,
+    worldwide licence</strong> to host, store, reproduce, resize, and display that content for
+    the purposes of operating and promoting the Platform. This licence ends when you remove the
+    content, save for copies retained in backups for a limited period, and for any copies
+    others may have lawfully saved or shared.</p>
+    <p>You confirm that you hold the rights necessary to grant this licence.</p>
+  </section>
+
+  <section id="s15">
+    <h2><span class="n">15</span> Our Intellectual Property</h2>
+    <p>The ARTE DEALS name, logo, wordmark, visual design, and the software behind the Platform
+    are our property or licensed to us. You may not copy, reproduce, or create derivative works
+    from them without written permission. Nothing in these terms transfers any right in our
+    intellectual property to you.</p>
+  </section>
+
+  <section id="s16">
+    <h2><span class="n">16</span> Transactions Between Users</h2>
+    <p>Because ARTE DEALS is not a party to any sale, Buyers and Sellers deal with each other
+    directly and at their own risk.</p>
+    <div class="callout">
+      <div class="ct">Before you buy</div>
+      <p>Meet in a safe, public place during daylight. Inspect the vehicle in person and, where
+      possible, have it checked by a mechanic. Verify the Certificate of Registration and
+      Official Receipt, confirm the engine and chassis numbers match, and check for any
+      encumbrance. Never send a deposit to someone you have not met, and be cautious of prices
+      that seem too good to be true.</p>
+    </div>
+    <p>Disputes arising from a transaction are between the Buyer and the Seller. We may, at our
+    discretion, provide relevant records where required by law or lawful request, but we do not
+    mediate, arbitrate, or guarantee any outcome.</p>
+  </section>
+
+  <section id="s17">
+    <h2><span class="n">17</span> Suspension &amp; Termination</h2>
+    <h3>17.1 By you</h3>
+    <p>You may stop using the Platform at any time and may request deletion of your account as
+    described in our <a href="privacy.html">Privacy Policy</a>.</p>
+    <h3>17.2 By us</h3>
+    <p>We may suspend or terminate an account that breaches these terms, is the subject of
+    credible reports, or appears to be operating fraudulently. Where an account is terminated
+    for a breach, any unused portion of a PRO subscription is forfeited and no refund is due.</p>
+    <h3>17.3 Effect</h3>
+    <p>On termination, your Listings are removed from public view. Sections that by their
+    nature should survive — including intellectual property, limitation of liability,
+    indemnity, and governing law — continue to apply.</p>
+  </section>
+
+  <section id="s18">
+    <h2><span class="n">18</span> Availability &amp; Third Parties</h2>
+    <p>The Platform is provided on an "as is" and "as available" basis. We do not warrant that
+    it will be uninterrupted, error-free, or free from delay.</p>
+    <p>We rely on third-party providers for hosting, database services, image delivery, email,
+    and location search. Interruption or failure of any such provider may affect the Platform,
+    and we are not liable for their acts or omissions. Links to third-party services are
+    provided for convenience and imply no endorsement.</p>
+  </section>
+
+  <section id="s19">
+    <h2><span class="n">19</span> Limitation of Liability</h2>
+    <p>To the fullest extent permitted by Philippine law:</p>
+    <ul>
+      <li>We are not liable for the condition, legality, ownership, or description of any vehicle listed.</li>
+      <li>We are not liable for the conduct of any User, whether online or in person.</li>
+      <li>We are not liable for indirect, incidental, consequential, or exemplary loss, including lost profits, lost opportunity, or loss of data.</li>
+      <li>Our total aggregate liability arising from the Platform shall not exceed the total subscription fees you paid to us in the three months preceding the claim, or ₱1,000, whichever is greater.</li>
+    </ul>
+    <p>Nothing in these terms excludes liability for fraud, wilful misconduct, or any liability
+    that cannot lawfully be excluded.</p>
+  </section>
+
+  <section id="s20">
+    <h2><span class="n">20</span> Indemnity</h2>
+    <p>You agree to indemnify and hold ARTE DEALS harmless from any claim, demand, loss, or
+    expense, including reasonable legal fees, arising from your use of the Platform, your
+    Listings or content, your breach of these terms, or your violation of any law or the rights
+    of a third party.</p>
+  </section>
+
+  <section id="s21">
+    <h2><span class="n">21</span> Disputes &amp; Governing Law</h2>
+    <p>These terms are governed by the laws of the <strong>Republic of the Philippines</strong>,
+    without regard to conflict of law principles.</p>
+    <p>If a dispute arises between you and ARTE DEALS, we ask that you first contact us so we
+    can try to resolve it directly. Most matters are settled this way. Where a dispute cannot be
+    resolved, it shall be submitted to the exclusive jurisdiction of the competent courts of
+    Metro Manila, Philippines.</p>
+  </section>
+
+  <section id="s22">
+    <h2><span class="n">22</span> Changes to These Terms</h2>
+    <p>We may amend these terms as the Platform develops or as the law requires. The effective
+    date at the top of this page shows when they last changed, and material changes will be
+    announced on the Platform.</p>
+    <p>Continuing to use ARTE DEALS after a change takes effect constitutes acceptance of the
+    amended terms. If you do not accept them, stop using the Platform and request deletion of
+    your account.</p>
+  </section>
+
+  <section id="s23">
+    <h2><span class="n">23</span> General Provisions</h2>
+    <h3>23.1 Entire agreement</h3>
+    <p>These terms, together with the Privacy Policy, constitute the entire agreement between
+    you and ARTE DEALS regarding the Platform.</p>
+    <h3>23.2 Severability</h3>
+    <p>If any provision is found unenforceable, the remaining provisions continue in full
+    force, and the unenforceable provision shall be interpreted so as to give effect to its
+    intent as closely as the law allows.</p>
+    <h3>23.3 No waiver</h3>
+    <p>Our failure to enforce any provision is not a waiver of our right to enforce it later.</p>
+    <h3>23.4 Assignment</h3>
+    <p>You may not assign or transfer your rights under these terms. We may assign ours in
+    connection with a merger, acquisition, or transfer of the business, on notice to you.</p>
+    <h3>23.5 Notices</h3>
+    <p>We may give notice by email to the address on your account or by posting on the Platform.
+    Notices to us should be sent to the address in section 24.</p>
+    <h3>23.6 Force majeure</h3>
+    <p>Neither party is liable for failure to perform caused by events beyond reasonable
+    control, including natural disasters, power or network failure, or government action.</p>
+  </section>
+
+  <section id="s24">
+    <h2><span class="n">24</span> Contact</h2>
+    <p>Questions, notices, and complaints regarding these terms:</p>
+    <table>
+      <tr><td>Email</td><td><a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a></td></tr>
+      <tr><td>Location</td><td>Metro Manila, Makati, Philippines</td></tr>
+      <tr><td>Response</td><td>We aim to reply within three business days</td></tr>
+    </table>
+  </section>
+
+</div>
+
+<div class="foot">
+  2023 ARTE DEALS. All rights reserved.<br>
+  Metro Manila, Makati Philippines<br>
+  <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a>
+  <div class="foot-links">
+    <a href="index.html">Home</a> <span>&middot;</span>
+    <a href="privacy.html">Privacy Policy</a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — ARTE DEALS</title>
+<meta name="description" content="How ARTE DEALS collects, uses, shares, and protects your personal information under the Data Privacy Act of 2012.">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07070a; --panel:rgba(255,255,255,0.03); --line:rgba(201,204,209,0.14);
+  --red:#e01230; --red-2:#ff2d4d;
+  --silver:#c9ccd1; --silver-bright:#f3f4f6; --muted:#8b8d94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--black); color:var(--silver);
+  font-family:Inter,sans-serif; font-size:15px; line-height:1.78;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.top{
+  position:sticky; top:0; z-index:10;
+  border-bottom:1px solid var(--line); padding:18px 26px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  background:rgba(7,7,10,0.96);
+}
+.mark{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:18px;
+  letter-spacing:.22em; text-transform:uppercase; color:#fff; text-decoration:none;
+}
+.mark span{color:var(--red-2);}
+.back{font-size:12.5px; color:var(--muted);}
+.back:hover{color:var(--red-2);}
+
+.hero{
+  border-bottom:1px solid var(--line);
+  padding:56px 26px 44px; text-align:center;
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.09), transparent 62%);
+}
+.eyebrow{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.34em; text-transform:uppercase; color:var(--red-2); margin-bottom:10px;
+}
+h1{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:clamp(34px,7vw,54px);
+  line-height:1.02; color:#fff; letter-spacing:.01em; margin-bottom:14px;
+}
+.lede{max-width:640px; margin:0 auto; font-size:15.5px; color:var(--silver);}
+.meta-row{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-top:22px; flex-wrap:wrap; font-size:11.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.meta-row b{color:var(--silver-bright); font-weight:600;}
+.meta-dot{width:4px; height:4px; border-radius:50%; background:var(--red-2);}
+
+.wrap{max-width:780px; margin:0 auto; padding:44px 26px 100px;}
+
+.toc{
+  padding:22px 24px; margin-bottom:48px;
+  border:1px solid var(--line); border-radius:10px; background:var(--panel);
+}
+.toc h2{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  margin:0 0 14px; border:none; padding:0;
+}
+.toc ol{list-style:none; counter-reset:toc; columns:2; column-gap:30px;}
+.toc li{counter-increment:toc; margin-bottom:8px; break-inside:avoid; font-size:13.5px; padding-left:0;}
+.toc li::before{
+  content:counter(toc,decimal-leading-zero); margin-right:9px; position:static;
+  font-family:Rajdhani,sans-serif; font-weight:700; color:var(--red-2); font-size:11.5px;
+}
+.toc a{color:var(--silver);}
+.toc a:hover{color:#fff;}
+@media(max-width:600px){ .toc ol{columns:1;} }
+
+section{margin-bottom:42px; scroll-margin-top:80px;}
+section h2{
+  display:flex; align-items:baseline; gap:12px;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.16em; text-transform:uppercase; color:#fff;
+  margin-bottom:16px; padding-top:24px; border-top:1px solid var(--line);
+}
+section h2 .n{font-size:12px; color:var(--red-2); letter-spacing:.1em; flex-shrink:0;}
+h3{
+  font-size:14px; font-weight:600; color:var(--silver-bright);
+  margin:22px 0 8px; letter-spacing:.01em;
+}
+p{margin-bottom:14px;}
+ul{margin:0 0 16px; padding:0; list-style:none;}
+ul li{position:relative; padding-left:20px; margin-bottom:9px;}
+ul li::before{content:'—'; position:absolute; left:0; color:var(--red-2); font-weight:700;}
+strong{color:var(--silver-bright); font-weight:600;}
+
+.callout{
+  padding:18px 20px; margin:22px 0; border-radius:8px;
+  border:1px solid rgba(224,18,48,0.34); background:rgba(224,18,48,0.07);
+}
+.callout .ct{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11.5px;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--red-2); margin-bottom:7px;
+}
+.callout p:last-child{margin-bottom:0;}
+
+table{width:100%; border-collapse:collapse; margin:8px 0 18px; font-size:13.5px;}
+th{
+  text-align:left; padding:10px 14px 10px 0; color:var(--muted);
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.16em; text-transform:uppercase; border-bottom:1px solid var(--line);
+}
+td{padding:12px 14px 12px 0; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:top;}
+td:first-child{color:var(--silver-bright); padding-right:20px;}
+
+.pill{
+  display:inline-block; font-family:Rajdhani,sans-serif; font-weight:700;
+  font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  padding:3px 9px; border-radius:3px; white-space:nowrap;
+}
+.pill.pub{color:#2a1e00; background:linear-gradient(150deg,#fdf0b4,#c9a227);}
+.pill.priv{color:#fff; background:rgba(255,255,255,0.1); border:1px solid var(--line);}
+
+.foot{
+  border-top:1px solid var(--line); padding:30px 26px 40px;
+  color:var(--muted); font-size:12.5px; line-height:1.9;
+}
+.foot a{color:var(--muted);}
+.foot a:hover{color:var(--red-2);}
+.foot-links{margin-top:12px; display:flex; gap:9px; flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="mark" href="index.html">ARTE <span>DEALS</span></a>
+  <a class="back" href="index.html">&larr; Back to listings</a>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Data Protection</div>
+  <h1>Privacy Policy</h1>
+  <p class="lede">What we collect, why we collect it, who else sees it, how long we keep it,
+  and the rights you hold over it under Philippine law.</p>
+  <div class="meta-row">
+    <span>Effective <b>15 August 2026</b></span>
+    <span class="meta-dot"></span>
+    <span>Version <b>1.0</b></span>
+    <span class="meta-dot"></span>
+    <span>Republic Act <b>No. 10173</b></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#p1">Scope &amp; Who We Are</a></li>
+      <li><a href="#p2">Information We Collect</a></li>
+      <li><a href="#p3">Information We Do Not Collect</a></li>
+      <li><a href="#p4">Why We Process It</a></li>
+      <li><a href="#p5">Public vs Private</a></li>
+      <li><a href="#p6">Service Providers</a></li>
+      <li><a href="#p7">Where Data Is Stored</a></li>
+      <li><a href="#p8">Payments</a></li>
+      <li><a href="#p9">Location Data</a></li>
+      <li><a href="#p10">Messages &amp; Moderation</a></li>
+      <li><a href="#p11">Retention</a></li>
+      <li><a href="#p12">Your Rights</a></li>
+      <li><a href="#p13">Deleting Your Account</a></li>
+      <li><a href="#p14">Security</a></li>
+      <li><a href="#p15">Data Breach</a></li>
+      <li><a href="#p16">Stored on Your Device</a></li>
+      <li><a href="#p17">Children</a></li>
+      <li><a href="#p18">Changes</a></li>
+      <li><a href="#p19">Contact &amp; Complaints</a></li>
+    </ol>
+  </nav>
+
+  <section id="p1">
+    <h2><span class="n">01</span> Scope &amp; Who We Are</h2>
+    <p>ARTE DEALS operates a vehicle marketplace serving the Philippines. This policy explains
+    how we handle personal information and applies to everyone who uses the site, whether or
+    not they hold an account.</p>
+    <p>For the purposes of the <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong>,
+    ARTE DEALS acts as the <strong>Personal Information Controller</strong> for the data
+    described here. We operate from Metro Manila, Philippines.</p>
+    <p>This policy should be read alongside our <a href="terms.html">Terms of Service</a>.</p>
+  </section>
+
+  <section id="p2">
+    <h2><span class="n">02</span> Information We Collect</h2>
+    <p>We collect only what the marketplace needs to function.</p>
+    <h3>2.1 Information you give us</h3>
+    <table>
+      <tr><th>Data</th><th>When</th><th>Why</th></tr>
+      <tr><td>Full name</td><td>At sign-up</td><td>Identifies you to other users</td></tr>
+      <tr><td>Email address</td><td>At sign-up</td><td>Sign-in, verification, password reset</td></tr>
+      <tr><td>Password</td><td>At sign-up</td><td>Stored encrypted; never visible to us</td></tr>
+      <tr><td>Account type</td><td>At sign-up</td><td>Determines Buyer or Seller permissions</td></tr>
+      <tr><td>Profile photo</td><td>Optional</td><td>Shown on your profile and listings</td></tr>
+      <tr><td>Listing details</td><td>When posting</td><td>Displayed publicly on the marketplace</td></tr>
+      <tr><td>Vehicle photographs</td><td>When posting</td><td>Displayed publicly on the marketplace</td></tr>
+      <tr><td>Vehicle location</td><td>When posting</td><td>Lets buyers filter by area</td></tr>
+      <tr><td>Messages</td><td>When you write one</td><td>Delivered to the recipient and kept in both inboxes</td></tr>
+      <tr><td>Contact links</td><td>Optional, PRO only</td><td>Shown to buyers on your profile</td></tr>
+      <tr><td>Payment reference</td><td>When subscribing</td><td>Verifying a GCash payment</td></tr>
+      <tr><td>Reports</td><td>When you report a listing</td><td>Investigating the listing concerned</td></tr>
+    </table>
+    <h3>2.2 Information generated as you use the site</h3>
+    <ul>
+      <li><strong>Last active time</strong> — so others can see whether you are around to reply.</li>
+      <li><strong>Listing view counts</strong> — aggregate numbers only; we do not record who viewed what.</li>
+      <li><strong>Saved vehicles</strong> — visible only to you.</li>
+      <li><strong>Account timestamps</strong> — when an account or listing was created.</li>
+    </ul>
+    <p>Our service providers may also record technical information such as IP addresses and
+    browser type as part of delivering the site securely.</p>
+  </section>
+
+  <section id="p3">
+    <h2><span class="n">03</span> Information We Do Not Collect</h2>
+    <p>To be explicit, ARTE DEALS does <strong>not</strong> collect or store:</p>
+    <ul>
+      <li>GCash MPINs, one-time PINs, or any payment credentials</li>
+      <li>Card numbers or bank account details</li>
+      <li>Government identification documents</li>
+      <li>Continuous or background location tracking</li>
+      <li>Advertising or cross-site tracking identifiers</li>
+      <li>Sensitive personal information as defined by the Data Privacy Act, including race, health, religion, or political affiliation</li>
+    </ul>
+  </section>
+
+  <section id="p4">
+    <h2><span class="n">04</span> Why We Process It</h2>
+    <table>
+      <tr><th>Purpose</th><th>Basis</th></tr>
+      <tr><td>Creating and maintaining your account</td><td>Performance of our agreement with you</td></tr>
+      <tr><td>Publishing your listings to buyers</td><td>Performance of our agreement with you</td></tr>
+      <tr><td>Delivering messages between users</td><td>Performance of our agreement with you</td></tr>
+      <tr><td>Verifying subscription payments</td><td>Performance of our agreement with you</td></tr>
+      <tr><td>Investigating reports and preventing fraud</td><td>Legitimate interest in a safe marketplace</td></tr>
+      <tr><td>Enforcing listing limits and site rules</td><td>Legitimate interest in fair use</td></tr>
+      <tr><td>Keeping records of transactions</td><td>Compliance with legal obligations</td></tr>
+    </table>
+    <p>We do not use your personal information for advertising, and we do not sell it to anyone.</p>
+  </section>
+
+  <section id="p5">
+    <h2><span class="n">05</span> Public vs Private</h2>
+    <p>Because ARTE DEALS is a public marketplace, some information is visible to anyone,
+    including visitors without an account.</p>
+    <table>
+      <tr><th>Information</th><th>Visibility</th></tr>
+      <tr><td>Your name</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>Profile photo</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>Your listings and photos</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>Vehicle location (area)</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>Last active time</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>PRO contact links</td><td><span class="pill pub">Public</span></td></tr>
+      <tr><td>Email address</td><td><span class="pill priv">Private</span></td></tr>
+      <tr><td>Password</td><td><span class="pill priv">Private</span></td></tr>
+      <tr><td>Messages</td><td><span class="pill priv">Private</span></td></tr>
+      <tr><td>Saved vehicles</td><td><span class="pill priv">Private</span></td></tr>
+      <tr><td>Payment references</td><td><span class="pill priv">Private</span></td></tr>
+    </table>
+    <p>Consider carefully what you place in a listing or a photograph. Number plates, house
+    frontages, and documents visible in images become public once posted.</p>
+  </section>
+
+  <section id="p6">
+    <h2><span class="n">06</span> Service Providers</h2>
+    <p>We use established providers to run the site. Each processes only what its function
+    requires, and each is bound by its own privacy commitments.</p>
+    <table>
+      <tr><th>Provider</th><th>Function</th><th>Data involved</th></tr>
+      <tr><td>Supabase</td><td>Database and authentication</td><td>Account details, listings, messages</td></tr>
+      <tr><td>Cloudinary</td><td>Image hosting and delivery</td><td>Vehicle and profile photographs</td></tr>
+      <tr><td>Brevo</td><td>Transactional email</td><td>Email address, verification codes</td></tr>
+      <tr><td>MapTiler</td><td>Location search</td><td>Place names you type when posting</td></tr>
+      <tr><td>GitHub Pages</td><td>Website hosting</td><td>Technical connection data</td></tr>
+    </table>
+    <p>We do not authorise any provider to use your information for their own marketing.</p>
+  </section>
+
+  <section id="p7">
+    <h2><span class="n">07</span> Where Data Is Stored</h2>
+    <p>Our database is hosted in <strong>Singapore</strong>. Images, email delivery, and website
+    hosting may involve servers in other countries operated by the providers listed above.</p>
+    <p>Where personal information is transferred outside the Philippines, we take reasonable
+    steps to ensure it remains protected to a standard consistent with the Data Privacy Act,
+    including relying on providers that publish their own data protection commitments.</p>
+  </section>
+
+  <section id="p8">
+    <h2><span class="n">08</span> Payments</h2>
+    <p>Subscription payments are made through <strong>GCash</strong>, outside our systems. We do
+    not operate a payment gateway and never receive your GCash credentials.</p>
+    <p>What we receive is the <strong>reference number</strong> you submit, which we match
+    against payments received in order to activate your subscription. We retain these references
+    as proof of payment.</p>
+  </section>
+
+  <section id="p9">
+    <h2><span class="n">09</span> Location Data</h2>
+    <h3>9.1 Vehicle location</h3>
+    <p>When posting, sellers choose a place name from a search list. The chosen area and its
+    approximate coordinates are stored with the listing and shown publicly, so buyers can filter
+    by location.</p>
+    <h3>9.2 "Nearest to me"</h3>
+    <p>If a buyer sorts by distance, their browser asks permission and the calculation happens
+    <strong>on their own device</strong>. Their position is not transmitted to us and is not
+    stored. Declining the request simply returns the listings in their normal order.</p>
+  </section>
+
+  <section id="p10">
+    <h2><span class="n">10</span> Messages &amp; Moderation</h2>
+    <p>Messages are stored so both participants retain their conversation. They are private
+    between those two people.</p>
+    <p>Administrators may access messages where necessary to investigate a report, a suspected
+    breach of our terms, or a suspected fraud, and where we are required to do so by law or
+    lawful request. We do not read messages routinely.</p>
+    <div class="callout">
+      <div class="ct">Never share these</div>
+      <p>Do not send passwords, verification codes, GCash PINs, card details, or photographs of
+      identity documents through the Platform. No one from ARTE DEALS will ever ask for them.</p>
+    </div>
+  </section>
+
+  <section id="p11">
+    <h2><span class="n">11</span> Retention</h2>
+    <table>
+      <tr><th>Data</th><th>Kept for</th></tr>
+      <tr><td>Account information</td><td>While your account exists</td></tr>
+      <tr><td>Listings</td><td>Closed at cycle end; retained in our records afterwards</td></tr>
+      <tr><td>Photographs</td><td>Until the listing is deleted; copies may persist briefly on the image service</td></tr>
+      <tr><td>Messages</td><td>While either participant's account exists</td></tr>
+      <tr><td>Payment references</td><td>Retained as proof of subscription</td></tr>
+      <tr><td>Reports</td><td>Retained to identify repeat problems</td></tr>
+      <tr><td>Backups</td><td>Overwritten on a rolling basis</td></tr>
+    </table>
+    <p>Deleted content disappears from the site immediately but may persist in backups for a
+    limited period before being overwritten.</p>
+  </section>
+
+  <section id="p12">
+    <h2><span class="n">12</span> Your Rights</h2>
+    <p>Under the Data Privacy Act you have the right to:</p>
+    <ul>
+      <li><strong>Be informed</strong> — know that your information is being processed, and why.</li>
+      <li><strong>Access</strong> — obtain a copy of the personal information we hold about you.</li>
+      <li><strong>Rectify</strong> — correct anything inaccurate or incomplete.</li>
+      <li><strong>Erase or block</strong> — have your information removed, subject to legal retention.</li>
+      <li><strong>Object</strong> — object to processing in certain circumstances.</li>
+      <li><strong>Data portability</strong> — receive your information in a usable electronic format.</li>
+      <li><strong>Damages</strong> — seek compensation for harm caused by inaccurate or unlawfully used information.</li>
+    </ul>
+    <p>To exercise any of these, email
+    <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a> from the address on your
+    account. We aim to respond within <strong>fifteen (15) days</strong>. We may ask you to
+    confirm your identity before acting on a request.</p>
+  </section>
+
+  <section id="p13">
+    <h2><span class="n">13</span> Deleting Your Account</h2>
+    <p>Email us from your registered address asking for deletion. On receipt we will:</p>
+    <ul>
+      <li>Remove your listings and photographs from the site</li>
+      <li>Delete your profile, including your name and photograph</li>
+      <li>Remove your account and sign-in credentials</li>
+    </ul>
+    <p>Some information may be retained where the law requires it or where we need it to resolve
+    a dispute or prevent fraud — for example, payment records and reports made against the
+    account. Messages you sent may remain visible to the person who received them, as those
+    records also belong to them.</p>
+  </section>
+
+  <section id="p14">
+    <h2><span class="n">14</span> Security</h2>
+    <p>We apply organisational and technical measures appropriate to the nature of the data:</p>
+    <ul>
+      <li>Passwords are stored using one-way encryption and are never visible to us.</li>
+      <li>The site is served over HTTPS, so traffic is encrypted in transit.</li>
+      <li>Email verification is required before an account can be used.</li>
+      <li>Database rules enforce, at the data layer, that one account cannot read another's private information.</li>
+      <li>Administrative access is restricted to a separate, dedicated account.</li>
+      <li>Payment details are held in the database, visible only to signed-in users, rather than in public files.</li>
+    </ul>
+    <p>No system is entirely secure. Use a password unique to this site, and never share a
+    verification code with anyone.</p>
+  </section>
+
+  <section id="p15">
+    <h2><span class="n">15</span> Data Breach</h2>
+    <p>If a breach occurs that is likely to give rise to a real risk of serious harm, we will
+    notify the <strong>National Privacy Commission</strong> and the affected users within the
+    period required by law, describing what happened, what information was involved, and what
+    steps to take.</p>
+  </section>
+
+  <section id="p16">
+    <h2><span class="n">16</span> Stored on Your Device</h2>
+    <p>We store a <strong>sign-in token</strong> in your browser so you remain signed in between
+    visits. It is essential to the site working and is not used for advertising or tracking.</p>
+    <p>We do not use advertising cookies, third-party trackers, or analytics profiling. Clearing
+    your browser data will sign you out.</p>
+  </section>
+
+  <section id="p17">
+    <h2><span class="n">17</span> Children</h2>
+    <p>ARTE DEALS is intended for people aged <strong>18 and over</strong>. We do not knowingly
+    collect information from children. If you believe a child has created an account, contact us
+    and we will remove it and delete the associated information.</p>
+  </section>
+
+  <section id="p18">
+    <h2><span class="n">18</span> Changes</h2>
+    <p>We may update this policy as the site develops or the law changes. The effective date
+    above shows when it last changed. Material changes will be announced on the Platform, and
+    continued use afterwards indicates acceptance of the updated policy.</p>
+  </section>
+
+  <section id="p19">
+    <h2><span class="n">19</span> Contact &amp; Complaints</h2>
+    <p>For any privacy question, access request, correction, or deletion:</p>
+    <table>
+      <tr><td>Email</td><td><a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a></td></tr>
+      <tr><td>Location</td><td>Metro Manila, Makati, Philippines</td></tr>
+      <tr><td>Response</td><td>Within fifteen (15) days of receipt</td></tr>
+    </table>
+    <p>If you are not satisfied with how we have handled your concern, you have the right to
+    lodge a complaint with the <strong>National Privacy Commission</strong> of the Philippines.</p>
+  </section>
+
+</div>
+
+<div class="foot">
+  2023 ARTE DEALS. All rights reserved.<br>
+  Metro Manila, Makati Philippines<br>
+  <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a>
+  <div class="foot-links">
+    <a href="index.html">Home</a> <span>&middot;</span>
+    <a href="terms.html">Terms of Service</a>
+  </div>
+</div>
+
+</body>
+</html>

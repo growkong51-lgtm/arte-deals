@@ -343,8 +343,12 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .veh-scroll.is-pro .veh-table td{border-bottom-color:rgba(201,162,39,0.16);}
 .veh-scroll.is-pro .veh-name{color:#f6e6a8;}
 .veh-scroll.is-pro .veh-price{color:#fdf0b4;}
-.views-pill{display:inline-flex; align-items:center; gap:6px;}
-.views-pill svg{width:14px; height:14px; opacity:.8;}
+.cs-meta{display:inline-flex; align-items:center; gap:8px; min-width:0;}
+.cs-views{
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:10.5px; color:var(--muted); white-space:nowrap;
+}
+.cs-views svg{width:11px; height:11px; opacity:.75;}
 .veh-table{width:100%; border-collapse:collapse; min-width:760px;}
 .veh-table th{
   text-align:left; padding:14px 16px; font-family:'Rajdhani',sans-serif; font-weight:700;
@@ -1438,6 +1442,10 @@ footer{
 }
 .ft-copy{color:var(--silver); font-size:13px; margin-bottom:3px;}
 .ft-line a{color:var(--muted); text-decoration:none; transition:color .18s ease;}
+.ft-legal{margin-top:12px; display:flex; gap:9px; flex-wrap:wrap; font-size:12px;}
+.ft-legal a{color:var(--muted); text-decoration:none; transition:color .18s ease;}
+.ft-legal a:hover{color:var(--red-2);}
+.ft-legal span{opacity:.4;}
 .ft-line a:hover{color:var(--red-2);}
 
 @media(max-width:760px){
@@ -1510,6 +1518,11 @@ footer{
   <div class="ft-copy">2023 ARTE DEALS. All rights reserved.</div>
   <div class="ft-line">Metro Manila, Makati Philippines</div>
   <div class="ft-line"><a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a></div>
+  <div class="ft-legal">
+    <a href="terms.html">Terms of Service</a>
+    <span>&middot;</span>
+    <a href="privacy.html">Privacy Policy</a>
+  </div>
 </footer>
 
 <!-- AUTH MODAL -->
@@ -1793,7 +1806,7 @@ let sellerProfiles = {};        // id -> {name, avatar_url}
 let currentRoute = 'home';
 let searchQuery = '';
 let activeCategory = 'All';
-let sortBy = 'newest';
+let sortBy = 'featured';
 let activeArea = 'All';
 let myCoords = null;
 let editingListingId = null;
@@ -2525,9 +2538,11 @@ async function loadListings(){
   if(error){ dbFail(error, 'Could not load listings'); allListings = []; return; }
   const now = Date.now();
   allListings = (data || []).map(rowToListing).filter(l => !l.expiresAt || l.expiresAt > now);
+  shuffleListings();
   const { data: profs } = await sb.from('profiles').select('id,name,avatar_url,last_seen,is_pro,pro_until,messenger,viber,whatsapp');
   sellerProfiles = {};
   (profs || []).forEach(pr => { sellerProfiles[pr.id] = pr; });
+  shuffleListings();
 }
 
 /* ================= ROUTER / RENDER ================= */
@@ -2588,6 +2603,7 @@ function renderHome(app){
           ${areaOptions().map(a=>`<option value="${esc(a)}"${activeArea===a?' selected':''}>${esc(a)}</option>`).join('')}
         </select>
         <select class="select-mini" id="sortSel" onchange="sortBy=this.value; renderGrid();">
+          <option value="featured" ${sortBy==='featured'?'selected':''}>Featured</option>
           <option value="newest" ${sortBy==='newest'?'selected':''}>Newest</option>
           <option value="price-low" ${sortBy==='price-low'?'selected':''}>Price: Low to High</option>
           <option value="price-high" ${sortBy==='price-high'?'selected':''}>Price: High to Low</option>
@@ -2665,9 +2681,23 @@ function getFilteredListings(){
   }
   else if(sortBy==='price-low') list = list.slice().sort((a,b)=>a.price-b.price);
   else if(sortBy==='price-high') list = list.slice().sort((a,b)=>b.price-a.price);
-  else list = list.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  else if(sortBy==='newest') list = list.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  else list = list.slice().sort((a,b)=>(b.shuffle||0)-(a.shuffle||0));
   return list;
 }
+/* Every listing is shuffled on each visit, so nobody is stuck at the bottom
+   for being old. PRO listings carry a heavier weight, which lifts them more
+   often \u2014 but a free listing can still land above a PRO one. */
+const PRO_WEIGHT  = 0.7;
+const FREE_WEIGHT = 0.5;
+
+function shuffleListings(){
+  allListings.forEach(l => {
+    const weight = proOf(l.seller) ? PRO_WEIGHT : FREE_WEIGHT;
+    l.shuffle = Math.random() * weight;
+  });
+}
+
 function renderGrid(){
   const wrap = document.getElementById('gridWrap');
   if(!wrap) return;
@@ -2722,7 +2752,13 @@ function cardHTML(l){
         ${avatarHTML(l.seller, l.sellerName, 30, proOf(l.seller)?'gold':'')}
         <span class="cs-text">
           <span class="cs-name">${esc(l.sellerName)}${proOf(l.seller)?' <span class="pro-badge mini">PRO</span>':''}</span>
-          ${presenceHTML(l.seller, 'tiny')}
+          <span class="cs-meta">
+            ${presenceHTML(l.seller, 'tiny')}
+            <span class="cs-views">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+              ${viewLabel(l.views)}
+            </span>
+          </span>
         </span>
       </div>
     </div>
@@ -4034,10 +4070,6 @@ function renderDetail(){
         ${l.mileage?`<div class="pill">${Number(l.mileage).toLocaleString('en-PH')} km</div>`:''}
         <div class="pill">📍 ${esc(l.location)}</div>
         <div class="pill">${timeAgo(l.createdAt)}</div>
-        <div class="pill views-pill">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          ${viewLabel(l.views)} ${(l.views===1)?'view':'views'}
-        </div>
       </div>
       ${(l.details&&l.details.length)?`<div class="spec-block"><h4>Details</h4><ul>${l.details.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
       ${(l.mods&&l.mods.length)?`<div class="spec-block"><h4>Modifications / Loads</h4><ul>${l.mods.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div>`:''}
