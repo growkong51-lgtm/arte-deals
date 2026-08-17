@@ -1,0 +1,5 @@
+# ARTE DEALS
+User-agent: *
+Allow: /
+
+Sitemap: https://growkong51-lgtm.github.io/arte-deals/sitemap.xml
