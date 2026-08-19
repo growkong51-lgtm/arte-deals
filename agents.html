@@ -26,22 +26,63 @@ a{color:var(--red-2); text-decoration:none;}
 a:hover{text-decoration:underline;}
 
 .hero{
-  text-align:center; padding:54px 24px 40px;
-  border-bottom:1px solid var(--line);
-  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.13), transparent 66%);
+  position:relative; overflow:hidden; text-align:center;
+  padding:64px 24px 52px; border-bottom:1px solid var(--line);
 }
-.hero img{width:min(200px,54vw); height:auto; margin-bottom:26px;}
+.hero-glow{
+  position:absolute; inset:-40% -20% auto -20%; height:150%;
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.22), transparent 62%);
+  pointer-events:none;
+}
+.hero > *{position:relative;}
 .eyebrow{
-  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11.5px;
-  letter-spacing:.3em; text-transform:uppercase; color:var(--red-2); margin-bottom:9px;
+  display:inline-block; font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--red-2); margin-bottom:18px;
+  padding:6px 15px; border:1px solid rgba(224,18,48,0.45); border-radius:999px;
+  background:rgba(224,18,48,0.09);
 }
 h1{
-  font-family:Rajdhani,sans-serif; font-weight:700;
-  font-size:clamp(30px,6.5vw,46px); line-height:1.05; color:#fff; margin-bottom:12px;
+  font-family:Rajdhani,sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:clamp(27px,6.4vw,44px); line-height:1.14; color:#fff;
+  letter-spacing:.02em; margin-bottom:16px;
 }
-.sub{max-width:520px; margin:0 auto; font-size:15px; color:var(--silver);}
+.amount{
+  display:inline-block; position:relative; overflow:hidden;
+  font-size:clamp(24px,7vw,60px); letter-spacing:.01em; line-height:1.12; white-space:nowrap;
+  background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 40%,#b8891f 66%,#f6e6a8 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e8c45a;
+  filter:drop-shadow(0 3px 14px rgba(201,162,39,0.32));
+}
+.kicker{
+  font-family:Rajdhani,sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:clamp(15px,3.6vw,27px); letter-spacing:.2em; white-space:nowrap;
+  margin-bottom:22px;
+  background:linear-gradient(180deg,#ffffff 0%,#e6e8ec 34%,#9aa0a8 62%,#f4f5f7 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e6e8ec;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+}
+.sub{max-width:540px; margin:0 auto 28px; font-size:14.5px; line-height:1.7; color:var(--silver);}
+.amount::after{
+  content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform:skewX(-18deg); animation:amtShine 4.5s ease-in-out infinite; pointer-events:none;
+}
+@keyframes amtShine{ 0%,60%{left:-60%;} 82%,100%{left:130%;} }
+@media(prefers-reduced-motion:reduce){ .amount::after{display:none;} }
+.cta{
+  display:inline-block; padding:16px 38px; border-radius:999px; text-decoration:none;
+  background:linear-gradient(135deg,#ff2d4d,#8c0a1c); color:#fff;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.16em; text-transform:uppercase;
+  box-shadow:0 8px 26px rgba(224,18,48,0.35);
+  transition:transform .16s ease, box-shadow .2s ease;
+}
+.cta:hover{transform:translateY(-2px); box-shadow:0 12px 32px rgba(224,18,48,0.5); text-decoration:none;}
+.cta:active{transform:translateY(0);}
 
-.wrap{max-width:620px; margin:0 auto; padding:36px 24px 90px;}
+.wrap{max-width:620px; margin:0 auto; padding:40px 24px 90px; scroll-margin-top:20px;}
 
 .perks{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:32px;}
 .perk{padding:15px 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel);}
@@ -51,10 +92,18 @@ h1{
 }
 .perk span{font-size:12.5px; color:var(--muted); line-height:1.5;}
 
-.card{padding:24px 22px; border:1px solid var(--line); border-radius:12px; background:var(--panel);}
+.card{
+  padding:28px 24px; border:1px solid var(--line); border-radius:14px;
+  background:linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+}
 .card h2{
-  font-family:Rajdhani,sans-serif; font-weight:700; font-size:21px;
-  color:#fff; margin-bottom:5px;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:24px;
+  letter-spacing:.02em; color:#fff; margin-bottom:5px;
+}
+.card h2::after{
+  content:''; display:block; width:44px; height:2px; margin-top:10px;
+  background:linear-gradient(90deg, var(--red-2), transparent);
 }
 .card .hint{font-size:13px; color:var(--muted); margin-bottom:22px; line-height:1.55;}
 
@@ -133,19 +182,19 @@ textarea{resize:vertical; line-height:1.6;}
 <body>
 
 <div class="hero">
-  <div class="eyebrow">Invitation</div>
-  <h1>Become an ARTE DEALS Agent</h1>
-  <p class="sub">Already selling cars on Facebook Marketplace? Bring your listings to a
-  marketplace built for vehicles, reach buyers across Metro Manila, and grow with us.</p>
+  <div class="hero-glow"></div>
+  <div class="eyebrow">Now Recruiting</div>
+  <h1>Do you want to earn<br>
+    <span class="amount">₱10,000 &ndash; ₱30,000</span><br>
+    commission?</h1>
+  <div class="kicker">Become an ARTE DEALS Agent</div>
+  <p class="sub">Turn your network and social media into an income opportunity. No minimum
+  quota, work from anywhere, marketing and listing support, and performance incentives.
+  Beginners are welcome.</p>
+  <a class="cta" href="#apply">Join ARTE DEALS Now</a>
 </div>
 
-<div class="wrap">
-
-  <div class="perks">
-    <div class="perk"><b>More reach</b><span>Your cars seen by buyers browsing every day</span></div>
-    <div class="perk"><b>Free to join</b><span>No fee to apply, no fee to be accepted</span></div>
-    <div class="perk"><b>Direct enquiries</b><span>Buyers message you straight from your listings</span></div>
-  </div>
+<div class="wrap" id="apply">
 
   <div class="card" id="card">
     <h2>Application</h2>
