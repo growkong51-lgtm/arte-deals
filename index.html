@@ -1129,6 +1129,57 @@ select.calc-box{
 .reason.active .rs-tick{
   background:var(--red-2); border-color:var(--red-2); color:#fff;
 }
+.ag-hero{text-align:center; padding:6px 0 26px;}
+.ag-eyebrow{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11.5px;
+  letter-spacing:.26em; text-transform:uppercase; color:var(--red-2); margin-bottom:8px;
+}
+.ag-title{font-size:clamp(27px,5.5vw,38px); color:#fff; margin:0 0 10px;}
+.ag-sub{font-size:14px; line-height:1.65; color:var(--silver); max-width:480px; margin:0 auto;}
+.ag-perks{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:26px;}
+.ag-perk{
+  padding:15px 16px; border:1px solid var(--line); border-radius:10px;
+  background:rgba(255,255,255,0.03);
+}
+.ag-perk b{
+  display:block; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px;
+  color:#fff; margin-bottom:4px;
+}
+.ag-perk span{font-size:12.5px; color:var(--muted); line-height:1.5;}
+.ag-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.calc-label i{font-style:normal; color:var(--red-2); margin-left:2px;}
+.calc-label .opt{
+  font-style:normal; color:var(--muted); letter-spacing:.06em;
+  text-transform:none; font-size:10px; margin-left:6px;
+}
+.ag-toggle{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+.ag-opt{
+  padding:13px 8px; border-radius:8px; cursor:pointer;
+  background:rgba(0,0,0,0.35); border:1px solid var(--line); color:var(--silver);
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; letter-spacing:.08em;
+  text-transform:uppercase; transition:all .16s ease;
+}
+.ag-opt:hover{border-color:var(--silver); color:#fff;}
+.ag-opt.active{border-color:var(--red-2); background:rgba(224,18,48,0.14); color:#fff;}
+.ag-status{
+  display:inline-block; margin-top:16px; padding:9px 20px; border-radius:999px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; text-transform:uppercase;
+}
+.ag-status.new{color:var(--silver-bright); border:1px solid var(--line); background:rgba(255,255,255,0.05);}
+.ag-status.approved{color:#0d0d10; background:linear-gradient(150deg,#fdf0b4,#c9a227);}
+.ag-status.rejected{color:var(--muted); border:1px solid var(--line);}
+.ag-note{
+  max-width:480px; margin:16px auto 0; padding:12px 14px; font-size:13px;
+  line-height:1.6; color:var(--silver); border-left:2px solid var(--line);
+  background:rgba(255,255,255,0.03); text-align:left;
+}
+.ag-facts{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:10px; font-size:12.5px; color:var(--silver);}
+.ag-facts b{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-right:5px;
+}
+@media(max-width:480px){ .ag-grid{grid-template-columns:1fr;} }
 .report-card{
   padding:15px 16px; margin-bottom:11px; border:1px solid var(--line);
   border-radius:10px; background:rgba(255,255,255,0.03);
@@ -1590,6 +1641,8 @@ footer{
     <a href="terms.html">Terms of Service</a>
     <span>&middot;</span>
     <a href="privacy.html">Privacy Policy</a>
+    <span>&middot;</span>
+    <a href="agents.html">Become an Agent</a>
   </div>
 </footer>
 
@@ -3072,6 +3125,7 @@ let adminTab = 'listings';
 let adminUsers = [];
 let pendingPayments = [];
 let openReports = [];
+let agentApps = [];
 
 async function adminSignIn(e){
   e.preventDefault();
@@ -3145,6 +3199,7 @@ function renderAdmin(app){
   if(!adminUsers.length) loadAdminUsers().then(()=>renderAdmin(app));
   if(!pendingPayments.length) loadPayments().then(()=>renderAdmin(app));
   if(!openReports.length) loadReports().then(()=>renderAdmin(app));
+  if(!agentApps.length) loadAgentApps().then(()=>renderAdmin(app));
   const sold = allListings.filter(l=>l.status==='sold').length;
   app.innerHTML = `<main>
     <div class="admin-head">
@@ -3164,6 +3219,7 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+      <button class="msg-tab ${adminTab==='agents'?'active':''}" onclick="setAdminTab('agents')">Agents${agentApps.filter(a=>a.status==='new').length?' <span>'+agentApps.filter(a=>a.status==='new').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='reports'?'active':''}" onclick="setAdminTab('reports')">Reports${openReports.filter(r=>r.status==='open').length?' <span>'+openReports.filter(r=>r.status==='open').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
       <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
@@ -3171,6 +3227,7 @@ function renderAdmin(app){
 
     <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
                         : adminTab==='users' ? adminUsersHTML()
+                        : adminTab==='agents' ? adminAgentsHTML()
                         : adminTab==='reports' ? adminReportsHTML()
                         : adminTab==='settings' ? adminSettingsHTML()
                         : adminPaymentsHTML()}</div>
@@ -3192,6 +3249,56 @@ function setAdminTab(t){
   if(t === 'reports'){
     loadReports().then(()=>renderAdmin(document.getElementById('app')));
   }
+  if(t === 'agents'){
+    loadAgentApps().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+async function loadAgentApps(){
+  const { data } = await sb.from('agent_applications').select('*')
+    .order('created_at',{ascending:false}).limit(100);
+  agentApps = data || [];
+}
+
+function adminAgentsHTML(){
+  if(!agentApps.length) return '<div class="empty">No agent applications yet.</div>';
+  return agentApps.map(a=>`
+    <div class="report-card ${a.status==='new'?'open':''}">
+      <div class="rc-top">
+        <span class="rc-reason">${esc(a.full_name)}${a.age?' \u00b7 '+a.age:''}${a.sex?' \u00b7 '+esc(a.sex):''}</span>
+        <span class="rc-date">${new Date(a.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</span>
+      </div>
+      <div class="ag-facts">
+        <span><b>Area</b> ${esc(a.area||'\u2014')}</span>
+        <span><b>Mobile</b> ${esc(a.mobile||'\u2014')}</span>
+        <span><b>Marketplace</b> ${a.has_marketplace?'Yes':'No'}</span>
+        <span><b>3 cars a week</b> ${a.weekly_commit?'Yes':'No'}</span>
+        <span><b>Experience</b> ${esc(a.experience||'\u2014')}</span>
+        ${a.email?`<span><b>Email</b> ${esc(a.email)}</span>`:''}
+        ${a.facebook?`<span><b>Facebook</b> ${esc(a.facebook)}</span>`:''}
+      </div>
+      ${a.why?`<div class="rc-note">${esc(a.why)}</div>`:''}
+      <div class="rc-foot">
+        <span class="rc-by">Status: ${esc(a.status)}</span>
+        <div class="veh-actions">
+          ${a.status==='new' ? `
+            <button class="veh-btn" onclick="setAgentStatus('${a.id}','approved')">Approve</button>
+            <button class="veh-btn danger" onclick="setAgentStatus('${a.id}','rejected')">Decline</button>
+          ` : ''}
+
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function setAgentStatus(id, status){
+  const word = status === 'approved' ? 'approve' : 'decline';
+  if(!confirm('Are you sure you want to ' + word + ' this application?')) return;
+  const { error } = await sb.from('agent_applications').update({ status }).eq('id', id);
+  if(error){ dbFail(error, 'Could not update that application'); return; }
+  toast('Application ' + status);
+  await loadAgentApps();
+  renderAdmin(document.getElementById('app'));
 }
 
 async function loadReports(){

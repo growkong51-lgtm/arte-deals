@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Become an Agent — ARTE DEALS</title>
+<meta name="description" content="Apply to become an ARTE DEALS agent. Post vehicles, reach buyers across Metro Manila, and grow with us.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Become an ARTE DEALS Agent">
+<meta property="og:description" content="Already selling cars on Facebook Marketplace? Join the ARTE DEALS team.">
+<meta property="og:image" content="https://growkong51-lgtm.github.io/arte-deals/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07070a; --panel:rgba(255,255,255,0.03); --line:rgba(201,204,209,0.14);
+  --red:#e01230; --red-2:#ff2d4d;
+  --silver:#c9ccd1; --silver-bright:#f3f4f6; --muted:#8b8d94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--black); color:var(--silver);
+  font-family:Inter,sans-serif; font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.hero{
+  text-align:center; padding:54px 24px 40px;
+  border-bottom:1px solid var(--line);
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.13), transparent 66%);
+}
+.hero img{width:min(200px,54vw); height:auto; margin-bottom:26px;}
+.eyebrow{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11.5px;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--red-2); margin-bottom:9px;
+}
+h1{
+  font-family:Rajdhani,sans-serif; font-weight:700;
+  font-size:clamp(30px,6.5vw,46px); line-height:1.05; color:#fff; margin-bottom:12px;
+}
+.sub{max-width:520px; margin:0 auto; font-size:15px; color:var(--silver);}
+
+.wrap{max-width:620px; margin:0 auto; padding:36px 24px 90px;}
+
+.perks{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:32px;}
+.perk{padding:15px 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel);}
+.perk b{
+  display:block; font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  color:#fff; margin-bottom:3px;
+}
+.perk span{font-size:12.5px; color:var(--muted); line-height:1.5;}
+
+.card{padding:24px 22px; border:1px solid var(--line); border-radius:12px; background:var(--panel);}
+.card h2{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:21px;
+  color:#fff; margin-bottom:5px;
+}
+.card .hint{font-size:13px; color:var(--muted); margin-bottom:22px; line-height:1.55;}
+
+label{
+  display:block; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:7px; font-weight:600;
+}
+label i{font-style:normal; color:var(--red-2);}
+label .opt{letter-spacing:.05em; text-transform:none; font-size:10.5px; margin-left:5px;}
+input, select, textarea{
+  width:100%; padding:13px 15px; margin-bottom:20px; border-radius:8px;
+  background:rgba(0,0,0,0.4); border:1px solid var(--line); color:#fff;
+  font-size:15px; font-family:Inter,sans-serif; -webkit-appearance:none; appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238b8f97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat:no-repeat; background-position:right 15px center; padding-right:42px;
+}
+input::placeholder, textarea::placeholder{color:#5c6067;}
+input:focus, select:focus, textarea:focus{outline:none; border-color:var(--red-2);}
+textarea{resize:vertical; line-height:1.6;}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:440px){ .row{grid-template-columns:1fr;} }
+
+.toggle{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+.opt-btn{
+  padding:13px 8px; border-radius:8px; cursor:pointer;
+  background:rgba(0,0,0,0.4); border:1px solid var(--line); color:var(--silver);
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:.09em; text-transform:uppercase; transition:all .16s ease;
+}
+.opt-btn:hover{border-color:var(--silver); color:#fff;}
+.opt-btn.on{border-color:var(--red-2); background:rgba(224,18,48,0.14); color:#fff;}
+
+.submit{
+  width:100%; padding:16px; border:none; border-radius:8px; cursor:pointer;
+  background:linear-gradient(135deg,#ff2d4d,#6e0714); color:#fff;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.14em; text-transform:uppercase;
+  transition:box-shadow .2s ease, transform .16s ease;
+}
+.submit:hover{box-shadow:0 0 22px rgba(224,18,48,0.45);}
+.submit:active{transform:scale(.985);}
+.submit:disabled{opacity:.6; cursor:default;}
+
+.err{
+  padding:11px 13px; margin-bottom:16px; border-radius:7px; font-size:13.5px;
+  color:#ffbdc7; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.1);
+}
+.fine{font-size:12px; color:var(--muted); margin-top:14px; line-height:1.6;}
+
+.done{text-align:center; padding:16px 0;}
+.done .tick{
+  width:62px; height:62px; margin:0 auto 18px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(57,217,138,0.14); border:1px solid rgba(57,217,138,0.45); color:#39d98a;
+}
+.done .tick svg{width:28px; height:28px;}
+.done h2{font-family:Rajdhani,sans-serif; font-weight:700; font-size:26px; color:#fff; margin-bottom:8px;}
+.done p{font-size:14px; color:var(--silver); max-width:400px; margin:0 auto;}
+
+.foot{
+  border-top:1px solid var(--line); padding:26px 24px 40px;
+  color:var(--muted); font-size:12.5px; line-height:1.9;
+}
+.foot a{color:var(--muted);}
+.foot a:hover{color:var(--red-2);}
+.spinner{
+  width:17px; height:17px; border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff; border-radius:50%; display:inline-block;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Invitation</div>
+  <h1>Become an ARTE DEALS Agent</h1>
+  <p class="sub">Already selling cars on Facebook Marketplace? Bring your listings to a
+  marketplace built for vehicles, reach buyers across Metro Manila, and grow with us.</p>
+</div>
+
+<div class="wrap">
+
+  <div class="perks">
+    <div class="perk"><b>More reach</b><span>Your cars seen by buyers browsing every day</span></div>
+    <div class="perk"><b>Free to join</b><span>No fee to apply, no fee to be accepted</span></div>
+    <div class="perk"><b>Direct enquiries</b><span>Buyers message you straight from your listings</span></div>
+  </div>
+
+  <div class="card" id="card">
+    <h2>Application</h2>
+    <p class="hint">Everything here stays private and is seen only by the ARTE DEALS team.
+    We review each application by hand and reply by message.</p>
+
+    <div id="err"></div>
+
+    <label>Full Name <i>*</i></label>
+    <input id="fName" placeholder="Juan Dela Cruz" autocomplete="name">
+
+    <div class="row">
+      <div>
+        <label>Age <i>*</i></label>
+        <input id="fAge" type="number" min="18" max="99" inputmode="numeric" placeholder="28">
+      </div>
+      <div>
+        <label>Sex <span class="opt">optional</span></label>
+        <select id="fSex">
+          <option value="">Prefer not to say</option>
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Mobile Number <i>*</i></label>
+    <input id="fMobile" inputmode="tel" placeholder="09XX XXX XXXX" autocomplete="tel">
+
+    <label>Email <i>*</i></label>
+    <input id="fEmail" type="email" placeholder="you@example.com" autocomplete="email">
+
+    <label>Facebook Profile <span class="opt">optional</span></label>
+    <input id="fFb" placeholder="facebook.com/yourname">
+
+    <label>Area You Cover <i>*</i></label>
+    <input id="fArea" placeholder="e.g. Makati, Taguig, Pasay">
+
+    <label>Do you have Facebook Marketplace? <i>*</i></label>
+    <div class="toggle">
+      <button type="button" class="opt-btn on" id="mkY" onclick="pick('mk',true)">Yes</button>
+      <button type="button" class="opt-btn" id="mkN" onclick="pick('mk',false)">No</button>
+    </div>
+
+    <label>Willing to post at least 3 cars per week? <i>*</i></label>
+    <div class="toggle">
+      <button type="button" class="opt-btn on" id="wkY" onclick="pick('wk',true)">Yes</button>
+      <button type="button" class="opt-btn" id="wkN" onclick="pick('wk',false)">No</button>
+    </div>
+
+    <label>Experience Selling Vehicles <i>*</i></label>
+    <select id="fExp">
+      <option value="">Select</option>
+      <option>Just starting out</option>
+      <option>Under 1 year</option>
+      <option>1 to 3 years</option>
+      <option>More than 3 years</option>
+    </select>
+
+    <label>Why do you want to join? <span class="opt">optional</span></label>
+    <textarea id="fWhy" rows="3" placeholder="Tell us a little about yourself"></textarea>
+
+    <button class="submit" id="btn" onclick="send()">Submit Application</button>
+    <p class="fine">By applying you agree to our <a href="terms.html">Terms of Service</a>
+    and <a href="privacy.html">Privacy Policy</a>. We use your details only to review this
+    application and to contact you about it.</p>
+  </div>
+
+</div>
+
+<div class="foot">
+  2023 ARTE DEALS. All rights reserved.<br>
+  Metro Manila, Makati Philippines<br>
+  <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const sb = window.supabase.createClient(ARTE_CONFIG.supabaseUrl, ARTE_CONFIG.supabaseAnonKey);
+const answers = { mk:true, wk:true };
+
+function pick(key, val){
+  answers[key] = val;
+  document.getElementById(key + 'Y').classList.toggle('on', val);
+  document.getElementById(key + 'N').classList.toggle('on', !val);
+}
+
+const val = id => document.getElementById(id).value.trim();
+
+async function send(){
+  const err = document.getElementById('err');
+  err.innerHTML = '';
+
+  const name = val('fName');
+  const age = Number(val('fAge'));
+  const mobile = val('fMobile');
+  const email = val('fEmail');
+  const area = val('fArea');
+  const exp = val('fExp');
+
+  const missing = [];
+  if(!name) missing.push('your full name');
+  if(!age || age < 18) missing.push('your age (18 or over)');
+  if(mobile.replace(/\D/g,'').length < 10) missing.push('a valid mobile number');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) missing.push('a valid email');
+  if(!area) missing.push('the area you cover');
+  if(!exp) missing.push('your experience');
+
+  if(missing.length){
+    err.innerHTML = '<div class="err">Please add ' + missing.join(', ') + '.</div>';
+    window.scrollTo({ top: document.getElementById('card').offsetTop - 20, behavior:'smooth' });
+    return;
+  }
+
+  const btn = document.getElementById('btn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const { error } = await sb.from('agent_applications').insert({
+    full_name: name,
+    age,
+    sex: val('fSex') || null,
+    mobile,
+    email,
+    facebook: val('fFb') || null,
+    area,
+    has_marketplace: answers.mk,
+    weekly_commit: answers.wk,
+    experience: exp,
+    why: val('fWhy') || null
+  });
+
+  btn.textContent = 'Submit Application';
+  btn.disabled = false;
+
+  if(error){
+    err.innerHTML = '<div class="err">' + (error.message || 'Something went wrong. Please try again.') + '</div>';
+    return;
+  }
+
+  document.getElementById('card').innerHTML = `
+    <div class="done">
+      <div class="tick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2>Application Sent</h2>
+      <p>Thanks, ${name.split(' ')[0]}. We review every application by hand and will message
+      you at <b>${mobile}</b> once yours has been looked at.</p>
+    </div>`;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
+
+</body>
+</html>
