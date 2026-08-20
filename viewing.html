@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Viewing — ARTE DEALS</title>
+<meta name="description" content="Reserve a viewing slot for any vehicle listed on ARTE DEALS. Strictly by appointment.">
+<meta property="og:title" content="Book a Viewing — ARTE DEALS">
+<meta property="og:description" content="Viewing is strictly by appointment. Reserve your slot.">
+<meta property="og:image" content="https://growkong51-lgtm.github.io/arte-deals/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07070a; --panel:rgba(255,255,255,0.035); --line:rgba(201,204,209,0.14);
+  --red:#e01230; --red-2:#ff2d4d;
+  --silver:#c9ccd1; --silver-bright:#f3f4f6; --muted:#8b8d94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--black); color:var(--silver);
+  font-family:Inter,sans-serif; font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--red-2); text-decoration:none;}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative; overflow:hidden; text-align:center;
+  padding:60px 24px 46px; border-bottom:1px solid var(--line);
+}
+.hero-glow{
+  position:absolute; inset:-40% -20% auto -20%; height:150%;
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.2), transparent 62%);
+  pointer-events:none;
+}
+.hero > *{position:relative;}
+.eyebrow{
+  display:inline-block; font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--red-2); margin-bottom:16px;
+  padding:6px 15px; border:1px solid rgba(224,18,48,0.45); border-radius:999px;
+  background:rgba(224,18,48,0.09);
+}
+h1{
+  font-family:Rajdhani,sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:clamp(30px,7.4vw,54px); line-height:1.04; letter-spacing:.03em;
+  margin-bottom:14px; white-space:nowrap;
+  background:linear-gradient(180deg,#ffffff 0%,#e6e8ec 36%,#9aa0a8 64%,#f4f5f7 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e6e8ec;
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,0.6));
+}
+.hero p{max-width:460px; margin:0 auto; font-size:14.5px; color:var(--silver);}
+
+/* ---------- the rule ---------- */
+.rule{
+  max-width:620px; margin:26px auto 0; display:flex; gap:14px; align-items:flex-start;
+  padding:16px 18px; border-radius:10px; text-align:left;
+  border:1px solid rgba(224,18,48,0.45);
+  background:linear-gradient(145deg, rgba(224,18,48,0.14), rgba(255,255,255,0.02));
+}
+.rule svg{width:22px; height:22px; color:var(--red-2); flex-shrink:0; margin-top:1px;}
+.rule .t{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:12px; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--red-2); margin-bottom:4px;
+}
+.rule .b{font-size:13.5px; line-height:1.6; color:var(--silver-bright);}
+.rule b{color:#fff; font-weight:700;}
+
+/* ---------- form ---------- */
+.wrap{max-width:600px; margin:0 auto; padding:38px 24px 90px;}
+.card{
+  padding:28px 24px; border:1px solid var(--line); border-radius:14px;
+  background:linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
+  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+}
+.card h2{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:24px;
+  letter-spacing:.02em; color:#fff; margin-bottom:5px;
+}
+.card h2::after{
+  content:''; display:block; width:44px; height:2px; margin-top:10px;
+  background:linear-gradient(90deg, var(--red-2), transparent);
+}
+.card .hint{font-size:13.5px; color:var(--muted); margin:14px 0 28px; line-height:1.65;}
+
+/* Each field is its own block, so the run down the page keeps one rhythm. */
+.field{margin-bottom:22px;}
+.field:last-of-type{margin-bottom:26px;}
+label{
+  display:block; font-family:Rajdhani,sans-serif; font-weight:600;
+  font-size:13px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--silver); margin-bottom:9px;
+}
+input, select{
+  width:100%; padding:14px 15px; border-radius:9px;
+  background:rgba(0,0,0,0.42); border:1px solid var(--line); color:#fff;
+  font-size:15px; font-family:Inter,sans-serif; -webkit-appearance:none; appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238b8f97' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat:no-repeat; background-position:right 15px center; padding-right:42px;
+}
+input::placeholder{color:#5c6067;}
+input:focus, select:focus{outline:none; border-color:var(--red-2);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.6);}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:440px){ .row{grid-template-columns:1fr;} }
+
+.submit{
+  width:100%; padding:17px; border:none; border-radius:9px; cursor:pointer;
+  background:linear-gradient(135deg,#ff2d4d,#8c0a1c); color:#fff;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:15px;
+  letter-spacing:.16em; text-transform:uppercase;
+  box-shadow:0 8px 24px rgba(224,18,48,0.3);
+  transition:box-shadow .2s ease, transform .16s ease;
+}
+.submit:hover{box-shadow:0 12px 30px rgba(224,18,48,0.45);}
+.submit:active{transform:scale(.985);}
+.submit:disabled{opacity:.6; cursor:default;}
+
+.err{
+  padding:11px 13px; margin-bottom:16px; border-radius:7px; font-size:13.5px;
+  color:#ffbdc7; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.1);
+}
+.fine{font-size:12px; color:var(--muted); margin-top:14px; line-height:1.6;}
+
+/* ---------- confirmation ---------- */
+.done{text-align:center; padding:14px 0;}
+.done .tick{
+  width:64px; height:64px; margin:0 auto 18px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(57,217,138,0.14); border:1px solid rgba(57,217,138,0.45); color:#39d98a;
+}
+.done .tick svg{width:29px; height:29px;}
+.done h2{font-family:Rajdhani,sans-serif; font-weight:700; font-size:26px; color:#fff; margin-bottom:10px;}
+.done h2::after{display:none;}
+.done p{font-size:14px; color:var(--silver); max-width:400px; margin:0 auto;}
+.recap{
+  margin:22px auto 0; max-width:380px; text-align:left;
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.recap div{
+  display:flex; justify-content:space-between; gap:14px; padding:12px 15px;
+  font-size:13.5px; border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.recap div:last-child{border-bottom:none;}
+.recap span{color:var(--muted); font-size:11px; letter-spacing:.14em; text-transform:uppercase;}
+.recap b{color:#fff; font-weight:600; text-align:right;}
+
+.foot{
+  border-top:1px solid var(--line); padding:26px 24px 40px;
+  color:var(--muted); font-size:12.5px; line-height:1.9;
+}
+.foot a{color:var(--muted);}
+.spinner{
+  width:17px; height:17px; border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff; border-radius:50%; display:inline-block;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow">Reserve your slot</div>
+  <h1>Appointment Viewing</h1>
+  <p>Tell us which vehicle you'd like to see and when. We'll confirm your slot before you travel.</p>
+
+  <div class="rule">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+    <div>
+      <div class="t">Please note</div>
+      <div class="b">Viewing is <b>STRICTLY</b> by appointment only.
+      <b>NO</b> appointment, <b>NO</b> viewing.</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="card" id="card">
+    <h2>Book a Viewing</h2>
+    <p class="hint">All fields are required. Our team will confirm your appointment and send
+    the exact location after you submit.</p>
+
+    <div id="err"></div>
+
+    <div class="field">
+      <label for="fName">Full Name</label>
+      <input id="fName" placeholder="Juan Dela Cruz" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label for="fContact">Contact Number</label>
+      <input id="fContact" inputmode="tel" placeholder="09XX XXX XXXX" autocomplete="tel">
+    </div>
+
+    <div class="field">
+      <label for="fTime">What Time To View</label>
+      <input id="fTime" placeholder="e.g. 2:00 PM">
+    </div>
+
+    <div class="field">
+      <label for="fDate">When To View</label>
+      <input id="fDate" placeholder="e.g. August 22, 2026">
+    </div>
+
+    <div class="field">
+      <label for="fCar">Unit To View</label>
+      <input id="fCar" placeholder="e.g. 2019 Honda City VX">
+    </div>
+
+    <button class="submit" id="btn" onclick="send()">Request Appointment</button>
+    <p class="fine">Appointments are confirmed by our team. Please do not travel to view a
+    unit until you have received confirmation.</p>
+  </div>
+</div>
+
+<div class="foot">
+  2023 ARTE DEALS. All rights reserved.<br>
+  Metro Manila, Makati Philippines<br>
+  <a href="index.html">Back to listings</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const sb = window.supabase.createClient(ARTE_CONFIG.supabaseUrl, ARTE_CONFIG.supabaseAnonKey);
+const val = id => document.getElementById(id).value.trim();
+async function send(){
+  const err = document.getElementById('err');
+  err.innerHTML = '';
+
+  const name = val('fName');
+  const contact = val('fContact');
+  const time = val('fTime');
+  const date = val('fDate');
+  const car  = val('fCar');
+
+  const missing = [];
+  if(!name) missing.push('your full name');
+  if(contact.replace(/\D/g,'').length < 10) missing.push('a valid contact number');
+  if(!time) missing.push('the time you want to view');
+  if(!date) missing.push('the date you want to view');
+  if(!car)  missing.push('the unit you want to view');
+
+  if(missing.length){
+    err.innerHTML = '<div class="err">Please add ' + missing.join(', ') + '.</div>';
+    window.scrollTo({ top: document.getElementById('card').offsetTop - 20, behavior:'smooth' });
+    return;
+  }
+
+  const btn = document.getElementById('btn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const { error } = await sb.from('appointments').insert({
+    full_name: name,
+    contact,
+    view_date: date,
+    view_time: time,
+    car
+  });
+
+  btn.textContent = 'Request Appointment';
+  btn.disabled = false;
+
+  if(error){
+    err.innerHTML = '<div class="err">' + (error.message || 'Something went wrong. Please try again.') + '</div>';
+    return;
+  }
+
+  document.getElementById('card').innerHTML = `
+    <div class="done">
+      <div class="tick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2>Request Sent</h2>
+      <p>Thanks, ${name.split(' ')[0]}. We'll contact you on <b>${contact}</b> to confirm this
+      slot. Please wait for confirmation before travelling.</p>
+      <div class="recap">
+        <div><span>Unit</span><b>${car}</b></div>
+        <div><span>Date</span><b>${date}</b></div>
+        <div><span>Time</span><b>${time}</b></div>
+      </div>
+    </div>`;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
+
+</body>
+</html>
