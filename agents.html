@@ -149,6 +149,14 @@ textarea{resize:vertical; line-height:1.6;}
 .submit:active{transform:scale(.985);}
 .submit:disabled{opacity:.6; cursor:default;}
 
+.watch{
+  display:flex; align-items:flex-start; gap:11px;
+  padding:13px 15px; margin-bottom:22px; border-radius:9px;
+  border:1px solid rgba(224,18,48,0.3); background:rgba(224,18,48,0.07);
+  font-size:13px; line-height:1.6; color:var(--silver);
+}
+.watch svg{width:19px; height:19px; flex-shrink:0; color:var(--red-2); margin-top:2px;}
+.watch b{color:#fff; font-weight:600;}
 .err{
   padding:11px 13px; margin-bottom:16px; border-radius:7px; font-size:13.5px;
   color:#ffbdc7; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.1);
@@ -200,6 +208,12 @@ textarea{resize:vertical; line-height:1.6;}
     <h2>Application</h2>
     <p class="hint">Everything here stays private and is seen only by the ARTE DEALS team.
     We review each application by hand and reply by message.</p>
+
+    <div class="watch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      <span><b>Keep an eye on your email.</b> We reply to every application. If you don't
+      see our response, <b>please check your Spam</b> to make sure you don't miss it.</span>
+    </div>
 
     <div id="err"></div>
 
@@ -342,8 +356,11 @@ async function send(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
       <h2>Application Sent</h2>
-      <p>Thanks, ${name.split(' ')[0]}. We review every application by hand and will message
-      you at <b>${mobile}</b> once yours has been looked at.</p>
+      <p>Thanks, ${name.split(' ')[0]}. We review every application by hand and will contact
+      you at <b>${email}</b> or <b>${mobile}</b> once yours has been looked at.</p>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted);"><b style="color:var(--silver-bright);">Keep
+      an eye on your email.</b> We reply to every application. If you don't see our response,
+      <b style="color:var(--silver-bright);">please check your Spam</b> to make sure you don't miss it.</p>
     </div>`;
   window.scrollTo({ top:0, behavior:'smooth' });
 }
