@@ -1441,6 +1441,11 @@ select.calc-box{
   text-transform:uppercase; color:var(--red-2); margin-bottom:2px;
 }
 .admin-title{font-size:32px; color:#fff; margin:0;}
+.build{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px; letter-spacing:.16em;
+  color:var(--red-2); border:1px solid rgba(224,18,48,0.45); border-radius:3px;
+  padding:2px 7px; vertical-align:middle; margin-left:8px;
+}
 .admin-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px;}
 .admin-stats div{
   padding:14px 12px; text-align:center; border:1px solid var(--line); border-radius:10px;
@@ -1641,6 +1646,8 @@ footer{
     <a href="terms.html">Terms of Service</a>
     <span>&middot;</span>
     <a href="privacy.html">Privacy Policy</a>
+    <span>&middot;</span>
+    <a href="viewing.html">Book a Viewing</a>
     <span>&middot;</span>
     <a href="agents.html">Become an Agent</a>
   </div>
@@ -3126,6 +3133,7 @@ let adminUsers = [];
 let pendingPayments = [];
 let openReports = [];
 let agentApps = [];
+let appointments = [];
 
 async function adminSignIn(e){
   e.preventDefault();
@@ -3200,12 +3208,13 @@ function renderAdmin(app){
   if(!pendingPayments.length) loadPayments().then(()=>renderAdmin(app));
   if(!openReports.length) loadReports().then(()=>renderAdmin(app));
   if(!agentApps.length) loadAgentApps().then(()=>renderAdmin(app));
+  if(!appointments.length) loadAppointments().then(()=>renderAdmin(app));
   const sold = allListings.filter(l=>l.status==='sold').length;
   app.innerHTML = `<main>
     <div class="admin-head">
       <div>
         <div class="admin-eyebrow">Administrator</div>
-        <h2 class="display admin-title">Control Panel</h2>
+        <h2 class="display admin-title">Control Panel <span class="build">BUILD 7-TAB</span></h2>
       </div>
       <button class="veh-btn" onclick="go('home')">View Site</button>
     </div>
@@ -3219,6 +3228,7 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
+      <button class="msg-tab ${adminTab==='viewings'?'active':''}" onclick="setAdminTab('viewings')">Viewings${appointments.filter(a=>a.status==='new').length?' <span>'+appointments.filter(a=>a.status==='new').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='agents'?'active':''}" onclick="setAdminTab('agents')">Agents${agentApps.filter(a=>a.status==='new').length?' <span>'+agentApps.filter(a=>a.status==='new').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='reports'?'active':''}" onclick="setAdminTab('reports')">Reports${openReports.filter(r=>r.status==='open').length?' <span>'+openReports.filter(r=>r.status==='open').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
@@ -3227,6 +3237,7 @@ function renderAdmin(app){
 
     <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
                         : adminTab==='users' ? adminUsersHTML()
+                        : adminTab==='viewings' ? adminViewingsHTML()
                         : adminTab==='agents' ? adminAgentsHTML()
                         : adminTab==='reports' ? adminReportsHTML()
                         : adminTab==='settings' ? adminSettingsHTML()
@@ -3252,6 +3263,50 @@ function setAdminTab(t){
   if(t === 'agents'){
     loadAgentApps().then(()=>renderAdmin(document.getElementById('app')));
   }
+  if(t === 'viewings'){
+    loadAppointments().then(()=>renderAdmin(document.getElementById('app')));
+  }
+}
+
+async function loadAppointments(){
+  const { data } = await sb.from('appointments').select('*')
+    .order('created_at',{ascending:false}).limit(200);
+  appointments = data || [];
+}
+
+function adminViewingsHTML(){
+  if(!appointments.length) return '<div class="empty">No viewing requests yet.</div>';
+  return appointments.map(a=>`
+    <div class="report-card ${a.status==='new'?'open':''}">
+      <div class="rc-top">
+        <span class="rc-reason">${esc(a.full_name)}</span>
+        <span class="rc-date">${timeAgo(new Date(a.created_at).getTime())}</span>
+      </div>
+      <div class="ag-facts">
+        <span><b>Unit</b> ${esc(a.car)}</span>
+        <span><b>When</b> ${esc(a.view_date)}</span>
+        <span><b>Time</b> ${esc(a.view_time)}</span>
+        <span><b>Contact</b> ${esc(a.contact)}</span>
+        <span><b>Status</b> ${esc(a.status)}</span>
+      </div>
+      <div class="rc-foot">
+        <span class="rc-by">Requested ${new Date(a.created_at).toLocaleDateString('en-PH',{day:'numeric',month:'short'})}</span>
+        <div class="veh-actions">
+          ${a.status==='new' ? `
+            <button class="veh-btn" onclick="setApptStatus('${a.id}','confirmed')">Confirm</button>
+            <button class="veh-btn danger" onclick="setApptStatus('${a.id}','declined')">Decline</button>
+          ` : `<button class="veh-btn" onclick="setApptStatus('${a.id}','done')">Mark Done</button>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function setApptStatus(id, status){
+  const { error } = await sb.from('appointments').update({ status }).eq('id', id);
+  if(error){ dbFail(error, 'Could not update that booking'); return; }
+  toast('Viewing ' + status);
+  await loadAppointments();
+  renderAdmin(document.getElementById('app'));
 }
 
 async function loadAgentApps(){
