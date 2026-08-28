@@ -1180,6 +1180,22 @@ select.calc-box{
   letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-right:5px;
 }
 @media(max-width:480px){ .ag-grid{grid-template-columns:1fr;} }
+.list-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:12px 15px; margin-bottom:14px; border-radius:9px;
+  border:1px solid var(--line); background:rgba(255,255,255,0.03);
+  font-size:13px; color:var(--muted);
+}
+.list-bar.warn{border-color:rgba(224,18,48,0.5); background:rgba(224,18,48,0.08);}
+.list-bar em{display:block; font-style:normal; font-size:11.5px; color:var(--red-2); margin-top:3px;}
+.load-err{
+  padding:12px 14px; margin-bottom:12px; border-radius:8px; font-size:13px; line-height:1.55;
+  color:#ffbdc7; border-left:2px solid var(--red-2); background:rgba(224,18,48,0.1);
+}
+.load-err b{display:block; color:#fff; margin-bottom:3px;}
+.list-bar b{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:16px; color:#fff; margin-right:3px;
+}
 .report-card{
   padding:15px 16px; margin-bottom:11px; border:1px solid var(--line);
   border-radius:10px; background:rgba(255,255,255,0.03);
@@ -3214,7 +3230,7 @@ function renderAdmin(app){
     <div class="admin-head">
       <div>
         <div class="admin-eyebrow">Administrator</div>
-        <h2 class="display admin-title">Control Panel <span class="build">BUILD DEL</span></h2>
+        <h2 class="display admin-title">Control Panel <span class="build">BUILD TRUTH</span></h2>
       </div>
       <button class="veh-btn" onclick="go('home')">View Site</button>
     </div>
@@ -3228,8 +3244,8 @@ function renderAdmin(app){
     <div class="msg-tabs">
       <button class="msg-tab ${adminTab==='listings'?'active':''}" onclick="setAdminTab('listings')">Listings</button>
       <button class="msg-tab ${adminTab==='users'?'active':''}" onclick="setAdminTab('users')">Users</button>
-      <button class="msg-tab ${adminTab==='viewings'?'active':''}" onclick="setAdminTab('viewings')">Viewings${appointments.filter(a=>a.status==='new').length?' <span>'+appointments.filter(a=>a.status==='new').length+'</span>':''}</button>
-      <button class="msg-tab ${adminTab==='agents'?'active':''}" onclick="setAdminTab('agents')">Agents${agentApps.filter(a=>a.status==='new').length?' <span>'+agentApps.filter(a=>a.status==='new').length+'</span>':''}</button>
+      <button class="msg-tab ${adminTab==='viewings'?'active':''}" onclick="setAdminTab('viewings')">Viewings${appointments.length?' <span>'+appointments.length+'</span>':''}</button>
+      <button class="msg-tab ${adminTab==='agents'?'active':''}" onclick="setAdminTab('agents')">Agents${agentApps.length?' <span>'+agentApps.length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='reports'?'active':''}" onclick="setAdminTab('reports')">Reports${openReports.filter(r=>r.status==='open').length?' <span>'+openReports.filter(r=>r.status==='open').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
       <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
@@ -3270,15 +3286,27 @@ function setAdminTab(t){
   }
 }
 
+let apptError = null, apptTotal = null;
 async function loadAppointments(){
-  const { data } = await sb.from('appointments').select('*')
-    .order('created_at',{ascending:false}).limit(200);
+  const { data, error, count } = await sb
+    .from('appointments')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending:false })
+    .limit(500);
+  apptError = error ? (error.message || String(error)) : null;
+  apptTotal = (typeof count === 'number') ? count : null;
   appointments = data || [];
 }
 
 function adminViewingsHTML(){
-  if(!appointments.length) return '<div class="empty">No viewing requests yet.</div>';
-  return appointments.map(a=>`
+  if(!appointments.length){
+    return (apptError ? `<div class="load-err"><b>Could not load from the database.</b> ${esc(apptError)}</div>` : '')
+      + listBar('request', 0, 0, apptTotal, apptError, 'refreshViewings')
+      + '<div class="empty">No viewing requests yet.</div>';
+  }
+  const news = appointments.filter(a=>a.status==='new').length;
+  return listBar('request', appointments.length, news, apptTotal, apptError, 'refreshViewings')
+    + appointments.map(a=>`
     <div class="report-card ${a.status==='new'?'open':''}">
       <div class="rc-top">
         <span class="rc-reason">${esc(a.full_name)}</span>
@@ -3312,15 +3340,27 @@ async function setApptStatus(id, status){
   renderAdmin(document.getElementById('app'));
 }
 
+let agentError = null, agentTotal = null;
 async function loadAgentApps(){
-  const { data } = await sb.from('agent_applications').select('*')
-    .order('created_at',{ascending:false}).limit(100);
+  const { data, error, count } = await sb
+    .from('agent_applications')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending:false })
+    .limit(500);
+  agentError = error ? (error.message || String(error)) : null;
+  agentTotal = (typeof count === 'number') ? count : null;
   agentApps = data || [];
 }
 
 function adminAgentsHTML(){
-  if(!agentApps.length) return '<div class="empty">No agent applications yet.</div>';
-  return agentApps.map(a=>`
+  if(!agentApps.length){
+    return (agentError ? `<div class="load-err"><b>Could not load from the database.</b> ${esc(agentError)}</div>` : '')
+      + listBar('application', 0, 0, agentTotal, agentError, 'refreshAgents')
+      + '<div class="empty">No agent applications yet.</div>';
+  }
+  const news = agentApps.filter(a=>a.status==='new').length;
+  return listBar('application', agentApps.length, news, agentTotal, agentError, 'refreshAgents')
+    + agentApps.map(a=>`
     <div class="report-card ${a.status==='new'?'open':''}">
       <div class="rc-top">
         <span class="rc-reason">${esc(a.full_name)}${a.age?' \u00b7 '+a.age:''}${a.sex?' \u00b7 '+esc(a.sex):''}</span>
@@ -3348,6 +3388,38 @@ function adminAgentsHTML(){
         </div>
       </div>
     </div>`).join('');
+}
+
+/* One honest summary: what the database holds, what loaded, and any error. */
+function listBar(word, shown, news, total, error, refreshFn){
+  const mismatch = (typeof total === 'number') && total !== shown;
+  return `
+    ${error ? `<div class="load-err"><b>Could not load from the database.</b> ${esc(error)}</div>` : ''}
+    <div class="list-bar ${mismatch?'warn':''}">
+      <span>
+        <b>${typeof total === 'number' ? total : shown}</b>
+        ${word}${(typeof total === 'number' ? total : shown)===1?'':'s'} in the database
+        \u00b7 ${news} new
+        ${mismatch ? `<em>only ${shown} loaded \u2014 tap Refresh</em>` : ''}
+      </span>
+      <button class="veh-btn" onclick="${refreshFn}()">Refresh</button>
+    </div>`;
+}
+
+async function refreshAgents(){
+  agentApps = [];
+  await loadAgentApps();
+  toast(agentError ? 'Error: ' + agentError
+        : 'Database has ' + (agentTotal ?? agentApps.length) + ', loaded ' + agentApps.length);
+  renderAdmin(document.getElementById('app'));
+}
+
+async function refreshViewings(){
+  appointments = [];
+  await loadAppointments();
+  toast(apptError ? 'Error: ' + apptError
+        : 'Database has ' + (apptTotal ?? appointments.length) + ', loaded ' + appointments.length);
+  renderAdmin(document.getElementById('app'));
 }
 
 async function deleteAgentApp(id){
