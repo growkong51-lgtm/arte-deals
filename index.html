@@ -259,24 +259,36 @@ input, select, textarea{transition:border-color .18s ease, background .18s ease;
 .hamb{display:none;}
 
 /* ---------- HERO ---------- */
-/* ============ LIVE LAYER ============
-   Visible, continuous movement. Everything here animates transform or
-   opacity only, so it runs on the GPU and never blocks scrolling. */
+/* ============ MOTION LAYER ============
+   Rebuilt to hold 60fps on mid-range Android: everything below animates
+   only transform and opacity (no filter:blur on anything continuous, no
+   box-shadow keyframes, nothing that touches layout like left/width),
+   and every continuous loop is a single, deliberate element rather than
+   one per repeated card. Nothing here needs new JavaScript. */
 
-/* Two red glows drifting behind the whole page, at different speeds. */
+/* Ambient depth: two soft glows drifting slowly behind the whole page.
+   The soft edge comes from the radial-gradient's own transparent falloff,
+   not a blur filter, so there's no GPU blur cost to animate. */
+body{position:relative; isolation:isolate;}
 body::before, body::after{
-  content:''; position:fixed; z-index:0; pointer-events:none;
+  content:''; position:fixed; z-index:-1; pointer-events:none;
   width:70vw; height:70vw; max-width:760px; max-height:760px; border-radius:50%;
-  filter:blur(80px); opacity:.5;
+  opacity:.5;
 }
 body::before{
   top:-16vw; left:-14vw;
-  background:radial-gradient(circle, rgba(224,18,48,0.42), transparent 68%);
+  /* Multi-stop falloff stands in for filter:blur(80px) — the softness
+     is baked into the gradient itself, so there's nothing to composite. */
+  background:radial-gradient(circle,
+    rgba(224,18,48,0.42) 0%, rgba(224,18,48,0.34) 18%, rgba(224,18,48,0.22) 34%,
+    rgba(224,18,48,0.12) 48%, rgba(224,18,48,0.05) 62%, transparent 78%);
   animation:driftA 26s ease-in-out infinite alternate;
 }
 body::after{
   bottom:-22vw; right:-16vw;
-  background:radial-gradient(circle, rgba(150,20,60,0.34), transparent 68%);
+  background:radial-gradient(circle,
+    rgba(150,20,60,0.34) 0%, rgba(150,20,60,0.27) 18%, rgba(150,20,60,0.17) 34%,
+    rgba(150,20,60,0.09) 48%, rgba(150,20,60,0.04) 62%, transparent 78%);
   animation:driftB 34s ease-in-out infinite alternate;
 }
 @keyframes driftA{
@@ -289,33 +301,22 @@ body::after{
   50% {transform:translate3d(-16vw,-12vh,0) scale(.9);}
   100%{transform:translate3d(-6vw,-24vh,0) scale(1.2);}
 }
-header, main, footer, .cat-strip, .ticker, .bottom-nav{position:relative; z-index:1;}
 
-/* A light sweeping across the hero, like a car passing. */
+/* A light sweeping across the hero, like a car passing — transform, not
+   `left`. Animating `left` forces a layout recalc on every frame. */
 .hero::after{
-  content:''; position:absolute; top:0; left:-40%; width:28%; height:100%;
+  content:''; position:absolute; top:0; left:-28%; width:28%; height:100%;
   background:linear-gradient(100deg, transparent, rgba(255,255,255,0.055), transparent);
-  transform:skewX(-16deg); pointer-events:none;
+  transform-origin:0 0; transform:skewX(-16deg) translateX(0); pointer-events:none;
   animation:heroSweep 7s ease-in-out infinite;
 }
 @keyframes heroSweep{
-  0%, 55%{left:-40%;}
-  85%,100%{left:130%;}
+  0%, 55%{transform:skewX(-16deg) translateX(0);}
+  85%,100%{transform:skewX(-16deg) translateX(560%);}
 }
 
-/* The logo breathes. */
-.hero-icon{animation:breathe 4.5s ease-in-out infinite;}
-@keyframes breathe{
-  0%,100%{transform:translateY(0) scale(1);}
-  50%    {transform:translateY(-7px) scale(1.03);}
-}
-.hero-glow{animation:glowPulse 4.5s ease-in-out infinite;}
-@keyframes glowPulse{
-  0%,100%{opacity:.55; transform:scale(1);}
-  50%    {opacity:1;    transform:scale(1.15);}
-}
-
-/* Brand ticker, scrolling without pause. */
+/* Brand ticker: a real filter (tap a brand to search for it), scrolling
+   without pause — a single continuous marquee, paused on hover/press. */
 .ticker{
   overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
   background:linear-gradient(90deg, rgba(224,18,48,0.07), transparent 40%, rgba(224,18,48,0.07));
@@ -332,7 +333,7 @@ header, main, footer, .cat-strip, .ticker, .bottom-nav{position:relative; z-inde
   letter-spacing:.24em; text-transform:uppercase; color:var(--muted);
   padding:5px 20px; white-space:nowrap; cursor:pointer;
   background:none; border:none; border-radius:999px;
-  transition:color .18s ease, background .18s ease;
+  transition:color .18s ease, background .18s ease, transform .18s cubic-bezier(.4,0,.2,1);
 }
 .tk-brand:hover{color:#fff; background:rgba(255,255,255,0.07);}
 .tk-brand:active{transform:scale(.96);}
@@ -342,106 +343,73 @@ header, main, footer, .cat-strip, .ticker, .bottom-nav{position:relative; z-inde
 .ticker-track i{width:5px; height:5px; border-radius:50%; background:var(--red-2); opacity:.75; flex-shrink:0;}
 @keyframes tick{ from{transform:translate3d(0,0,0);} to{transform:translate3d(-50%,0,0);} }
 
-/* The counting numbers sit steady while they roll. */
+/* The counting numbers sit steady while runCounters() (existing JS)
+   counts them up — this only stops the digit width from jittering. */
 .stat-row .num{font-variant-numeric:tabular-nums;}
 
-/* Cards arrive one after another. */
-.grid > *{animation:cardRise .5s cubic-bezier(.16,.8,.3,1) both;}
-.grid > *:nth-child(1){animation-delay:.02s;}
-.grid > *:nth-child(2){animation-delay:.08s;}
-.grid > *:nth-child(3){animation-delay:.14s;}
-.grid > *:nth-child(4){animation-delay:.2s;}
-.grid > *:nth-child(5){animation-delay:.26s;}
-.grid > *:nth-child(6){animation-delay:.32s;}
-.grid > *:nth-child(n+7){animation-delay:.38s;}
-@keyframes cardRise{
-  from{opacity:0; transform:translate3d(0,26px,0) scale(.97);}
-  to  {opacity:1; transform:none;}
+/* The live dot on an online seller actually pulses — a transform/opacity
+   "ping" ring on a pseudo-element, instead of an animated box-shadow
+   (box-shadow keyframes repaint every frame; this composites). */
+.presence.on i{position:relative;}
+.presence.on i::after{
+  content:''; position:absolute; inset:0; border-radius:50%;
+  background:rgba(57,217,138,0.55); pointer-events:none;
+  animation:livePing 1.9s ease-out infinite;
+}
+@keyframes livePing{
+  0%{transform:scale(1); opacity:.55;}
+  100%{transform:scale(2.6); opacity:0;}
 }
 
-/* The live dot on a seller actually pulses. */
-.presence.on i{animation:livePulse 1.9s ease-in-out infinite;}
-@keyframes livePulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(57,217,138,0.55);}
-  70%    {box-shadow:0 0 0 7px rgba(57,217,138,0);}
-}
-
-@media(prefers-reduced-motion:reduce){
-  body::before, body::after, .hero::after, .hero-icon, .hero-glow,
-  .ticker-track, .grid > *, .presence.on i{animation:none !important;}
-}
-
-/* ============ LIVE LAYER II ============ */
-
-/* 7. Scroll progress across the top. */
-.scroll-bar{position:fixed; top:0; left:0; right:0; height:2px; z-index:400; background:transparent;}
-.scroll-bar span{
-  display:block; height:100%; transform:scaleX(0); transform-origin:0 50%;
-  background:linear-gradient(90deg, var(--red-2), #ff7a8c);
-  box-shadow:0 0 10px rgba(224,18,48,0.6);
-}
-
-/* 8. The header tightens as you scroll. */
-header{transition:padding .25s ease, background .25s ease;}
-body.scrolled header{padding-top:9px; padding-bottom:9px; background:rgba(9,9,12,0.98);}
-header .brand img.word{transition:transform .25s ease, opacity .25s ease; transform-origin:left center;}
-body.scrolled header .brand img.word{transform:scale(.86);}
-
-/* 1. The rotating word in the headline. */
-.hero-word{display:inline-block; min-width:3.5ch; transition:opacity .22s ease, transform .22s ease;}
-.hero-word.swap{opacity:0; transform:translateY(-8px);}
-
-/* 2. Road streaks drifting behind the hero. */
-.hero::before{
-  content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
-  background:repeating-linear-gradient(115deg,
-    transparent 0 58px, rgba(255,255,255,0.035) 58px 60px);
-  animation:streak 9s linear infinite;
-}
-@keyframes streak{ from{background-position:0 0;} to{background-position:240px 0;} }
-
-/* 3. NEW on anything posted in the last two days. */
+/* NEW badge: a one-shot pop when it mounts, not an infinite pulse — a
+   listing only becomes "new" once, so there's nothing left to draw the
+   eye back to after that first moment. */
 .new-tag{
   position:absolute; top:10px; left:10px; z-index:3;
   font-family:'Rajdhani',sans-serif; font-weight:700; font-size:10px;
   letter-spacing:.18em; text-transform:uppercase; color:#fff;
   padding:3px 9px; border-radius:3px; background:var(--red-2);
-  animation:newPulse 2s ease-in-out infinite;
+  animation:newPop .32s cubic-bezier(.34,1.56,.64,1) both;
 }
-@keyframes newPulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(224,18,48,0.6);}
-  70%    {box-shadow:0 0 0 9px rgba(224,18,48,0);}
-}
-
-/* 4. The card photo drifts gently while you look at it. */
-.card .imgwrap img{animation:photoDrift 18s ease-in-out infinite alternate;}
-@keyframes photoDrift{
-  from{transform:scale(1);}
-  to  {transform:scale(1.05);}
+@keyframes newPop{
+  from{opacity:0; transform:scale(.6);}
+  to  {opacity:1; transform:scale(1);}
 }
 
-/* 5. Light passing over the price. */
+/* Price shine: one sweep on mount, transform-driven — not an infinite
+   loop running on every card's price tag on screen at once. */
 .price-tag{position:relative; overflow:hidden;}
 .price-tag::after{
-  content:''; position:absolute; top:0; left:-70%; width:45%; height:100%;
+  content:''; position:absolute; top:0; left:0; width:45%; height:100%;
   background:linear-gradient(100deg, transparent, rgba(255,255,255,0.4), transparent);
-  transform:skewX(-18deg); animation:priceShine 5s ease-in-out infinite;
+  transform-origin:0 0; transform:skewX(-18deg) translateX(-260%); pointer-events:none;
+  animation:priceShine 1.4s ease-out .4s both;
 }
-@keyframes priceShine{ 0%,68%{left:-70%;} 88%,100%{left:150%;} }
+@keyframes priceShine{ to{transform:skewX(-18deg) translateX(320%);} }
 
-/* 9. Category chips answer when chosen. */
-.cat-chip{transition:transform .18s cubic-bezier(.2,1.6,.4,1), background .2s ease, color .2s ease;}
-.cat-chip:active{transform:scale(.94);}
-.cat-chip.active{animation:chipPop .34s cubic-bezier(.2,1.6,.4,1);}
-@keyframes chipPop{ 0%{transform:scale(1);} 45%{transform:scale(1.12);} 100%{transform:scale(1);} }
-
-/* 10. The bottom bar reacts to a tap. */
+/* The bottom bar reacts to a tap; the active tab's icon pops in. */
 .bottom-nav button{transition:transform .18s ease;}
 .bottom-nav button:active{transform:scale(.9);}
 .bottom-nav button.active svg{animation:navPop .4s cubic-bezier(.2,1.6,.4,1);}
 @keyframes navPop{ 0%{transform:translateY(0) scale(1);} 40%{transform:translateY(-5px) scale(1.16);} 100%{transform:translateY(0) scale(1);} }
 
-/* 11. Ripple under the finger. */
+/* Loading placeholders sweep with light (pre-existing). */
+.sk{animation:skShine 1.25s linear infinite;}
+
+/* Nothing found: a gentle, bounded settle-in on mount — not a forever-spin. */
+.empty svg{animation:emptySettle .5s cubic-bezier(.2,1.6,.4,1) both;}
+@keyframes emptySettle{
+  from{opacity:0; transform:scale(.9) rotate(-4deg);}
+  to  {opacity:1; transform:scale(1) rotate(0);}
+}
+
+/* The headline word cycles (startHeroWords(), below) — transform/opacity
+   swap only, driven by existing JS, not a new continuous CSS loop. */
+.hero-word{display:inline-block; min-width:3.5ch; transition:opacity .22s ease, transform .22s ease;}
+.hero-word.swap{opacity:0; transform:translateY(-8px);}
+
+/* Ripple under the finger (pointerdown listener, below) — transform/
+   opacity only, one-shot per tap. */
 .ripple{
   position:absolute; border-radius:50%; pointer-events:none;
   background:radial-gradient(circle, rgba(255,255,255,0.42), transparent 68%);
@@ -449,36 +417,32 @@ body.scrolled header .brand img.word{transform:scale(.86);}
 }
 @keyframes rip{ to{transform:scale(1); opacity:0;} }
 
-/* 12. The inbox dot jumps when something arrives. */
-.nav-badge{animation:badgeJump 2.4s ease-in-out infinite;}
-@keyframes badgeJump{
-  0%,88%,100%{transform:translateY(0) scale(1);}
-  92%        {transform:translateY(-4px) scale(1.25);}
-  96%        {transform:translateY(0) scale(1);}
+/* Scroll progress bar — the fill's width is driven via transform:scaleX
+   from a rAF-throttled scroll listener, below; nothing here animates on
+   its own. */
+.scroll-bar{position:fixed; top:0; left:0; right:0; height:2px; z-index:400; background:transparent;}
+.scroll-bar span{
+  display:block; height:100%; transform:scaleX(0); transform-origin:0 50%;
+  background:linear-gradient(90deg, var(--red-2), #ff7a8c);
+  box-shadow:0 0 10px rgba(224,18,48,0.6);
 }
 
-/* 13. A flash of light on success. */
-.burst{
-  position:fixed; inset:0; z-index:1200; pointer-events:none;
-  background:radial-gradient(circle at 50% 45%, rgba(224,18,48,0.28), transparent 62%);
-  animation:burstOut .9s ease-out forwards;
-}
-@keyframes burstOut{ from{opacity:1; transform:scale(.9);} to{opacity:0; transform:scale(1.25);} }
-
-/* 14. Loading placeholders sweep with light. */
-.sk{animation:skShine 1.25s linear infinite;}
-
-/* 15. Nothing found, gently turning. */
-.empty svg{animation:emptySpin 9s ease-in-out infinite;}
-@keyframes emptySpin{
-  0%,100%{transform:rotate(-6deg) scale(1);}
-  50%    {transform:rotate(6deg) scale(1.06);}
-}
+/* The header tightens as you scroll (body.scrolled, toggled by the same
+   listener as the progress bar above). Explicit, requested exception to
+   transform/opacity-only: padding and background-color are what a
+   "tighter" header actually needs to change. Kept small and one-shot
+   per scroll-state flip, not a per-frame animation, so the cost is a
+   single transition on a class change, not a continuous loop. */
+header{transition:padding .25s ease, background .25s ease;}
+body.scrolled header{padding-top:9px; padding-bottom:9px; background:rgba(9,9,12,0.98);}
+header .brand img.word{transition:transform .25s ease, opacity .25s ease; transform-origin:left center;}
+body.scrolled header .brand img.word{transform:scale(.86);}
 
 @media(prefers-reduced-motion:reduce){
-  .hero::before, .new-tag, .card .imgwrap img, .price-tag::after,
-  .cat-chip.active, .bottom-nav button.active svg, .nav-badge,
-  .empty svg, .ripple, .burst{animation:none !important;}
+  body::before, body::after, .hero::after, .ticker-track, .presence.on i::after,
+  .new-tag, .price-tag::after, .bottom-nav button.active svg, .empty svg,
+  .ripple{animation:none !important;}
+  .hero-word{transition:none;}
   .scroll-bar{display:none;}
 }
 
@@ -1842,6 +1806,79 @@ footer{
   }
   .brand .word{height:42px;}
 }
+
+/* ---------- MOTION LAYER v2 ---------- */
+/* Additive, interaction-driven motion to round out the ambient layer
+   above. Same rules: transform/opacity only, no backdrop-filter,
+   nothing that touches layout, every rule reduced-motion-safe. Most of
+   this audience never fires :hover, so :active gets its own feedback
+   rather than leaning on hover alone. */
+
+/* Shared micro-interactions the rebuilt layer above doesn't cover yet. */
+.chip{transition:border-color .18s cubic-bezier(.4,0,.2,1), color .18s cubic-bezier(.4,0,.2,1), background .18s cubic-bezier(.4,0,.2,1), transform .18s cubic-bezier(.4,0,.2,1);}
+.chip:hover{transform:translateY(-1px);}
+.chip:active{transform:scale(.96);}
+.pill{transition:border-color .18s cubic-bezier(.4,0,.2,1), color .18s cubic-bezier(.4,0,.2,1), transform .18s cubic-bezier(.4,0,.2,1);}
+.pill:hover{transform:translateY(-1px);}
+.icon-btn{transition:background .18s cubic-bezier(.4,0,.2,1), color .18s cubic-bezier(.4,0,.2,1), transform .18s cubic-bezier(.4,0,.2,1);}
+.icon-btn:hover{transform:translateY(-1px);}
+.icon-btn:active{transform:scale(.92);}
+.modal-close{transition:background .18s cubic-bezier(.4,0,.2,1), transform .22s cubic-bezier(.34,1.56,.64,1);}
+.modal-close:hover{background:rgba(255,255,255,0.14); transform:rotate(90deg);}
+.modal-close:active{transform:rotate(90deg) scale(.9);}
+
+/* Modal/overlay entrance: softer easing + a more opaque backdrop.
+   No backdrop-filter, ever — it was deliberately removed from this site
+   after causing severe scroll lag on mid-range Android; opacity does
+   the visual-weight work instead. */
+.overlay{transition:opacity .28s cubic-bezier(.16,.8,.3,1), background-color .28s ease;}
+.overlay.show{background-color:rgba(3,3,5,0.94);}
+.modal{transition:transform .3s cubic-bezier(.16,.8,.3,1), opacity .22s ease; opacity:0;}
+.overlay.show .modal{opacity:1;}
+
+/* Listing photo: a small hover zoom so cards read as touchable, not
+   flat. .imgwrap already clips overflow, so it can't bleed past the
+   card edge. This replaces the always-on drift a continuous version
+   would need — it only moves in response to actual attention. */
+.card .imgwrap img{transition:transform .35s cubic-bezier(.25,.46,.45,.94), opacity .3s ease;}
+.card:hover .imgwrap img{transform:scale(1.045);}
+
+/* Tap feedback for touch, where the existing transition list already
+   includes transform. .role-card is redeclared in full since it didn't
+   transition transform before. */
+.card:active{transform:scale(.985);}
+.role-card{transition:border-color .16s cubic-bezier(.4,0,.2,1), background .16s cubic-bezier(.4,0,.2,1), color .16s cubic-bezier(.4,0,.2,1), transform .16s cubic-bezier(.4,0,.2,1);}
+.role-card:active{transform:scale(.97);}
+.role-card.active{transform:scale(1.015);}
+.nav-links a:active{transform:scale(.95);}
+.search-cta:active{transform:scale(.93);}
+.card-seller:active{transform:scale(.96);}
+
+/* Scroll-triggered reveal — progressive enhancement only, via CSS
+   scroll-driven animations (animation-timeline: view()). No JS: falls
+   back to fully visible, static content on browsers without support. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .row-card, .seller-box, .upgrade-card, .stat-row, .section-head{
+      animation: motionReveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+@keyframes motionReveal{
+  from{opacity:0; transform:translateY(22px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .chip:hover, .chip:active, .pill:hover, .icon-btn:hover, .icon-btn:active{transform:none;}
+  .modal-close:hover, .modal-close:active{transform:none;}
+  .overlay, .overlay.show, .modal, .overlay.show .modal{transition:none;}
+  .card:hover .imgwrap img, .card:active{transform:none;}
+  .role-card:active, .role-card.active{transform:none;}
+  .nav-links a:active, .search-cta:active, .card-seller:active{transform:none;}
+}
 </style>
 </head>
 <body>
@@ -2189,15 +2226,6 @@ const CATEGORIES = ['All','Sedan','Hatchback','Sportscar','SUV','Family Van','Pi
 const AVATAR_COLORS = ['#e01230','#7a0612','#3a3d44','#8b8d94','#b30f28'];
 
 /* ================= UTIL ================= */
-/* 13. A flash of light across the screen on success. */
-function burst(){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const b = document.createElement('div');
-  b.className = 'burst';
-  document.body.appendChild(b);
-  setTimeout(()=>b.remove(), 900);
-}
-
 function toast(msg){
   const wrap = document.getElementById('toastWrap');
   const t = document.createElement('div');
@@ -3111,19 +3139,6 @@ function getFilteredListings(){
   else list = list.slice().sort((a,b)=>(b.shuffle||0)-(a.shuffle||0));
   return list;
 }
-/* Every listing is shuffled on each visit, so nobody is stuck at the bottom
-   for being old. PRO listings carry a heavier weight, which lifts them more
-   often \u2014 but a free listing can still land above a PRO one. */
-const PRO_WEIGHT  = 0.7;
-const FREE_WEIGHT = 0.5;
-
-function shuffleListings(){
-  allListings.forEach(l => {
-    const weight = proOf(l.seller) ? PRO_WEIGHT : FREE_WEIGHT;
-    l.shuffle = Math.random() * weight;
-  });
-}
-
 /* Hero word cycles, so the headline is never still. */
 const HERO_WORDS = ['DRIVE','SUV','PICKUP','SEDAN','HATCHBACK','SPORTSCAR'];
 let heroWordTimer = null;
@@ -3139,6 +3154,20 @@ function startHeroWords(){
     setTimeout(()=>{ el.textContent = HERO_WORDS[i]; el.classList.remove('swap'); }, 220);
   }, 2400);
 }
+
+/* Every listing is shuffled on each visit, so nobody is stuck at the bottom
+   for being old. PRO listings carry a heavier weight, which lifts them more
+   often \u2014 but a free listing can still land above a PRO one. */
+const PRO_WEIGHT  = 0.7;
+const FREE_WEIGHT = 0.5;
+
+function shuffleListings(){
+  allListings.forEach(l => {
+    const weight = proOf(l.seller) ? PRO_WEIGHT : FREE_WEIGHT;
+    l.shuffle = Math.random() * weight;
+  });
+}
+
 
 function renderGrid(){
   const wrap = document.getElementById('gridWrap');
@@ -4624,7 +4653,6 @@ async function handlePost(e){
       btn.textContent=label; btn.disabled=false; return false;
     }
     toast('Listing published');
-    burst();
   }
 
   await loadListings();
@@ -5057,9 +5085,9 @@ document.addEventListener('visibilitychange', ()=>{
   onScroll();
 })();
 
-/* 11. Every button ripples from where the finger lands. */
+/* Every button ripples from where the finger lands. */
 document.addEventListener('pointerdown', e => {
-  const t = e.target.closest('.btn, .veh-btn, .chip, .msg-tab, .pill, .bottom-nav button, .cat-chip');
+  const t = e.target.closest('.btn, .veh-btn, .chip, .msg-tab, .pill, .bottom-nav button');
   if(!t) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const r = t.getBoundingClientRect();
