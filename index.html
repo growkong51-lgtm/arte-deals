@@ -427,6 +427,17 @@ body::after{
   box-shadow:0 0 10px rgba(224,18,48,0.6);
 }
 
+/* The header tightens as you scroll (body.scrolled, toggled by the same
+   listener as the progress bar above). Explicit, requested exception to
+   transform/opacity-only: padding and background-color are what a
+   "tighter" header actually needs to change. Kept small and one-shot
+   per scroll-state flip, not a per-frame animation, so the cost is a
+   single transition on a class change, not a continuous loop. */
+header{transition:padding .25s ease, background .25s ease;}
+body.scrolled header{padding-top:9px; padding-bottom:9px; background:rgba(9,9,12,0.98);}
+header .brand img.word{transition:transform .25s ease, opacity .25s ease; transform-origin:left center;}
+body.scrolled header .brand img.word{transform:scale(.86);}
+
 @media(prefers-reduced-motion:reduce){
   body::before, body::after, .hero::after, .ticker-track, .presence.on i::after,
   .new-tag, .price-tag::after, .bottom-nav button.active svg, .empty svg,
@@ -5055,8 +5066,8 @@ document.addEventListener('visibilitychange', ()=>{
   if(document.hidden && currentUser) touchLastSeen();
 });
 
-/* Scroll progress bar fill — rAF-throttled, transform:scaleX only. */
-(function scrollProgress(){
+/* One scroll listener drives the progress bar and the shrinking header. */
+(function scrollEffects(){
   let ticking = false;
   const onScroll = () => {
     if(ticking) return;
@@ -5066,6 +5077,7 @@ document.addEventListener('visibilitychange', ()=>{
       const max = Math.max(1, document.body.scrollHeight - window.innerHeight);
       const fill = document.getElementById('scrollFill');
       if(fill) fill.style.transform = 'scaleX(' + Math.min(1, y / max) + ')';
+      document.body.classList.toggle('scrolled', y > 60);
       ticking = false;
     });
   };
