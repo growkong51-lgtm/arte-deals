@@ -1650,9 +1650,12 @@ body::before{
 .modal-close:hover{background:rgba(255,255,255,0.14); transform:rotate(90deg);}
 .modal-close:active{transform:rotate(90deg) scale(.9);}
 
-/* Modal/overlay entrance: softer easing + a blur-in backdrop */
-.overlay{transition:opacity .28s cubic-bezier(.16,.8,.3,1), backdrop-filter .28s ease; backdrop-filter:blur(0px);}
-.overlay.show{backdrop-filter:blur(3px);}
+/* Modal/overlay entrance: softer easing + a more opaque backdrop.
+   No backdrop-filter — it was deliberately removed from this site after
+   causing severe scroll lag on mid-range Android, so opacity does the
+   visual-weight work instead. */
+.overlay{transition:opacity .28s cubic-bezier(.16,.8,.3,1), background-color .28s ease;}
+.overlay.show{background-color:rgba(3,3,5,0.94);}
 .modal{transition:transform .3s cubic-bezier(.16,.8,.3,1), opacity .22s ease; opacity:0;}
 .overlay.show .modal{opacity:1;}
 
@@ -1678,7 +1681,6 @@ body::before{
   .chip:hover, .chip:active, .pill:hover, .icon-btn:hover, .icon-btn:active{transform:none;}
   .modal-close:hover, .modal-close:active{transform:none;}
   .overlay, .overlay.show, .modal, .overlay.show .modal{transition:none;}
-  .overlay.show{backdrop-filter:none;}
 }
 </style>
 </head>
