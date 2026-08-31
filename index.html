@@ -1879,10 +1879,160 @@ footer{
   .role-card:active, .role-card.active{transform:none;}
   .nav-links a:active, .search-cta:active, .card-seller:active{transform:none;}
 }
+
+/* ================================================================
+   PREMIUM MOTION — 3D depth, parallax, magnetic pointer response.
+   Paired with the "premiumMotion" script block near the end of
+   <script>. Nothing here or in that script touches listing/chat/
+   profile rendering or Supabase/Cloudinary/ARTE_CONFIG — it only
+   reads pointer/scroll position and writes CSS custom properties or
+   transforms on elements already in the DOM.
+
+   Cost guide (see PR description for the full breakdown):
+   - Universal / cheap: the 3 parallax-layer transforms, the modal's
+     3D entrance, the card/section reveal keyframes. transform+opacity
+     only, driven by one shared rAF-throttled scroll listener.
+   - Desktop-only (behind @media (pointer: fine), and the JS below
+     checks matchMedia before attaching any of these listeners at
+     all — touch devices load none of this): card 3D tilt + inner
+     parallax + glare sheen, hero logo tilt, magnetic buttons, the
+     custom cursor glow. These are the "heavier" effects — real cost,
+     but scoped to hardware that can afford it.
+   ================================================================ */
+
+/* ---- Always-on: layered parallax backdrop, tied to scroll position ---- */
+.parallax-layer{position:fixed; inset:-10% -10%; z-index:-2; pointer-events:none; will-change:transform;}
+.parallax-far{
+  background:
+    radial-gradient(620px 440px at 14% 22%, rgba(224,18,48,0.055), transparent 60%),
+    radial-gradient(700px 500px at 86% 76%, rgba(201,204,209,0.045), transparent 60%);
+  transform:translate3d(0, calc(var(--scroll-y, 0) * -0.03px), 0);
+}
+.parallax-mid{
+  background-image:repeating-linear-gradient(115deg, transparent 0 120px, rgba(224,18,48,0.032) 120px 122px);
+  transform:translate3d(0, calc(var(--scroll-y, 0) * -0.075px), 0);
+}
+.parallax-near{
+  background-image:radial-gradient(rgba(201,204,209,0.06) 1px, transparent 1.6px);
+  background-size:64px 64px; opacity:.55;
+  transform:translate3d(0, calc(var(--scroll-y, 0) * -0.14px), 0);
+}
+@media(prefers-reduced-motion:reduce){
+  .parallax-layer{transform:none !important;}
+}
+
+/* ---- Always-on: cards settle into place in 3D, not a flat fade ---- */
+@keyframes cardIn{
+  from{opacity:0; transform:perspective(1000px) rotateX(-11deg) translateY(26px) scale(.95);}
+  to{opacity:1; transform:perspective(1000px) rotateX(0) translateY(0) scale(1);}
+}
+
+/* ---- Always-on: sections tilt in as they cross into view (progressive
+   enhancement — @supports-gated, a no-op with no support) ---- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .row-card, .seller-box, .upgrade-card, .stat-row, .section-head{
+      animation:motionReveal3D linear both;
+      animation-timeline:view();
+      animation-range:entry 0% entry 100%;
+    }
+  }
+}
+@keyframes motionReveal3D{
+  from{opacity:0; transform:perspective(900px) rotateX(-9deg) translateY(24px);}
+  to{opacity:1; transform:perspective(900px) rotateX(0) translateY(0);}
+}
+
+/* ---- Always-on: modals open with real depth and a touch of overshoot
+   ("weight") instead of a flat slide-up ---- */
+.modal{
+  transform:perspective(1400px) rotateX(-9deg) translateY(28px) scale(.94);
+  transform-origin:50% 18%;
+  transition:transform .5s cubic-bezier(.22,1.32,.36,1), opacity .25s ease;
+}
+.overlay.show .modal{transform:perspective(1400px) rotateX(0) translateY(0) scale(1);}
+@media(prefers-reduced-motion:reduce){
+  .modal{transition:opacity .25s ease; transform:none !important;}
+}
+
+/* ---- Desktop only: card 3D tilt, inner depth layers, glare sheen ---- */
+@media (pointer: fine) {
+  .grid{perspective:1400px;}
+  .card{
+    transform-style:preserve-3d;
+    transform:perspective(1000px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)) translateY(var(--cy, 0px)) scale(var(--cs, 1));
+    transition:transform .5s cubic-bezier(.16,.8,.3,1), box-shadow .4s ease;
+    will-change:transform;
+  }
+  .card.tracking{transition:transform .06s linear, box-shadow .4s ease;}
+  .card.tracking{box-shadow:0 26px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(224,18,48,.28);}
+  /* the photo sits deeper than the frame; scaled up slightly so
+     perspective's shrink-toward-center doesn't reveal an edge gap */
+  .card .imgwrap{transform:translateZ(-24px) scale(1.1); transform-style:preserve-3d;}
+  .card .imgwrap img{
+    transform:translate(var(--ix, 0px), var(--iy, 0px)) scale(var(--is, 1));
+    transition:transform .5s cubic-bezier(.16,.8,.3,1);
+  }
+  .card .price-tag, .card .new-tag{transform:translateZ(30px);}
+  .card .fav-btn{transform:translateZ(36px);}
+  .card .info{transform:translateZ(16px); position:relative;}
+  /* a soft light that tracks the pointer across the card's surface */
+  .card::after{
+    content:''; position:absolute; inset:0; z-index:5; pointer-events:none;
+    background:radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.16), transparent 55%);
+    opacity:0; transition:opacity .35s ease;
+  }
+  .card.tracking::after{opacity:1;}
+}
+
+/* ---- Desktop only: the hero logo reads pointer position across the
+   whole hero, not just while directly over the icon ---- */
+@media (pointer: fine) {
+  .hero{perspective:900px;}
+  .hero-icon-wrap{transform-style:preserve-3d;}
+  .hero-icon{
+    transform:rotateX(var(--hy, 0deg)) rotateY(var(--hx, 0deg)) translateZ(var(--hz, 0px));
+    transition:transform .7s cubic-bezier(.16,.8,.3,1);
+  }
+  .hero-icon-wrap.tracking .hero-icon{transition:transform .08s linear;}
+  .hero-glow{transform-style:preserve-3d; transform:translate(-50%,-50%) translateZ(-30px);}
+}
+
+/* ---- Desktop only: magnetic pull is JS-driven (inline transform on
+   .btn-primary, see script) — scoped to primary CTAs only, per the
+   "1-2 focal elements, not every button" guidance; more than that
+   reads as noisy rather than premium. ---- */
+
+/* ---- Desktop only: custom cursor glow ---- */
+.cursor-glow{
+  display:none; position:fixed; top:0; left:0; width:28px; height:28px; margin:-14px 0 0 -14px;
+  border-radius:50%; pointer-events:none; z-index:9999;
+  background:radial-gradient(circle, rgba(224,18,48,0.55), rgba(224,18,48,0.12) 55%, transparent 72%);
+  transform:translate3d(var(--cx, -100px), var(--cy, -100px), 0) scale(1);
+  opacity:0; transition:opacity .25s ease, transform .12s ease-out, background .25s ease;
+  mix-blend-mode:screen;
+}
+@media (pointer: fine) { .cursor-glow{display:block;} }
+.cursor-glow.show{opacity:1;}
+.cursor-glow.active{
+  transform:translate3d(var(--cx, -100px), var(--cy, -100px), 0) scale(2.4);
+  background:radial-gradient(circle, rgba(224,18,48,0.3), rgba(201,204,209,0.12) 55%, transparent 72%);
+}
+
+@media(prefers-reduced-motion:reduce){
+  .card, .card.tracking, .card .imgwrap img, .card::after,
+  .hero-icon, .hero-icon-wrap.tracking .hero-icon,
+  .cursor-glow{transition:none !important; transform:none !important; opacity:0 !important;}
+  .cursor-glow{display:none !important;}
+}
 </style>
 </head>
 <body>
 
+<div class="parallax-layer parallax-far" aria-hidden="true"></div>
+<div class="parallax-layer parallax-mid" aria-hidden="true"></div>
+<div class="parallax-layer parallax-near" aria-hidden="true"></div>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 <div class="scroll-bar"><span id="scrollFill"></span></div>
 <header>
   <div class="brand" onclick="go('home')">
@@ -5113,6 +5263,181 @@ sb.auth.onAuthStateChange((event)=>{
   if(event==='PASSWORD_RECOVERY'){ openNewPassword(); return; }
   if(event==='SIGNED_OUT' && currentUser){ currentUser=null; favorites=[]; inbox=[]; renderAuthArea(); renderNavs(); go('home'); }
 });
+
+/* ================================================================
+   PREMIUM MOTION — 3D tilt, magnetic buttons, custom cursor, scroll
+   parallax. Self-contained and additive: everything here is event
+   delegation reading pointer/scroll position and writing CSS custom
+   properties or transforms onto elements the app above already
+   rendered. It never calls into, reads from, or modifies listing,
+   chat, profile, or auth state, and never touches sb/cloudinary/
+   ARTE_CONFIG. Safe to delete this whole block to revert the effect.
+   ================================================================ */
+(function premiumMotion(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointer  = window.matchMedia('(pointer: fine)').matches;
+  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+  /* ---- Scroll-position parallax: one property, read by 3 CSS layers.
+     Universal (not pointer-gated) — cheap enough for phones, and it's
+     the "ambient depth that responds to scroll" the redesign asked for. */
+  (function parallaxScroll(){
+    let ticking = false;
+    const update = () => {
+      document.documentElement.style.setProperty('--scroll-y', String(window.scrollY || 0));
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => {
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive:true });
+    update();
+  })();
+
+  /* Everything past this point is pointer:fine only, and skips
+     attaching entirely — not just visually hiding — under
+     prefers-reduced-motion or on touch, so phones never pay for it. */
+  if(!finePointer || reduceMotion) return;
+
+  /* ---- Card 3D tilt + inner photo parallax + pointer-tracked glare ---- */
+  (function cardTilt(){
+    let raf = null, activeCard = null;
+    const reset = card => {
+      card.style.removeProperty('--rx'); card.style.removeProperty('--ry');
+      card.style.removeProperty('--cy'); card.style.removeProperty('--cs');
+      card.style.removeProperty('--ix'); card.style.removeProperty('--iy');
+      card.style.removeProperty('--is');
+      card.classList.remove('tracking');
+    };
+    document.addEventListener('pointerover', e => {
+      const card = e.target.closest('.card');
+      if(!card || card === activeCard) return;
+      activeCard = card;
+      card.classList.add('tracking');
+      card.style.setProperty('--cy','-6px');
+      card.style.setProperty('--cs','1.015');
+    }, { passive:true });
+    document.addEventListener('pointerout', e => {
+      const card = e.target.closest('.card');
+      if(!card || (e.relatedTarget && card.contains(e.relatedTarget))) return;
+      reset(card);
+      if(activeCard === card) activeCard = null;
+    }, { passive:true });
+    document.addEventListener('pointermove', e => {
+      if(!activeCard || raf) return;
+      const card = activeCard;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const r = card.getBoundingClientRect();
+        const px = clamp((e.clientX - r.left) / r.width, 0, 1);
+        const py = clamp((e.clientY - r.top) / r.height, 0, 1);
+        const dx = (px - 0.5) * 2, dy = (py - 0.5) * 2;
+        card.style.setProperty('--rx', (dx * 9).toFixed(2) + 'deg');
+        card.style.setProperty('--ry', (-dy * 9).toFixed(2) + 'deg');
+        card.style.setProperty('--ix', (dx * -8).toFixed(1) + 'px');
+        card.style.setProperty('--iy', (dy * -8).toFixed(1) + 'px');
+        card.style.setProperty('--is', '1.06');
+        card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+      });
+    }, { passive:true });
+  })();
+
+  /* ---- Hero logo: tracks pointer across the whole hero, not just
+     while directly over the icon — reads as "aware" rather than a
+     narrow hover target. ---- */
+  (function heroTilt(){
+    let raf = null;
+    document.addEventListener('pointermove', e => {
+      const hero = e.target.closest('.hero');
+      const wrap = document.querySelector('.hero-icon-wrap');
+      if(!hero || !wrap || raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const r = hero.getBoundingClientRect();
+        const dx = clamp(((e.clientX - r.left) / r.width - 0.5) * 2, -1, 1);
+        const dy = clamp(((e.clientY - r.top) / r.height - 0.5) * 2, -1, 1);
+        wrap.style.setProperty('--hx', (dx * 16).toFixed(2) + 'deg');
+        wrap.style.setProperty('--hy', (-dy * 16).toFixed(2) + 'deg');
+        wrap.style.setProperty('--hz', '18px');
+        wrap.classList.add('tracking');
+      });
+    }, { passive:true });
+    document.addEventListener('pointerout', e => {
+      if(!e.target.closest('.hero')) return;
+      const wrap = document.querySelector('.hero-icon-wrap');
+      if(!wrap || (e.relatedTarget && e.target.closest('.hero').contains(e.relatedTarget))) return;
+      wrap.style.removeProperty('--hx'); wrap.style.removeProperty('--hy'); wrap.style.removeProperty('--hz');
+      wrap.classList.remove('tracking');
+    }, { passive:true });
+  })();
+
+  /* ---- Magnetic pull, scoped to primary CTAs only (.btn-primary) —
+     per the skill's own guidance, more than 1-2 magnetic elements per
+     screen reads as noisy rather than premium. Inline transform, so
+     it composes with a press-down scale on pointerdown without
+     fighting the CSS :active rule (inline always wins while set). ---- */
+  (function magnetic(){
+    let raf = null, activeBtn = null, pressed = false;
+    const apply = (btn, dx, dy) => {
+      btn.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)' + (pressed ? ' scale(.96)' : '');
+    };
+    document.addEventListener('pointerover', e => {
+      const btn = e.target.closest('.btn-primary');
+      if(!btn) return;
+      activeBtn = btn;
+      btn.style.transition = 'none';
+    }, { passive:true });
+    document.addEventListener('pointerout', e => {
+      const btn = e.target.closest('.btn-primary');
+      if(!btn || (e.relatedTarget && btn.contains(e.relatedTarget))) return;
+      btn.style.transition = 'transform .45s cubic-bezier(.16,1.4,.3,1)';
+      btn.style.transform = '';
+      pressed = false;
+      if(activeBtn === btn) activeBtn = null;
+    }, { passive:true });
+    document.addEventListener('pointerdown', e => {
+      if(activeBtn && activeBtn.contains(e.target)) pressed = true;
+    }, { passive:true });
+    document.addEventListener('pointerup', () => { pressed = false; }, { passive:true });
+    document.addEventListener('pointermove', e => {
+      if(!activeBtn || raf) return;
+      const btn = activeBtn;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        apply(btn, clamp((e.clientX - cx) * 0.35, -14, 14), clamp((e.clientY - cy) * 0.35, -14, 14));
+      });
+    }, { passive:true });
+  })();
+
+  /* ---- Custom cursor glow: follows the pointer everywhere, and
+     brightens/enlarges over anything interactive. ---- */
+  (function cursorGlow(){
+    const glow = document.getElementById('cursorGlow');
+    if(!glow) return;
+    let raf = null, shown = false;
+    document.addEventListener('pointermove', e => {
+      if(!shown){ glow.classList.add('show'); shown = true; }
+      if(raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        glow.style.setProperty('--cx', e.clientX + 'px');
+        glow.style.setProperty('--cy', e.clientY + 'px');
+      });
+    }, { passive:true });
+    document.addEventListener('pointerover', e => {
+      if(e.target.closest('.card, .btn, .chip, .pill, a, .icon-btn, .modal-close')) glow.classList.add('active');
+    }, { passive:true });
+    document.addEventListener('pointerout', e => {
+      if(e.target.closest('.card, .btn, .chip, .pill, a, .icon-btn, .modal-close')) glow.classList.remove('active');
+    }, { passive:true });
+    document.addEventListener('pointerleave', () => { glow.classList.remove('show'); }, true);
+  })();
+})();
+
 init();
 </script>
 </body>
