@@ -731,16 +731,21 @@ main{max-width:1360px; margin:0 auto; padding:24px 22px 90px;}
 .card .title{transition:color .2s ease;}
 .card:hover .title{color:var(--red-2);}
 /* listings ease in rather than snapping into place */
-.grid > *{animation:cardIn .85s cubic-bezier(.16,1,.3,1) both;}
-.grid > *:nth-child(2){animation-delay:.12s;}
-.grid > *:nth-child(3){animation-delay:.24s;}
-.grid > *:nth-child(4){animation-delay:.36s;}
-.grid > *:nth-child(5){animation-delay:.48s;}
-.grid > *:nth-child(6){animation-delay:.6s;}
-.grid > *:nth-child(7){animation-delay:.72s;}
-.grid > *:nth-child(n+8){animation-delay:.84s;}
+/* Cards default to fully visible — the safe fallback if JS/observers
+   never run for any reason. Only once JS confirms it's actively
+   watching (html.motion-ready, set by cardEntrance() near the end of
+   <script>) do they start hidden/rotated, revealed by adding
+   .card-enter the moment each card is IntersectionObserver-confirmed
+   on screen — not simply on DOM insertion. See cardEntrance() for why
+   that distinction is the actual fix, not just a rewrite. */
+html.motion-ready .grid > *{
+  opacity:0;
+  transform:perspective(1000px) rotateX(-46deg) rotateY(-16deg) translateY(90px) translateZ(-60px) scale(.72);
+}
+html.motion-ready .grid > *.card-enter{animation:cardIn .85s cubic-bezier(.16,1,.3,1) both;}
 @keyframes cardIn{from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:none;}}
 @media(prefers-reduced-motion:reduce){
+  html.motion-ready .grid > *{opacity:1; transform:none;}
   .grid > *{animation:none;}
   .card:hover{transform:none;}
 }
@@ -5493,9 +5498,15 @@ sb.auth.onAuthStateChange((event)=>{
    this is the "obviously alive" background for the rest of the site,
    the hero's own video covers the hero). Skips entirely under
    prefers-reduced-motion (the canvas is simply never drawn to, not
-   just visually hidden). Capped at 30fps via a timestamp check inside
-   the rAF loop, and paused/resumed on document.hidden so a backgrounded
-   tab doesn't keep drawing. Touches nothing but this one <canvas>. */
+   just visually hidden). Capped at 60fps for smooth drift — the cost
+   of that is offset three ways, so the trade-off doesn't just move
+   from "smooth but choppy" to "smooth but janky": fewer particles,
+   the expensive part (recreating each orb's radial gradient at a new
+   position) only runs every 3rd frame instead of every frame, and
+   particles are drawn as filled squares instead of arced circles
+   (cheaper to rasterize; at 1-3px the shape is imperceptible either
+   way). Paused/resumed on document.hidden. Touches nothing but this
+   one <canvas>. */
 (function bgCanvas(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -5504,7 +5515,7 @@ sb.auth.onAuthStateChange((event)=>{
   const ctx = canvas.getContext('2d');
   if(!ctx) return;
 
-  const DPR = Math.min(window.devicePixelRatio || 1, 1.75); // capped: full DPR on a
+  const DPR = Math.min(window.devicePixelRatio || 1, 1.5); // capped: full DPR on a
     // high-res Android panel multiplies fill-rate cost for little visible gain
   let w = 0, h = 0;
   function resize(){
@@ -5516,18 +5527,21 @@ sb.auth.onAuthStateChange((event)=>{
   resize();
   window.addEventListener('resize', resize, { passive:true });
 
-  /* A few large, slow "aurora" glows drifting in loose orbits. */
+  /* A few large, slow "aurora" glows drifting in loose orbits. Their
+     gradients are only rebuilt every ORB_REFRESH frames (see draw()) —
+     cached here between rebuilds so every-frame draws stay cheap. */
   const orbs = ['rgba(224,18,48,0.16)','rgba(201,204,209,0.11)','rgba(224,18,48,0.10)'].map((color, i) => ({
     color, r: 260 + Math.random() * 180,
     baseX: Math.random(), baseY: Math.random(),
     ax: 0.18 + Math.random() * 0.12, ay: 0.14 + Math.random() * 0.1,
     speed: 0.00012 + i * 0.00004, phase: Math.random() * Math.PI * 2,
+    gradient: null, gx: 0, gy: 0,
   }));
 
   /* A field of small drifting light particles — headlight-streak reds
      and silvers, scaled to viewport area so a phone doesn't draw a
-     desktop-sized field. */
-  const COUNT = Math.round(Math.min(60, Math.max(26, (window.innerWidth * window.innerHeight) / 22000)));
+     desktop-sized field. Count trimmed to make room for the 60fps cap. */
+  const COUNT = Math.round(Math.min(34, Math.max(14, (window.innerWidth * window.innerHeight) / 34000)));
   const particles = Array.from({ length: COUNT }, () => ({
     x: Math.random(), y: Math.random(),
     vx: (Math.random() - 0.5) * 0.00028,
@@ -5537,8 +5551,9 @@ sb.auth.onAuthStateChange((event)=>{
     silver: Math.random() < 0.4,
   }));
 
-  const FRAME_MS = 1000 / 30; // hard cap: skip drawing on frames faster than 30fps
-  let t = 0, raf = null, lastFrame = 0;
+  const FRAME_MS = 1000 / 60; // smooth drift — raised from 30fps
+  const ORB_REFRESH = 3; // recompute orb position/gradient every 3rd drawn frame only
+  let t = 0, raf = null, lastFrame = 0, frameCount = 0;
 
   function draw(now){
     raf = requestAnimationFrame(draw);
@@ -5546,19 +5561,26 @@ sb.auth.onAuthStateChange((event)=>{
     const dt = lastFrame ? (now - lastFrame) : FRAME_MS;
     lastFrame = now;
     t += dt;
+    frameCount++;
 
     ctx.clearRect(0, 0, w, h);
 
+    if(frameCount % ORB_REFRESH === 0){
+      orbs.forEach(o => {
+        o.gx = (o.baseX + Math.sin(t * o.speed + o.phase) * o.ax) * w;
+        o.gy = (o.baseY + Math.cos(t * o.speed * 0.8 + o.phase) * o.ay) * h;
+        const g = ctx.createRadialGradient(o.gx, o.gy, 0, o.gx, o.gy, o.r);
+        g.addColorStop(0, o.color);
+        g.addColorStop(1, 'transparent');
+        o.gradient = g;
+      });
+    }
     ctx.globalCompositeOperation = 'lighter';
     orbs.forEach(o => {
-      const x = (o.baseX + Math.sin(t * o.speed + o.phase) * o.ax) * w;
-      const y = (o.baseY + Math.cos(t * o.speed * 0.8 + o.phase) * o.ay) * h;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, o.r);
-      g.addColorStop(0, o.color);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
+      if(!o.gradient) return;
+      ctx.fillStyle = o.gradient;
       ctx.beginPath();
-      ctx.arc(x, y, o.r, 0, Math.PI * 2);
+      ctx.arc(o.gx, o.gy, o.r, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.globalCompositeOperation = 'source-over';
@@ -5569,15 +5591,14 @@ sb.auth.onAuthStateChange((event)=>{
       if(p.y > 1.02) p.y = -0.02;
       p.tw += dt * 0.003;
       const alpha = 0.25 + Math.sin(p.tw) * 0.2 + 0.2;
-      ctx.beginPath();
       ctx.fillStyle = p.silver ? 'rgba(230,232,236,' + alpha.toFixed(2) + ')' : 'rgba(255,90,110,' + alpha.toFixed(2) + ')';
-      ctx.arc(p.x * w, p.y * h, p.r, 0, Math.PI * 2);
-      ctx.fill();
+      const d = p.r * 2;
+      ctx.fillRect(p.x * w - p.r, p.y * h - p.r, d, d);
     });
   }
 
   let running = false;
-  function start(){ if(running) return; running = true; lastFrame = 0; raf = requestAnimationFrame(draw); }
+  function start(){ if(running) return; running = true; lastFrame = 0; frameCount = 0; raf = requestAnimationFrame(draw); }
   function stop(){ running = false; if(raf) cancelAnimationFrame(raf); raf = null; }
 
   document.addEventListener('visibilitychange', () => { if(document.hidden) stop(); else start(); });
@@ -5611,6 +5632,67 @@ sb.auth.onAuthStateChange((event)=>{
     if(v){ cleanup(v); mo.disconnect(); }
   });
   mo.observe(document.body, { childList:true, subtree:true });
+})();
+
+/* ================================================================
+   CARD ENTRANCE — fixes the tumble never being seen. Root cause: the
+   old CSS ran the entrance `animation` the instant each card was
+   inserted into the DOM (renderGrid() does wrap.innerHTML = ...). But
+   .card has content-visibility:auto (existing, for scroll perf on long
+   lists), and on a phone the hero is usually tall enough that the grid
+   starts below the fold — so cards were animating, in real time, while
+   off-screen and not rendered. By the time someone actually scrolled
+   down, the animation had already finished; the card just appeared.
+   Fixing the trigger, not just the keyframe: an IntersectionObserver
+   now adds .card-enter (which the CSS above uses to start the
+   animation) only once a card is actually confirmed on screen, so the
+   tumble plays exactly when it's visible, every time, however far down
+   the page it is. html.motion-ready gates the "start hidden" CSS too,
+   so if this script fails for any reason cards default to fully
+   visible rather than risk being stuck invisible. A MutationObserver
+   on #app catches every re-render (renderGrid uses both innerHTML and,
+   for the empty state, outerHTML) and registers any new cards; a
+   6s safety timeout force-reveals anything that's somehow never
+   intersected. Never touches renderGrid/cardHTML — purely observes
+   the DOM they produce. */
+(function cardEntrance(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  document.documentElement.classList.add('motion-ready');
+
+  const io = new IntersectionObserver(entries => {
+    let i = 0;
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      const el = entry.target;
+      io.unobserve(el);
+      el.style.animationDelay = (i * 90) + 'ms';
+      i++;
+      requestAnimationFrame(() => el.classList.add('card-enter'));
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+
+  function observeNewCards(){
+    document.querySelectorAll('.grid > .card').forEach(card => {
+      if(card.dataset.entranceSeen) return;
+      card.dataset.entranceSeen = '1';
+      io.observe(card);
+    });
+  }
+  observeNewCards();
+
+  const app = document.getElementById('app');
+  if(app){
+    const mo = new MutationObserver(observeNewCards);
+    mo.observe(app, { childList:true, subtree:true });
+  }
+
+  // Safety net: never leave a card permanently invisible if its
+  // observer entry somehow never fires (e.g. registered after it had
+  // already scrolled fully past).
+  setTimeout(() => {
+    document.querySelectorAll('.grid > *:not(.card-enter)').forEach(el => el.classList.add('card-enter'));
+  }, 6000);
 })();
 
 init();
