@@ -960,12 +960,26 @@ select.calc-box{
   font-size:13px; font-weight:600; color:#fff; white-space:nowrap;
 }
 .st-table tr:last-child td{border-bottom:none;}
-.cr-terms{
-  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:26px; line-height:1.35;
-  color:var(--red-2); white-space:pre-wrap;
+.cr-terms{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;}
+.cr-term{
+  padding:14px 4px 15px; border:1px solid rgba(224,18,48,0.28); border-radius:3px;
+  background:rgba(224,18,48,0.07);
+}
+.cr-term-label{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--silver); margin-bottom:8px;
+}
+.cr-term-value{
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:21px; line-height:1.1;
+  color:var(--red-2); white-space:nowrap;
+}
+@media(max-width:400px){
+  .cr-term-value{font-size:17px;}
+  .cr-term{padding:12px 3px 13px;}
 }
 .cr-sub{
   font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--silver);
+  margin-bottom:16px;
 }
 .cr-sub span{color:#fff;}
 .calc-note{font-size:13px; line-height:1.65; color:var(--muted); margin:0;}
@@ -2561,11 +2575,13 @@ function hideLocSuggest(){
   }, 120);
 }
 
+/* No term picker: every offered term (24/36/48mo) is computed and
+   shown at once, side by side, so a buyer or agent sees all options
+   the moment a downpayment is entered. */
 function runCalc(){
   const priceEl = document.getElementById('cPrice');
   if(!priceEl) return;
   const price = Math.max(0, Number(priceEl.value) || 0);
-  const term  = Number(document.getElementById('cTerm').value) || 36;
 
   let down;
   if(downMode === 'amt'){
@@ -2576,14 +2592,18 @@ function runCalc(){
     down = price * (pct/100);
   }
 
-  const loan  = Math.max(0, price - down);
-  const rate  = CALC_RATES[term] || 0;
-  const years = term / 12;
-  const monthly = loan > 0 ? (loan * (1 + rate * years)) / term : 0;
+  const loan = Math.max(0, price - down);
 
-  document.getElementById('oDown').textContent    = fmtPrice(Math.round(down));
-  document.getElementById('oLoan').textContent    = fmtPrice(Math.round(loan));
-  document.getElementById('oMonthly').textContent = fmtPrice(Math.round(monthly));
+  document.getElementById('oDown').textContent = fmtPrice(Math.round(down));
+  document.getElementById('oLoan').textContent = fmtPrice(Math.round(loan));
+
+  [24, 36, 48].forEach(term => {
+    const rate    = CALC_RATES[term] || 0;
+    const years   = term / 12;
+    const monthly = loan > 0 ? (loan * (1 + rate * years)) / term : 0;
+    const el = document.getElementById('oM' + term);
+    if(el) el.textContent = fmtPrice(Math.round(monthly));
+  });
 }
 
 function fmtPrice(n){ return '\u20b1'+Number(n).toLocaleString('en-PH'); }
@@ -4956,14 +4976,6 @@ function renderDetail(){
           <input class="calc-box" type="number" id="cPrice" value="${Number(l.price)||''}"
                  placeholder="e.g. 838000" min="0" step="1000" oninput="runCalc()">
 
-          <label class="calc-label">Term (Months)</label>
-          <select class="calc-box" id="cTerm" onchange="runCalc()">
-            <option value="12">12 Months</option>
-            <option value="24">24 Months</option>
-            <option value="36" selected>36 Months</option>
-            <option value="48">48 Months</option>
-          </select>
-
           <label class="calc-label">Downpayment</label>
           <div class="calc-toggle">
             <button type="button" id="tglPct" class="calc-tgl active" onclick="setDownMode('pct')">Standard %</button>
@@ -4990,9 +5002,22 @@ function renderDetail(){
           </div>
 
           <div class="calc-result">
-            <div class="cr-label">Estimated Monthly Payment</div>
-            <div class="cr-value" id="oMonthly">\u20b10</div>
             <div class="cr-sub">Downpayment: <span id="oDown">\u20b10</span> \u00b7 Loan Amount: <span id="oLoan">\u20b10</span></div>
+            <div class="cr-label">Estimated Monthly Payment</div>
+            <div class="cr-terms">
+              <div class="cr-term">
+                <div class="cr-term-label">2 Years</div>
+                <div class="cr-term-value" id="oM24">\u20b10</div>
+              </div>
+              <div class="cr-term">
+                <div class="cr-term-label">3 Years</div>
+                <div class="cr-term-value" id="oM36">\u20b10</div>
+              </div>
+              <div class="cr-term">
+                <div class="cr-term-label">4 Years</div>
+                <div class="cr-term-value" id="oM48">\u20b10</div>
+              </div>
+            </div>
           </div>
 
           <p class="calc-note">
