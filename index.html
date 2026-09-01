@@ -2136,6 +2136,8 @@ footer{
     <span>&middot;</span>
     <a href="privacy.html">Privacy Policy</a>
     <span>&middot;</span>
+    <a href="about.html">About</a>
+    <span>&middot;</span>
     <a href="viewing.html">Book a Viewing</a>
     <span>&middot;</span>
     <a href="agents.html">Become an Agent</a>
@@ -3443,7 +3445,7 @@ function cardHTML(l){
     <div class="info">
       <div class="info-main">
         <div class="title">${esc(l.title)}</div>
-        <div class="meta">📍 ${esc(l.location)}${distanceLabel(l)} · ${timeAgo(l.createdAt)}</div>
+        <div class="meta">📍 ${esc(l.location)}${distanceLabel(l)}</div>
       </div>
       <div class="card-seller" onclick="event.stopPropagation(); openSeller('${l.seller}')" title="${esc(l.sellerName)}">
         ${avatarHTML(l.seller, l.sellerName, 30, proOf(l.seller)?'gold':'')}
@@ -5051,6 +5053,7 @@ function renderDetail(){
              <button class="btn btn-primary btn-block" onclick="openMessage('${l.id}')">✉ Message Seller</button>
              <button class="icon-btn" style="width:44px;height:44px;" onclick="toggleFav('${l.id}')">${isFav?'♥':'♡'}</button>
            </div>`}
+      <a class="btn btn-primary btn-block${proOf(l.seller)?' gold-btn':''}" href="viewing.html" style="margin-top:8px;">Book a Viewing</a>
     </div>
   </div>`;
 }
