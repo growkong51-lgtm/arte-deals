@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — ARTE DEALS</title>
+<meta name="description" content="ARTE DEALS is a third-party automotive marketing platform connecting buyers with quality vehicles from trusted agents and dealerships across the Philippines.">
+<meta property="og:title" content="About ARTE DEALS">
+<meta property="og:description" content="Where Passion Meets the Right Deal. Premium Choices. Powerful Deals.">
+<meta property="og:image" content="https://growkong51-lgtm.github.io/arte-deals/og-image.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07070a; --panel:rgba(255,255,255,0.035); --line:rgba(201,204,209,0.14);
+  --red:#e01230; --red-2:#ff2d4d;
+  --silver:#c9ccd1; --silver-bright:#f3f4f6; --muted:#8b8d94;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--black); color:var(--silver);
+  font-family:Inter,sans-serif; font-size:15.5px; line-height:1.8;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{color:var(--red-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.top{
+  position:sticky; top:0; z-index:10;
+  border-bottom:1px solid var(--line); padding:18px 26px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  background:rgba(7,7,10,0.96);
+}
+.mark{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:18px;
+  letter-spacing:.22em; text-transform:uppercase; color:#fff; text-decoration:none;
+}
+.mark span{color:var(--red-2);}
+.back{font-size:12.5px; color:var(--muted);}
+.back:hover{color:var(--red-2);}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative; overflow:hidden; text-align:center;
+  padding:70px 24px 60px; border-bottom:1px solid var(--line);
+}
+.hero-glow{
+  position:absolute; inset:-40% -20% auto -20%; height:160%; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%, rgba(224,18,48,0.2), transparent 62%);
+  animation:glowDrift 18s ease-in-out infinite alternate;
+}
+@keyframes glowDrift{
+  from{transform:translate3d(-4%,0,0) scale(1);}
+  to  {transform:translate3d(4%,3%,0) scale(1.12);}
+}
+.hero > *{position:relative;}
+.eyebrow{
+  display:inline-block; font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--red-2); margin-bottom:18px;
+  padding:6px 15px; border:1px solid rgba(224,18,48,0.45); border-radius:999px;
+  background:rgba(224,18,48,0.09);
+}
+h1{
+  font-family:Rajdhani,sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:clamp(38px,9vw,72px); line-height:.98; letter-spacing:.03em; margin-bottom:16px;
+  background:linear-gradient(180deg,#ffffff 0%,#e6e8ec 34%,#9aa0a8 62%,#f4f5f7 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e6e8ec;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.6));
+}
+.tagline{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:clamp(15px,3.6vw,22px);
+  letter-spacing:.16em; text-transform:uppercase; color:var(--red-2);
+}
+
+/* ---------- body ---------- */
+.wrap{max-width:760px; margin:0 auto; padding:56px 26px 40px;}
+p{margin-bottom:20px;}
+p strong, strong{color:var(--silver-bright); font-weight:600;}
+.lead{font-size:17px; line-height:1.75; color:var(--silver-bright);}
+
+.rule{
+  width:52px; height:2px; margin:44px auto;
+  background:linear-gradient(90deg, transparent, var(--red-2), transparent);
+}
+
+h2{
+  font-family:Rajdhani,sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:clamp(22px,4.6vw,32px); letter-spacing:.12em; color:#fff;
+  text-align:center; margin-bottom:10px;
+}
+.h2-sub{text-align:center; font-size:13.5px; color:var(--muted); margin-bottom:34px;}
+
+/* ---------- pillars ---------- */
+.pillars{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px; margin-bottom:20px;
+}
+.pillar{
+  position:relative; overflow:hidden;
+  padding:24px 22px; border:1px solid var(--line); border-radius:12px;
+  background:linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  transition:border-color .22s ease, transform .22s ease;
+}
+.pillar:hover{border-color:rgba(224,18,48,0.45); transform:translateY(-3px);}
+.pillar .n{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:.24em; color:var(--red-2); margin-bottom:9px;
+}
+.pillar h3{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:21px;
+  letter-spacing:.1em; text-transform:uppercase; color:#fff; margin-bottom:7px;
+}
+.pillar p{font-size:13.5px; line-height:1.65; color:var(--silver); margin:0;}
+.pillar::after{
+  content:''; position:absolute; top:0; left:-70%; width:40%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,0.07), transparent);
+  transform:skewX(-18deg); transition:left .6s cubic-bezier(.16,.8,.3,1);
+}
+.pillar:hover::after{left:130%;}
+
+/* ---------- mission ---------- */
+.mission{
+  padding:34px 28px; border-radius:14px; text-align:center;
+  border:1px solid rgba(224,18,48,0.35);
+  background:linear-gradient(160deg, rgba(224,18,48,0.11), rgba(255,255,255,0.02));
+}
+.mission p{font-size:16px; line-height:1.75; color:var(--silver-bright); margin:0;}
+
+.closing{text-align:center; margin-top:46px;}
+.closing p{font-size:15.5px; color:var(--silver);}
+.sign{
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:clamp(17px,4vw,25px);
+  letter-spacing:.14em; text-transform:uppercase; color:#fff; margin-top:26px;
+}
+.sign span{color:var(--red-2);}
+
+.cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:34px;}
+.cta{
+  display:inline-block; padding:15px 30px; border-radius:999px; text-decoration:none;
+  font-family:Rajdhani,sans-serif; font-weight:700; font-size:14px;
+  letter-spacing:.16em; text-transform:uppercase;
+  transition:transform .16s ease, box-shadow .2s ease;
+}
+.cta.primary{
+  background:linear-gradient(135deg,#ff2d4d,#8c0a1c); color:#fff;
+  box-shadow:0 8px 24px rgba(224,18,48,0.32);
+}
+.cta.ghost{border:1px solid var(--line); color:var(--silver-bright);}
+.cta:hover{transform:translateY(-2px); text-decoration:none;}
+.cta.ghost:hover{border-color:var(--silver);}
+
+.foot{
+  border-top:1px solid var(--line); margin-top:60px; padding:30px 26px 40px;
+  color:var(--muted); font-size:12.5px; line-height:1.9;
+}
+.foot a{color:var(--muted);}
+.foot a:hover{color:var(--red-2);}
+.foot-links{margin-top:12px; display:flex; gap:9px; flex-wrap:wrap;}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-glow, .pillar::after{animation:none; transition:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="mark" href="index.html">ARTE <span>DEALS</span></a>
+  <a class="back" href="index.html">&larr; Back to listings</a>
+</div>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="eyebrow">About Us</div>
+  <h1>ARTE DEALS</h1>
+  <div class="tagline">Where Passion Meets the Right Deal</div>
+</div>
+
+<div class="wrap">
+
+  <p class="lead">ARTE DEALS is a third-party automotive marketing platform dedicated to
+  connecting car enthusiasts and buyers with quality vehicles and competitive deals from
+  <strong>automotive agents and dealerships</strong>.</p>
+
+  <p>We started our journey on <strong>TikTok</strong>, where we began marketing and showcasing
+  vehicles to a growing community of car enthusiasts and potential buyers. What started as a
+  social media platform for automotive content has grown into a dedicated platform built to
+  make discovering and finding the right vehicle easier.</p>
+
+  <p>As a <strong>third-party platform</strong>, we work alongside automotive agents and
+  dealerships by helping market and showcase their available units to a wider audience. We are
+  not limited to a single dealership or inventory, allowing buyers to explore different
+  vehicles, offers, and options in one place.</p>
+
+  <p>We believe buying a car should be more than just a transaction. It should be an experience
+  built on <strong>trust, transparency, and confidence</strong>. Every unit we feature is
+  carefully presented with the goal of giving our clients the information they need to make the
+  right decision.</p>
+
+  <p>From sporty and performance-inspired vehicles to practical daily drives, we aim to offer a
+  selection that matches different lifestyles, preferences, and budgets.</p>
+
+  <div class="rule"></div>
+
+  <h2>Why ARTE DEALS</h2>
+  <p class="h2-sub">Four things we hold ourselves to</p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="n">01</div>
+      <h3>Quality</h3>
+      <p>We focus on units that meet our standards for condition, presentation, and value.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">02</div>
+      <h3>Transparency</h3>
+      <p>Clear details, honest information, and straightforward transactions are at the heart
+      of what we do.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">03</div>
+      <h3>Value</h3>
+      <p>We work to provide competitive deals without compromising the quality of the vehicle
+      or the buying experience.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">04</div>
+      <h3>Passion</h3>
+      <p>Cars are more than transportation to us. They represent style, performance, freedom,
+      and individuality.</p>
+    </div>
+  </div>
+
+  <div class="rule"></div>
+
+  <h2>Our Mission</h2>
+  <p class="h2-sub">What we are here to do</p>
+
+  <div class="mission">
+    <p>To make quality vehicles more accessible by <strong>connecting buyers with trusted
+    automotive agents and dealerships</strong>, while creating a buying experience that is
+    <strong>simple, professional, and trustworthy</strong>.</p>
+  </div>
+
+  <div class="closing">
+    <p>Whether you're looking for your next daily driver, a family vehicle, or something that
+    simply makes you look back after parking it — we are here to help you find the right one.</p>
+    <div class="sign">ARTE DEALS <span>&mdash;</span> Premium Choices. Powerful Deals.</div>
+
+    <div class="cta-row">
+      <a class="cta primary" href="index.html">Browse Vehicles</a>
+      <a class="cta ghost" href="viewing.html">Book a Viewing</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="foot">
+  2023 ARTE DEALS. All rights reserved.<br>
+  Metro Manila, Makati Philippines<br>
+  <a href="mailto:artedeals1@gmail.com">artedeals1@gmail.com</a>
+  <div class="foot-links">
+    <a href="index.html">Home</a> <span>&middot;</span>
+    <a href="terms.html">Terms of Service</a> <span>&middot;</span>
+    <a href="privacy.html">Privacy Policy</a>
+  </div>
+</div>
+
+</body>
+</html>
