@@ -20,10 +20,11 @@ const ARTE_CONFIG = {
   proPrice:        79,     // what they pay this month
   proPriceRegular: 129,    // shown struck through beside it
 
-  // Shown to sellers instead of the GCash flow while it's switched off
-  // from the admin Settings tab (invitation-only phase — nobody pays).
-  // Entering this code activates PRO for one year.
-  proAccessCode: 'CHANGE-ME',
+  // PRO access codes (shown to sellers instead of the GCash flow while
+  // it's switched off from the admin Settings tab) are no longer a
+  // single fixed value here — they're rows in the pro_codes table,
+  // created and managed from the admin panel's PRO Codes tab, redeemed
+  // through the redeem_pro_code() database function. See sql/pro_codes.sql.
 
   // Listing caps per 2-week cycle. The database enforces these too —
   // if you change them here, change enforce_listing_cap in Supabase as well.
