@@ -749,7 +749,14 @@ html.motion-ready .grid > *.card-enter{animation:cardIn .85s cubic-bezier(.16,1,
   .grid > *{animation:none;}
   .card:hover{transform:none;}
 }
-.card{content-visibility:auto; contain-intrinsic-size:320px;}
+/* contain-intrinsic-size is the placeholder box size used while a card
+   is skipped (off-screen). It was 320px flat — real cards render at
+   roughly 190-200px tall, so every card's first render "unskip" had to
+   correct a ~40% size error, which forced layout + paint on the shared
+   document layer as it happened. auto <length> keeps that 210px
+   fallback for the very first paint, then remembers each card's real
+   measured size afterward so later unskips don't need the correction. */
+.card{content-visibility:auto; contain-intrinsic-size:auto 210px;}
 .card .title{
   font-family:'Rajdhani',sans-serif; font-weight:600; font-size:19px; line-height:1.2;
   letter-spacing:.015em; color:#fff; text-align:left;
@@ -1943,6 +1950,14 @@ footer{
       animation: motionReveal linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 100%;
+      /* Without this, the transform/opacity steps of a scroll-linked
+         animation on an unlayered element fall back to paint
+         invalidation of whatever shared layer contains it (traced:
+         this was landing on the main document layer) instead of
+         running on the compositor. These are few, sparse elements —
+         not a grid of dozens like .card — so a standing layer per
+         element here is cheap. */
+      will-change: transform, opacity;
     }
   }
 }
@@ -2033,6 +2048,7 @@ footer{
       animation:motionReveal3D linear both;
       animation-timeline:view();
       animation-range:entry 0% entry 100%;
+      will-change: transform, opacity;
     }
   }
 }
