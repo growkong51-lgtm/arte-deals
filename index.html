@@ -1941,31 +1941,6 @@ footer{
 .search-cta:active{transform:scale(.93);}
 .card-seller:active{transform:scale(.96);}
 
-/* Scroll-triggered reveal — progressive enhancement only, via CSS
-   scroll-driven animations (animation-timeline: view()). No JS: falls
-   back to fully visible, static content on browsers without support. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .row-card, .seller-box, .upgrade-card, .stat-row, .section-head{
-      animation: motionReveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 100%;
-      /* Without this, the transform/opacity steps of a scroll-linked
-         animation on an unlayered element fall back to paint
-         invalidation of whatever shared layer contains it (traced:
-         this was landing on the main document layer) instead of
-         running on the compositor. These are few, sparse elements —
-         not a grid of dozens like .card — so a standing layer per
-         element here is cheap. */
-      will-change: transform, opacity;
-    }
-  }
-}
-@keyframes motionReveal{
-  from{opacity:0; transform:translateY(22px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
 @media(prefers-reduced-motion:reduce){
   .chip:hover, .chip:active, .pill:hover, .icon-btn:hover, .icon-btn:active{transform:none;}
   .modal-close:hover, .modal-close:active{transform:none;}
@@ -2038,23 +2013,6 @@ footer{
   0%{opacity:0; transform:perspective(1000px) rotateX(-46deg) rotateY(-16deg) translateY(90px) translateZ(-60px) scale(.72);}
   55%{opacity:1; transform:perspective(1000px) rotateX(6deg) rotateY(3deg) translateY(-10px) translateZ(0) scale(1.03);}
   100%{opacity:1; transform:perspective(1000px) rotateX(0) rotateY(0) translateY(0) translateZ(0) scale(1);}
-}
-
-/* ---- Always-on: sections tilt in as they cross into view (progressive
-   enhancement — @supports-gated, a no-op with no support) ---- */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .row-card, .seller-box, .upgrade-card, .stat-row, .section-head{
-      animation:motionReveal3D linear both;
-      animation-timeline:view();
-      animation-range:entry 0% entry 100%;
-      will-change: transform, opacity;
-    }
-  }
-}
-@keyframes motionReveal3D{
-  from{opacity:0; transform:perspective(900px) rotateX(-9deg) translateY(24px);}
-  to{opacity:1; transform:perspective(900px) rotateX(0) translateY(0);}
 }
 
 /* ---- Always-on: modals open with real depth and a touch of overshoot
@@ -5671,12 +5629,16 @@ sb.auth.onAuthStateChange((event)=>{
 
   const DPR = Math.min(window.devicePixelRatio || 1, 1.5); // capped: full DPR on a
     // high-res Android panel multiplies fill-rate cost for little visible gain
+  const RENDER_SCALE = 0.5; // backing buffer at half resolution, upscaled by the
+    // browser's own image scaling to fill the CSS box — halves every fill/arc
+    // call's pixel cost for a background layer that's soft-focus by design
   let w = 0, h = 0;
   function resize(){
     w = window.innerWidth; h = window.innerHeight;
-    canvas.width = Math.round(w * DPR);
-    canvas.height = Math.round(h * DPR);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    const scale = DPR * RENDER_SCALE;
+    canvas.width = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
   }
   resize();
   window.addEventListener('resize', resize, { passive:true });
@@ -5694,8 +5656,10 @@ sb.auth.onAuthStateChange((event)=>{
 
   /* A field of small drifting light particles — headlight-streak reds
      and silvers, scaled to viewport area so a phone doesn't draw a
-     desktop-sized field. Count trimmed to make room for the 60fps cap. */
-  const COUNT = Math.round(Math.min(34, Math.max(14, (window.innerWidth * window.innerHeight) / 34000)));
+     desktop-sized field. Cut roughly in half again on top of the 60fps
+     cap — real mid-range Android measured worse, not better, with the
+     fuller count. */
+  const COUNT = Math.round(Math.min(16, Math.max(6, (window.innerWidth * window.innerHeight) / 60000)));
   const particles = Array.from({ length: COUNT }, () => ({
     x: Math.random(), y: Math.random(),
     vx: (Math.random() - 0.5) * 0.00028,
@@ -5784,6 +5748,37 @@ sb.auth.onAuthStateChange((event)=>{
   const mo = new MutationObserver(() => {
     const v = document.querySelector('.hero-video');
     if(v){ cleanup(v); mo.disconnect(); }
+  });
+  mo.observe(document.body, { childList:true, subtree:true });
+})();
+
+/* ================================================================
+   HERO VIDEO — pause when scrolled out of view. A looping <video>
+   keeps decoding frames whether it's on screen or not; several
+   screens past the hero, that's pure waste on a phone. Same
+   wait-for-render pattern as heroVideoMotion just above (the hero is
+   rendered by the app well after this script runs). Does nothing
+   under prefers-reduced-motion — heroVideoMotion already strips the
+   video's source entirely in that case, so there's nothing here to
+   pause or resume. Never touches how/when the hero itself renders. */
+(function heroVideoVisibility(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const attach = v => {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) v.play().catch(()=>{});
+        else v.pause();
+      });
+    }, { threshold: 0 });
+    io.observe(v);
+  };
+
+  const existing = document.querySelector('.hero-video');
+  if(existing){ attach(existing); return; }
+  const mo = new MutationObserver(() => {
+    const v = document.querySelector('.hero-video');
+    if(v){ attach(v); mo.disconnect(); }
   });
   mo.observe(document.body, { childList:true, subtree:true });
 })();
