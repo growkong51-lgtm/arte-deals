@@ -2104,6 +2104,23 @@ footer{
   .cursor-glow{display:none !important;}
 }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2115905626471098');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2115905626471098&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -2931,6 +2948,7 @@ async function verifySignupCode(e){
 
   const prof = await ensureProfile(data.user);
   currentUser = { username: data.user.id, email: otpEmail, name: prof.name, role: prof.role };
+  if(window.fbq){ fbq('track', 'CompleteRegistration'); }
   cancelOtp();
   closeModal('authOverlay');
   startPresence();
@@ -3526,6 +3544,7 @@ async function toggleFav(id){
     favorites.push(id);
     const { error } = await sb.from('favorites').insert({ user_id: currentUser.username, listing_id: id });
     if(error) dbFail(error, 'Could not update saved vehicles');
+    else if(window.fbq){ fbq('track', 'AddToWishlist'); }
   }
   renderGrid();
   if(currentRoute==='favorites') renderFavorites(document.getElementById('app'));
@@ -3749,6 +3768,7 @@ function openSeller(id, skipHash){
   if(!skipHash && location.hash !== '#seller=' + id){
     history.pushState({seller:id}, '', '#seller=' + id);
   }
+  if(window.fbq){ fbq('trackCustom', 'ViewSeller'); }
   go('seller');
 }
 
@@ -5156,6 +5176,7 @@ async function handlePost(e){
       btn.textContent=label; btn.disabled=false; return false;
     }
     toast('Listing published');
+    if(window.fbq){ fbq('trackCustom', 'ListingPosted'); }
   }
 
   await loadListings();
@@ -5170,6 +5191,7 @@ async function handlePost(e){
 async function openDetail(id, skipHash){
   const l = allListings.find(x=>x.id===id);
   if(!l) return;
+  if(window.fbq){ fbq('track', 'ViewContent', {content_ids:[id], content_type:'vehicle'}); }
   countView(l);
   if(!skipHash && location.hash !== '#car=' + id){
     history.pushState({car:id}, '', '#car=' + id);
@@ -5514,6 +5536,8 @@ async function sendMessage(e){
     inbox = inbox.filter(m=>m.id!==optimistic.id);
     renderChat();
     dbFail(error, 'Message not sent');
+  } else if(window.fbq){
+    fbq('track', 'Contact');
   }
   return false;
 }
