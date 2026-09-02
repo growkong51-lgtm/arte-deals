@@ -1638,6 +1638,28 @@ select.calc-box{
   border:1px solid rgba(201,162,39,0.4);
   background:linear-gradient(160deg, rgba(201,162,39,0.08), rgba(255,255,255,0.02));
 }
+/* Stands in for the whole GCash "how to subscribe" block while
+   payments are switched off — same dark-bronze/gold treatment and
+   .pp-shine sweep as .pro-plaque, just sized as a full panel. */
+.free-pro-panel{
+  position:relative; overflow:hidden; text-align:center;
+  padding:30px 22px; margin-bottom:22px; border-radius:12px;
+  background:linear-gradient(145deg, #17130a 0%, #241c0c 48%, #16120a 100%);
+  border:1px solid rgba(201,162,39,0.55);
+  box-shadow:0 6px 20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(253,240,180,0.16);
+}
+.free-pro-panel h2{
+  font-size:28px; margin:0 0 8px;
+  background:linear-gradient(180deg,#fdf0b4 0%,#e8c45a 42%,#b8891f 68%,#f6e6a8 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#e8c45a;
+}
+.free-pro-panel .fp-eyebrow{
+  font-family:'Rajdhani',sans-serif; font-weight:600; font-size:11px; letter-spacing:.28em;
+  text-transform:uppercase; color:#b99b46; margin-bottom:22px;
+}
+.free-pro-panel .calc-box{margin-bottom:14px;}
+.free-pro-panel #proCodeErr:empty{margin:0;}
 .lc-head h3{font-size:20px; color:#fff; margin:0 0 4px;}
 .lc-head p{font-size:12.5px; color:var(--muted); margin:0 0 16px; line-height:1.55;}
 .lc-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:12px; margin-bottom:16px;}
@@ -4067,7 +4089,20 @@ async function closeReport(id){
 
 function adminSettingsHTML(){
   const d = payDetails || {};
-  return `<div class="calc">
+  const gcashOn = d.gcash_enabled !== 'false';
+  return `<div class="calc" style="margin-bottom:18px;">
+    <h4 class="calc-title display">GCash Payments</h4>
+    <p class="calc-sub">
+      Switch the whole GCash payment flow on or off for every seller. While
+      off, the Upgrade page shows a free access-code panel instead — nothing
+      below is deleted, only hidden.
+    </p>
+    <div class="calc-toggle">
+      <button type="button" class="calc-tgl${gcashOn?' active':''}" onclick="setGcashEnabled(true)">On</button>
+      <button type="button" class="calc-tgl${gcashOn?'':' active'}" onclick="setGcashEnabled(false)">Off</button>
+    </div>
+  </div>
+  <div class="calc">
     <h4 class="calc-title display">Payment Details</h4>
     <p class="calc-sub">Only signed-in sellers can see these. They are never in the public files.</p>
 
@@ -4120,6 +4155,17 @@ async function savePaySettings(){
   payDetails.gcash_name = name;
   payDetails.gcash_number = number;
   toast('Payment details saved');
+}
+
+async function setGcashEnabled(on){
+  const value = on ? 'true' : 'false';
+  const { error } = await sb.from('app_settings')
+    .upsert({ key:'gcash_enabled', value, updated_at:new Date().toISOString() });
+  if(error){ dbFail(error, 'Could not save that setting'); return; }
+  payDetails = payDetails || {};
+  payDetails.gcash_enabled = value;
+  toast('GCash payments ' + (on ? 'enabled' : 'disabled'));
+  renderAdmin(document.getElementById('app'));
 }
 
 async function loadPayments(){
@@ -4240,6 +4286,10 @@ function renderUpgrade(app){
   if(!currentUser){ openAuth('login'); go('home'); return; }
   const c = cycleInfo() || { cap: ARTE_CONFIG.maxListingsFree, used:0, left:0 };
   const q = ARTE_CONFIG.gcashQr;
+  /* Defaults to enabled if the row hasn't loaded yet or was never set \u2014
+     "nothing breaks" for a value that's merely missing, not explicitly
+     turned off. Refreshed below in case this render used a stale cache. */
+  const gcashOn = !payDetails || payDetails.gcash_enabled !== 'false';
 
   app.innerHTML = `<main>
     <button class="back-link" onclick="go('my')">
@@ -4276,10 +4326,10 @@ function renderUpgrade(app){
         <div class="plan pro">
           <span class="pro-badge">PRO</span>
           <div class="plan-name">ARTE DEALS PRO</div>
-          <div class="plan-price">
+          ${gcashOn ? `<div class="plan-price">
             <span class="was">\u20b1${ARTE_CONFIG.proPriceRegular}</span>
             \u20b1${ARTE_CONFIG.proPrice}<small>/month</small>
-          </div>
+          </div>` : ''}
           <ul>
             <li><b>${ARTE_CONFIG.maxListingsPro} listings</b> per 2 weeks</li>
             <li>8 photos per listing</li>
@@ -4291,6 +4341,7 @@ function renderUpgrade(app){
         </div>
       </div>
 
+      ${gcashOn ? `
       <div class="section-head"><h2 class="metal-text">How to Subscribe</h2></div>
       <div class="pay-card">
         <div class="pay-step"><b>1</b> Send \u20b1${ARTE_CONFIG.proPrice} by GCash to the account below.</div>
@@ -4303,13 +4354,57 @@ function renderUpgrade(app){
       </div>
 
       <div id="payHistory"></div>
+      ` : `
+      <div class="free-pro-panel">
+        <div class="pp-shine"></div>
+        <h2 class="display">Free PRO Plan</h2>
+        <div class="fp-eyebrow">ARTE DEALS Exclusive Agents</div>
+        <div id="proCodeErr"></div>
+        <input class="calc-box" id="proCodeInput" placeholder="Enter your access code" autocomplete="off">
+        <button class="btn btn-primary btn-block gold-btn" onclick="redeemProCode()">Activate PRO</button>
+      </div>
+      `}
     `}
   </main>`;
 
   if(!currentUser.isPro){
     loadMyPayments();
-    renderPayDetails();
+    if(gcashOn) renderPayDetails();
+    /* payDetails may have been stale (or never loaded) for the gcashOn
+       check above; refresh it, and if that changes the answer, redraw
+       with the correct branch. Guarded so a slow response can't stomp
+       on a page the person has since navigated away from. */
+    loadPayDetails().then(fresh => {
+      const nowOn = fresh.gcash_enabled !== 'false';
+      if(nowOn !== gcashOn && currentRoute === 'upgrade') renderUpgrade(app);
+    });
   }
+}
+
+/* Self-service PRO activation while GCash payments are switched off \u2014
+   see setGcashEnabled() in the admin Settings tab. */
+async function redeemProCode(){
+  const input = document.getElementById('proCodeInput');
+  const errBox = document.getElementById('proCodeErr');
+  const code = (input.value || '').trim();
+  errBox.innerHTML = '';
+  if(!code){ errBox.innerHTML = '<div class="err-msg">Enter your access code.</div>'; return; }
+  if(code !== ARTE_CONFIG.proAccessCode){
+    errBox.innerHTML = '<div class="err-msg">That code isn\u2019t valid. Check it and try again.</div>';
+    return;
+  }
+  const until = new Date(); until.setFullYear(until.getFullYear() + 1);
+  const { error } = await sb.from('profiles')
+    .update({ is_pro:true, pro_until: until.toISOString() })
+    .eq('id', currentUser.username);
+  if(error){ dbFail(error, 'Could not activate PRO'); return; }
+  currentUser.isPro = true;
+  currentUser.proUntil = until.toISOString();
+  const prof = sellerProfiles[currentUser.username];
+  if(prof){ prof.is_pro = true; prof.pro_until = until.toISOString(); }
+  toast('PRO activated \u2014 welcome aboard');
+  renderNavs();
+  go('upgrade');
 }
 
 /* The QR is the only payment detail on show, so if it fails to load
