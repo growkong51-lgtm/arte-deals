@@ -1184,6 +1184,7 @@ select.calc-box{
 .sp-stats b{font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px; color:#fff; margin-right:3px;}
 .sp-sep{width:1px; height:14px; background:var(--line);}
 .sp-msg{margin-top:14px;}
+.sp-copylink{margin-top:14px;}
 @media(max-width:520px){
   .sp-head{gap:12px; padding:16px 14px;}
   .sp-name{font-size:21px;}
@@ -2706,18 +2707,38 @@ function closeModal(id){
   }
 }
 
-/* Someone arriving on a shared link lands straight on that car. */
+/* Someone arriving on a shared link lands straight on that car or
+   seller profile — allListings/sellerProfiles are already loaded by
+   the time init() calls this, so both checks below have real data to
+   check against, not an empty cache. */
 async function openFromHash(){
   if(location.hash === '#admin'){ go('admin'); return true; }
-  const m = location.hash.match(/^#car=(.+)$/);
-  if(!m) return false;
-  const id = decodeURIComponent(m[1]);
-  if(allListings.some(x=>x.id===id)){
-    await openDetail(id, true);
-    return true;
+
+  const carMatch = location.hash.match(/^#car=(.+)$/);
+  if(carMatch){
+    const id = decodeURIComponent(carMatch[1]);
+    if(allListings.some(x=>x.id===id)){
+      await openDetail(id, true);
+      return true;
+    }
+    toast('That listing is no longer available');
+    history.replaceState({}, '', location.pathname);
+    return false;
   }
-  toast('That listing is no longer available');
-  history.replaceState({}, '', location.pathname);
+
+  const sellerMatch = location.hash.match(/^#seller=(.+)$/);
+  if(sellerMatch){
+    const id = decodeURIComponent(sellerMatch[1]);
+    if(sellerProfiles[id]){
+      openSeller(id, true);
+      return true;
+    }
+    toast('That seller profile is not available');
+    history.replaceState({}, '', location.pathname);
+    go('home');
+    return false;
+  }
+
   return false;
 }
 
@@ -3188,7 +3209,18 @@ async function loadListings(){
 
 /* ================= ROUTER / RENDER ================= */
 function go(route){
+  /* #seller=<id> is tied to the 'seller' route itself (not an overlay
+     on top of one, like #car= is) — so leaving that route clears it,
+     the same way closeModal clears #car= when the detail overlay
+     closes. Checked against the OLD route, before reassigning it below
+     — init() calls go('home') before openFromHash() has had a chance
+     to open a shared #seller= link, and that first call must not wipe
+     the hash out from under it. */
+  const leavingSeller = currentRoute === 'seller' && route !== 'seller';
   currentRoute = route;
+  if(leavingSeller && location.hash.indexOf('#seller=') === 0){
+    history.pushState({}, '', location.pathname + location.search);
+  }
   document.querySelectorAll('[data-r]').forEach(el=>el.classList.toggle('active', el.dataset.r===route));
   render();
   window.scrollTo({top:0, behavior:'smooth'});
@@ -3528,6 +3560,7 @@ function renderMyListings(app){
                    ? left+' change'+(left===1?'':'s')+' left'
                    : 'One photo, then '+MAX_AVATAR_CHANGES+' changes'}</span>`
             : `<span class="pc-note locked">No changes left. Your photo is now fixed.</span>`}
+          <button class="veh-btn${currentUser.isPro?' gold-btn':''}" onclick="copyProfileLink('${currentUser.username}')">Copy Profile Link</button>
         </div>
       </div>
     </div>
@@ -3707,10 +3740,25 @@ async function deleteListing(id){
 /* ---- FAVORITES ---- */
 let viewingSeller = null;
 
-function openSeller(id){
+/* skipHash mirrors openDetail's pattern: true when we're already
+   navigating *to* this hash (from openFromHash / popstate), so we
+   don't push a second, redundant history entry on top of it. */
+function openSeller(id, skipHash){
   closeModal('detailOverlay');
   viewingSeller = id;
+  if(!skipHash && location.hash !== '#seller=' + id){
+    history.pushState({seller:id}, '', '#seller=' + id);
+  }
   go('seller');
+}
+
+function copyProfileLink(id){
+  const url = location.origin + location.pathname + '#seller=' + id;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>toast('Profile link copied')).catch(()=>toast('Link: ' + url));
+  } else {
+    toast('Link: ' + url);
+  }
 }
 
 /* ================= ADMIN ================= */
@@ -3720,6 +3768,7 @@ let pendingPayments = [];
 let openReports = [];
 let agentApps = [];
 let appointments = [];
+let proCodes = [];
 
 async function adminSignIn(e){
   e.preventDefault();
@@ -3819,6 +3868,7 @@ function renderAdmin(app){
       <button class="msg-tab ${adminTab==='reports'?'active':''}" onclick="setAdminTab('reports')">Reports${openReports.filter(r=>r.status==='open').length?' <span>'+openReports.filter(r=>r.status==='open').length+'</span>':''}</button>
       <button class="msg-tab ${adminTab==='settings'?'active':''}" onclick="setAdminTab('settings')">Settings</button>
       <button class="msg-tab ${adminTab==='payments'?'active':''}" onclick="setAdminTab('payments')">Payments${pendingPayments.filter(x=>x.status==='pending').length?' <span>'+pendingPayments.filter(x=>x.status==='pending').length+'</span>':''}</button>
+      <button class="msg-tab ${adminTab==='procodes'?'active':''}" onclick="setAdminTab('procodes')">PRO Codes</button>
     </div>
 
     <div id="adminBody">${adminTab==='listings' ? adminListingsHTML()
@@ -3827,6 +3877,7 @@ function renderAdmin(app){
                         : adminTab==='agents' ? adminAgentsHTML()
                         : adminTab==='reports' ? adminReportsHTML()
                         : adminTab==='settings' ? adminSettingsHTML()
+                        : adminTab==='procodes' ? adminProCodesHTML()
                         : adminPaymentsHTML()}</div>
   </main>`;
 }
@@ -3853,6 +3904,9 @@ function setAdminTab(t){
   if(t === 'viewings'){
     appointments = [];
     loadAppointments().then(()=>renderAdmin(document.getElementById('app')));
+  }
+  if(t === 'procodes'){
+    loadProCodes().then(()=>renderAdmin(document.getElementById('app')));
   }
 }
 
@@ -4194,6 +4248,122 @@ async function rejectPayment(paymentId){
   renderAdmin(document.getElementById('app'));
 }
 
+/* ---- PRO Codes (invitation-only PRO — nobody pays) ----
+   Reading/writing pro_codes here goes through ordinary RLS-scoped
+   queries — fine, since only an admin's own session can pass the
+   is_admin() policies in sql/pro_codes.sql. Redemption (redeemProCode,
+   above, near renderUpgrade) is the only thing a non-admin ever
+   touches, and it goes through the redeem_pro_code() function instead
+   of this table directly. */
+async function loadProCodes(){
+  const { data, error } = await sb.from('pro_codes').select('*').order('created_at',{ascending:false});
+  if(error){ dbFail(error, 'Could not load PRO codes'); return; }
+  proCodes = data || [];
+}
+
+function fillGeneratedCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I — never misread out loud
+  let s = '';
+  for(let i=0; i<8; i++) s += chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('pcCode').value = s;
+}
+
+async function createProCode(){
+  const codeInput = document.getElementById('pcCode');
+  const errBox = document.getElementById('pcErr');
+  const code = (codeInput.value || '').trim().toUpperCase();
+  const label = document.getElementById('pcLabel').value.trim();
+  const maxUses = Math.max(1, parseInt(document.getElementById('pcMaxUses').value, 10) || 1);
+  const months = Math.max(1, parseInt(document.getElementById('pcMonths').value, 10) || 12);
+  errBox.innerHTML = '';
+  if(!code){ errBox.innerHTML = '<div class="err-msg">Enter or generate a code.</div>'; return; }
+
+  const { error } = await sb.from('pro_codes').insert({
+    code, label: label || null, max_uses: maxUses, months
+  });
+  if(error){
+    if(error.code === '23505'){ errBox.innerHTML = '<div class="err-msg">That code already exists.</div>'; }
+    else { dbFail(error, 'Could not create that code'); }
+    return;
+  }
+  toast('Code created');
+  codeInput.value = '';
+  document.getElementById('pcLabel').value = '';
+  await loadProCodes();
+  renderAdmin(document.getElementById('app'));
+}
+
+async function setProCodeActive(id, active){
+  const { error } = await sb.from('pro_codes').update({ active }).eq('id', id);
+  if(error){ dbFail(error, 'Could not update that code'); return; }
+  toast(active ? 'Code reactivated' : 'Code deactivated');
+  await loadProCodes();
+  renderAdmin(document.getElementById('app'));
+}
+
+async function deleteProCode(id){
+  const row = proCodes.find(r => r.id === id);
+  if(!confirm('Delete code ' + (row ? row.code : 'this code') + '? This cannot be undone.')) return;
+  const { error } = await sb.from('pro_codes').delete().eq('id', id);
+  if(error){ dbFail(error, 'Could not delete that code'); return; }
+  toast('Code deleted');
+  await loadProCodes();
+  renderAdmin(document.getElementById('app'));
+}
+
+function copyProCode(id){
+  const row = proCodes.find(r => r.id === id);
+  if(!row) return;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(row.code).then(()=>toast('Code copied')).catch(()=>toast('Code: ' + row.code));
+  } else {
+    toast('Code: ' + row.code);
+  }
+}
+
+function adminProCodesHTML(){
+  const rows = proCodes || [];
+  return `<div class="calc" style="margin-bottom:18px;">
+    <h4 class="calc-title display">Create a PRO Code</h4>
+    <p class="calc-sub">Invitation-only PRO access — nobody pays. Give a code to an agent; they redeem it on the Upgrade page.</p>
+
+    <label class="calc-label">Code</label>
+    <div style="display:flex; gap:8px; margin-bottom:14px;">
+      <input class="calc-box" id="pcCode" placeholder="e.g. AGENT-JUAN" style="margin-bottom:0; flex:1;" autocomplete="off">
+      <button type="button" class="veh-btn" onclick="fillGeneratedCode()">Generate</button>
+    </div>
+
+    <label class="calc-label">Label (optional — who this is for)</label>
+    <input class="calc-box" id="pcLabel" placeholder="e.g. Juan dela Cruz" autocomplete="off">
+
+    <div class="lc-grid">
+      <div><label class="calc-label">Max Uses</label><input class="calc-box" id="pcMaxUses" type="number" min="1" value="1"></div>
+      <div><label class="calc-label">Months of PRO</label><input class="calc-box" id="pcMonths" type="number" min="1" value="12"></div>
+    </div>
+
+    <div id="pcErr"></div>
+    <button class="btn btn-primary btn-block" onclick="createProCode()">Create Code</button>
+  </div>
+  ${rows.length ? `<div class="veh-scroll"><table class="veh-table">
+    <thead><tr><th>Code</th><th>Label</th><th>Used</th><th>Months</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows.map(r=>`
+      <tr>
+        <td data-l="Code">${esc(r.code)}</td>
+        <td data-l="Label">${esc(r.label||'—')}</td>
+        <td data-l="Used">${r.used_count} of ${r.max_uses}</td>
+        <td data-l="Months">${r.months}</td>
+        <td data-l="Status"><span class="veh-status ${r.active?'available':'sold'}">${r.active?'Active':'Inactive'}</span></td>
+        <td data-l="Actions"><div class="veh-actions">
+          <button class="veh-btn" onclick="copyProCode('${r.id}')">Copy</button>
+          ${r.active
+            ? `<button class="veh-btn" onclick="setProCodeActive('${r.id}', false)">Deactivate</button>`
+            : `<button class="veh-btn" onclick="setProCodeActive('${r.id}', true)">Reactivate</button>`}
+          <button class="veh-btn danger" onclick="deleteProCode('${r.id}')">Delete</button>
+        </div></td>
+      </tr>`).join('')}</tbody></table></div>`
+    : '<div class="empty">No PRO codes yet.</div>'}`;
+}
+
 function adminListingsHTML(){
   const rows = allListings.slice().sort((a,b)=>b.createdAt-a.createdAt);
   if(!rows.length) return '<div class="empty">No listings yet.</div>';
@@ -4360,26 +4530,43 @@ function renderUpgrade(app){
 }
 
 /* Self-service PRO activation while GCash payments are switched off \u2014
-   see setGcashEnabled() in the admin Settings tab. */
+   see setGcashEnabled() in the admin Settings tab. Redemption never
+   reads or writes pro_codes directly from here \u2014 it all happens inside
+   the redeem_pro_code() database function (security definer), which is
+   the only thing this browser session is allowed to call. See
+   sql/pro_codes.sql for the table, its admin-only RLS, and the
+   function itself. */
 async function redeemProCode(){
   const input = document.getElementById('proCodeInput');
   const errBox = document.getElementById('proCodeErr');
   const code = (input.value || '').trim();
   errBox.innerHTML = '';
   if(!code){ errBox.innerHTML = '<div class="err-msg">Enter your access code.</div>'; return; }
-  if(code !== ARTE_CONFIG.proAccessCode){
+
+  const btn = document.querySelector('.free-pro-panel button.gold-btn');
+  if(btn) btn.disabled = true;
+  const { data: result, error } = await sb.rpc('redeem_pro_code', { p_code: code });
+  if(btn) btn.disabled = false;
+
+  if(error){ dbFail(error, 'Could not activate PRO'); return; }
+  if(result === 'used_up'){
+    errBox.innerHTML = '<div class="err-msg">That code has already been fully used.</div>';
+    return;
+  }
+  if(result !== 'ok'){
     errBox.innerHTML = '<div class="err-msg">That code isn\u2019t valid. Check it and try again.</div>';
     return;
   }
-  const until = new Date(); until.setFullYear(until.getFullYear() + 1);
-  const { error } = await sb.from('profiles')
-    .update({ is_pro:true, pro_until: until.toISOString() })
-    .eq('id', currentUser.username);
-  if(error){ dbFail(error, 'Could not activate PRO'); return; }
+
+  // The function only returns 'ok' \u2014 not the new pro_until \u2014 so refresh
+  // the session's PRO status from the profile it just updated.
+  const { data: prof, error: profErr } = await sb.from('profiles')
+    .select('is_pro,pro_until').eq('id', currentUser.username).single();
+  if(profErr){ dbFail(profErr, 'PRO is active, but could not refresh your session \u2014 reload the page'); return; }
   currentUser.isPro = true;
-  currentUser.proUntil = until.toISOString();
-  const prof = sellerProfiles[currentUser.username];
-  if(prof){ prof.is_pro = true; prof.pro_until = until.toISOString(); }
+  currentUser.proUntil = prof.pro_until;
+  const sp = sellerProfiles[currentUser.username];
+  if(sp){ sp.is_pro = true; sp.pro_until = prof.pro_until; }
   toast('PRO activated \u2014 welcome aboard');
   renderNavs();
   go('upgrade');
@@ -4705,6 +4892,7 @@ function renderSellerProfile(app){
           <span class="sp-sep"></span>
           <span><b>${sold}</b> Sold</span>
         </div>
+        <button class="btn btn-sm sp-copylink${proOf(viewingSeller)?' gold-btn':' btn-metal'}" onclick="copyProfileLink('${viewingSeller}')">Copy Profile Link</button>
         ${(!isMe && currentUser) ? `<button class="btn btn-metal btn-sm sp-msg" onclick="messageSellerFromProfile()">Message Seller</button>` : ''}
       </div>
     </div>
@@ -5439,6 +5627,8 @@ window.addEventListener('popstate', ()=>{
   const open = document.getElementById('detailOverlay').classList.contains('show');
   if(location.hash.indexOf('#car=') === 0){ openFromHash(); }
   else if(open){ document.getElementById('detailOverlay').classList.remove('show'); }
+  else if(location.hash.indexOf('#seller=') === 0){ openFromHash(); }
+  else if(currentRoute === 'seller'){ go('home'); }
 });
 
 sb.auth.onAuthStateChange((event)=>{
