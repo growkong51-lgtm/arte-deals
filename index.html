@@ -1235,7 +1235,11 @@ select.calc-box{
 .chat-listing .cl-body{flex:1; min-width:0;}
 .chat-listing .cl-title{font-family:'Rajdhani',sans-serif; font-weight:600; font-size:15px; letter-spacing:.015em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .chat-listing .cl-price{font-size:12px; color:var(--red-2); font-family:'Rajdhani',sans-serif; font-weight:700;}
-.chat-scroll{flex:1; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:8px;}
+/* min-height:0 overrides the flex-item default of min-height:auto —
+   without it, a long message list can grow this item past its flex
+   share and push .chat-compose (flex-shrink:0, below) out of the
+   modal's bounds instead of scrolling internally. */
+.chat-scroll{flex:1; min-height:0; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:8px;}
 .chat-empty{margin:auto; color:var(--muted); font-size:13px; text-align:center;}
 .chat-day{
   align-self:center; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
@@ -1265,7 +1269,8 @@ select.calc-box{
 }
 .bubble-time{display:block; font-size:10px; opacity:.65; margin-top:3px; text-align:right;}
 .chat-compose{
-  display:flex; align-items:flex-end; gap:9px; padding:11px 12px; flex-shrink:0;
+  display:flex; align-items:flex-end; gap:9px; flex-shrink:0;
+  padding:11px 12px calc(11px + env(safe-area-inset-bottom));
   border-top:1px solid var(--line); background:rgba(255,255,255,0.03);
 }
 .chat-compose textarea{
@@ -1282,12 +1287,22 @@ select.calc-box{
 .chat-send:active{transform:scale(0.9);}
 .chat-send svg{width:18px; height:18px;}
 @media(max-width:560px){
-  .chat-modal{height:100vh; max-width:100%; border-radius:0;}
+  /* 100vh is the *static* viewport — it doesn't shrink when the
+     on-screen keyboard opens, so the compose bar below ends up
+     positioned off-screen, under the keyboard. 100dvh is the
+     *dynamic* viewport, which does shrink; kept as a second
+     declaration (not a replacement) so older browsers without dvh
+     support still get the 100vh fallback, cascading correctly since
+     an unsupported value is ignored, not applied. */
+  .chat-modal{height:100vh; height:100dvh; max-width:100%; border-radius:0;}
   .bubble{max-width:82%;}
 }
 @media(max-width:640px){
   .overlay{padding:0; align-items:stretch;}
-  .modal{max-width:100%; max-height:100vh; height:100vh; border:none;}
+  /* Same dvh fix as .chat-modal above — every full-screen mobile
+     modal (post listing, report, auth, etc.) had the same keyboard
+     bug wherever it has a fixed-position input near the bottom. */
+  .modal{max-width:100%; max-height:100vh; max-height:100dvh; height:100vh; height:100dvh; border:none;}
   .modal.wide{max-width:100%;}
   .detail-info{padding:16px 15px 26px;}
   .detail-info .price{font-size:27px;}
@@ -5721,6 +5736,46 @@ sb.auth.onAuthStateChange((event)=>{
   setTimeout(() => {
     document.querySelectorAll('.grid > *:not(.card-enter)').forEach(el => el.classList.add('card-enter'));
   }, 6000);
+})();
+
+/* ================================================================
+   CHAT COMPOSE FOCUS — layout fix, not a chat-logic change. When the
+   message textarea is focused, the on-screen keyboard opens and eats
+   part of the viewport; this scrolls the compose bar (and the newest
+   message above it) back into view so the person can see what they're
+   replying to and confirm the send button is reachable. #msgText and
+   #chatScroll are static elements in the page (only their contents get
+   replaced by sendMessage()/renderChat(), never the elements
+   themselves), so a one-time lookup here is safe — no observer needed,
+   unlike the dynamically-rendered listing grid above. Never calls into
+   sendMessage/renderChat or touches message data. ---- */
+(function chatComposeFocus(){
+  const ta = document.getElementById('msgText');
+  const scroll = document.getElementById('chatScroll');
+  if(!ta || !scroll) return;
+
+  const reveal = () => {
+    ta.scrollIntoView({ block:'end', behavior:'smooth' });
+    scroll.scrollTop = scroll.scrollHeight;
+  };
+
+  ta.addEventListener('focus', () => {
+    reveal();
+    // the on-screen keyboard's open animation resizes the viewport
+    // after focus fires; re-run once it's had time to settle.
+    setTimeout(reveal, 300);
+  });
+
+  // The robust version of the above: fires exactly when the visual
+  // viewport actually changes (keyboard opening/closing/resizing),
+  // rather than guessing at a timeout. Supported on modern mobile
+  // Safari/Chrome; a no-op (falls back to the timeout above only)
+  // where it isn't.
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', () => {
+      if(document.activeElement === ta) reveal();
+    });
+  }
 })();
 
 init();
