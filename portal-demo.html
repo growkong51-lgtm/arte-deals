@@ -166,7 +166,11 @@
 
   /* ---------- hero / identity ---------- */
   .hero{ text-align:center; padding:34px 8px 30px; }
-  .avatar-wrap{ position:relative; width:104px; height:104px; margin:0 auto 22px; }
+  .avatar-wrap{
+    position:relative; width:104px; height:104px; margin:0 auto 22px;
+    animation:heroIn .55s var(--ease) both;
+  }
+  @keyframes heroIn{ from{ opacity:0; transform:scale(.9) translateY(8px); } to{ opacity:1; transform:scale(1) translateY(0); } }
   .avatar-ring{ position:absolute; inset:0; border-radius:50%; border:1px solid var(--hair-strong); }
   .avatar-ring::before{
     content:''; position:absolute; inset:-7px; border-radius:50%;
@@ -196,10 +200,10 @@
     display:flex; flex-direction:column; align-items:center; gap:8px;
     padding:14px 6px 12px; background:var(--card); border:1px solid var(--hair); border-radius:14px;
     min-height:44px;
-    transition:border-color .2s var(--ease), transform .2s var(--ease), background .2s var(--ease);
+    transition:border-color .2s var(--ease), transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease);
   }
-  .quick:hover{ border-color:var(--hair-strong); background:var(--card-2); }
-  .quick:active{ transform:scale(.96); }
+  .quick:hover{ border-color:var(--hair-strong); background:var(--card-2); transform:translateY(-2px); box-shadow:0 10px 22px -10px rgba(0,0,0,0.5); }
+  .quick:active{ transform:scale(.96); box-shadow:none; }
   .quick svg{ width:19px; height:19px; stroke:var(--white); }
   .quick span{ font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--white-dim); }
 
@@ -227,11 +231,14 @@
     display:flex; align-items:center; gap:14px; padding:15px 16px;
     background:var(--card); border:1px solid var(--hair); border-left:2px solid transparent; border-radius:12px;
     min-height:44px; width:100%; text-align:left;
-    transition:border-color .22s var(--ease), background .22s var(--ease), transform .22s var(--ease);
+    transition:border-color .22s var(--ease), background .22s var(--ease), transform .22s var(--ease), box-shadow .22s var(--ease);
     opacity:0; transform:translateY(10px); animation:rise .5s var(--ease) forwards;
   }
-  .link-row:hover{ background:var(--card-2); border-color:var(--hair-strong); border-left-color:var(--red-bright); }
-  .link-row:active{ transform:scale(.985); }
+  .link-row:hover{
+    background:var(--card-2); border-color:var(--hair-strong); border-left-color:var(--red-bright);
+    transform:translateY(-2px); box-shadow:0 12px 26px -12px rgba(0,0,0,0.55);
+  }
+  .link-row:active{ transform:scale(.985); box-shadow:none; }
   .link-icon{
     flex:none; width:38px; height:38px; display:flex; align-items:center; justify-content:center;
     border-radius:10px; background:var(--icon-bg); border:1px solid var(--hair);
@@ -308,9 +315,21 @@
   .editor-section:first-of-type{ border-top:none; }
   .editor-section h3{ font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--white-dim); margin:0 0 12px; }
 
-  .editor-link-row{ display:flex; gap:8px; margin-bottom:8px; }
+  .editor-link-row{ display:flex; gap:8px; margin-bottom:8px; align-items:stretch; }
+  .el-reorder{
+    flex:none; display:flex; flex-direction:column; gap:2px; width:26px;
+  }
+  .el-reorder button{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:6px;
+    color:var(--white-dim); padding:0; min-height:19px;
+    transition:color .2s var(--ease), border-color .2s var(--ease), opacity .2s var(--ease);
+  }
+  .el-reorder button:hover:not(:disabled){ color:var(--red-bright); border-color:var(--red-bright); }
+  .el-reorder button:disabled{ opacity:.3; cursor:default; }
+  .el-reorder svg{ width:10px; height:10px; stroke:currentColor; }
   .el-platform{
-    flex:none; width:118px; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
+    flex:none; width:104px; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
     padding:0 8px; color:var(--white); font-size:12px; min-height:42px;
   }
   .el-handle{
@@ -339,9 +358,12 @@
   }
   .theme-swatch{
     width:76px; height:50px; border-radius:12px; border:2px solid transparent;
-    position:relative; overflow:hidden; transition:border-color .2s var(--ease), transform .2s var(--ease);
+    position:relative; overflow:hidden; transition:border-color .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease);
   }
+  .theme-chip:hover .theme-swatch{ transform:translateY(-2px); box-shadow:0 10px 20px -8px rgba(0,0,0,0.5); }
   .theme-swatch:active{ transform:scale(.95); }
+  .theme-swatch.pop{ animation:themePop .35s var(--ease); }
+  @keyframes themePop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.1); } 100%{ transform:scale(1); } }
   .theme-swatch .ts-card{ position:absolute; left:6px; right:6px; bottom:6px; top:18px; border-radius:6px; }
   .theme-swatch .ts-dot{
     position:absolute; width:14px; height:14px; border-radius:50%; bottom:8px; right:8px;
@@ -392,7 +414,7 @@
   .toast b{ color:var(--red-bright); font-weight:500; }
 
   @media (prefers-reduced-motion: reduce){
-    .link-row{ animation:none; opacity:1; transform:none; }
+    .link-row, .avatar-wrap, .theme-swatch.pop{ animation:none; opacity:1; transform:none; }
     *{ transition-duration:.01ms !important; }
   }
 
@@ -558,6 +580,7 @@
       bgHint: "Saved on this device only — this is a design preview, not a live product yet.",
       resetDefault: "Reset to Default",
       removeLink: "Remove link",
+      moveUp: "Move up", moveDown: "Move down",
       bgInvalidType: "Please choose an image file",
       bgTooLarge: "Image is too large — please use one under 3MB",
       saveFailed: "Could not save — try a smaller image",
@@ -589,6 +612,7 @@
       bgHint: "Naka-save lang dito sa device mo — design preview pa lang ito, hindi pa live na produkto.",
       resetDefault: "Ibalik sa Default",
       removeLink: "Alisin ang link",
+      moveUp: "Pataas", moveDown: "Pababa",
       bgInvalidType: "Pumili ng image file",
       bgTooLarge: "Masyadong malaki ang image — gumamit ng wala pang 3MB",
       saveFailed: "Hindi na-save — subukan ng mas maliit na image",
@@ -856,6 +880,35 @@
       var row = document.createElement("div");
       row.className = "editor-link-row";
 
+      var reorder = document.createElement("div");
+      reorder.className = "el-reorder";
+      var upBtn = document.createElement("button");
+      upBtn.type = "button";
+      upBtn.setAttribute("aria-label", t("moveUp"));
+      upBtn.disabled = i === 0;
+      upBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+      upBtn.addEventListener("click", function(){
+        if (i === 0) return;
+        var tmp = state.links[i - 1];
+        state.links[i - 1] = state.links[i];
+        state.links[i] = tmp;
+        persist(); renderEditorLinks(); renderLinks();
+      });
+      var downBtn = document.createElement("button");
+      downBtn.type = "button";
+      downBtn.setAttribute("aria-label", t("moveDown"));
+      downBtn.disabled = i === state.links.length - 1;
+      downBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+      downBtn.addEventListener("click", function(){
+        if (i === state.links.length - 1) return;
+        var tmp = state.links[i + 1];
+        state.links[i + 1] = state.links[i];
+        state.links[i] = tmp;
+        persist(); renderEditorLinks(); renderLinks();
+      });
+      reorder.appendChild(upBtn);
+      reorder.appendChild(downBtn);
+
       var select = document.createElement("select");
       select.className = "el-platform";
       PLATFORM_ORDER.forEach(function(key){
@@ -891,6 +944,7 @@
         persist(); renderEditorLinks(); renderLinks();
       });
 
+      row.appendChild(reorder);
       row.appendChild(select);
       row.appendChild(input);
       row.appendChild(removeBtn);
@@ -969,8 +1023,16 @@
       chip.appendChild(swatch);
       chip.appendChild(label);
       chip.addEventListener("click", function(){
+        var changed = state.theme !== th.key;
         state.theme = th.key;
         persist(); applyTheme(); renderThemes();
+        if (changed){
+          var newSwatch = row.querySelector('[aria-pressed="true"] .theme-swatch');
+          if (newSwatch){
+            newSwatch.classList.add("pop");
+            newSwatch.addEventListener("animationend", function(){ newSwatch.classList.remove("pop"); }, { once:true });
+          }
+        }
       });
       row.appendChild(chip);
     });
