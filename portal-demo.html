@@ -449,6 +449,76 @@
   }
   .reset-btn:hover{ color:var(--red-bright); border-color:var(--red-bright); }
 
+  /* ---------- tap-behavior mode toggle ---------- */
+  .mode-toggle{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .mode-option{
+    display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px 10px;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:12px; color:var(--white-dim);
+    transition:border-color .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
+  }
+  .mode-option svg{ width:20px; height:20px; stroke:currentColor; }
+  .mode-option span{ font-size:11.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+  .mode-option[aria-pressed="true"]{ border-color:var(--red-bright); background:var(--card-2); color:var(--white); }
+  .mode-option[aria-pressed="true"] svg{ stroke:var(--red-bright); }
+
+  .direct-picker{ margin-top:14px; }
+  .direct-picker label{
+    display:block; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 8px 2px;
+  }
+  .direct-options{ display:flex; flex-direction:column; gap:8px; }
+  .direct-option{
+    display:flex; align-items:center; gap:12px; padding:9px 12px; width:100%; text-align:left;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:10px;
+    transition:border-color .2s var(--ease);
+  }
+  .direct-option[aria-pressed="true"]{ border-color:var(--red-bright); }
+  .direct-option .lec-icon{ flex:none; }
+  .direct-option-text{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+  .direct-option-name{ font-size:13px; font-weight:500; color:var(--white); }
+  .direct-option-handle{ font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .direct-option-check{
+    flex:none; width:18px; height:18px; border-radius:50%; border:1px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .direct-option[aria-pressed="true"] .direct-option-check{ border-color:var(--red-bright); background:var(--red-bright); }
+  .direct-option-check svg{ width:10px; height:10px; stroke:#fff; opacity:0; transition:opacity .15s var(--ease); }
+  .direct-option[aria-pressed="true"] .direct-option-check svg{ opacity:1; }
+
+  /* ---------- direct-link redirect screen (replaces the portal on load) ---------- */
+  .direct-screen{
+    position:fixed; inset:0; z-index:60; background:var(--black);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .direct-screen[hidden]{ display:none; }
+  .direct-screen-inner{ width:100%; max-width:340px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+  .ds-identity{ display:flex; align-items:center; gap:9px; margin-bottom:40px; opacity:.7; }
+  .ds-avatar{
+    width:26px; height:26px; border-radius:50%; background:linear-gradient(160deg,#1a1a19,#050505);
+    border:1px solid var(--hair-strong); display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-size:10px; font-weight:600; color:#f2f0ec;
+  }
+  .ds-name{ font-size:12.5px; font-weight:500; color:var(--white-dim); }
+  .ds-icon{
+    width:76px; height:76px; border-radius:20px; display:flex; align-items:center; justify-content:center;
+    margin-bottom:22px; animation:dsPulse 1.6s ease-in-out infinite;
+  }
+  .ds-icon svg{ width:36px; height:36px; }
+  @keyframes dsPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+  .ds-status{ font-size:14px; font-weight:500; color:var(--white); margin:0 0 22px; }
+  .ds-progress{ width:170px; height:3px; background:var(--hair-strong); border-radius:99px; overflow:hidden; }
+  .ds-progress-bar{ height:100%; width:0%; background:var(--red-bright); border-radius:99px; transition:width 1s linear; }
+  .ds-arrived{ margin-top:30px; animation:heroIn .4s var(--ease) both; }
+  .ds-arrived-note{ font-size:12px; color:var(--muted); margin:0 0 4px; }
+  .ds-arrived-platform{ font-family:var(--serif); font-size:24px; font-weight:700; color:var(--white); margin:0 0 14px; }
+  .ds-arrived-sub{ font-size:11.5px; line-height:1.6; color:var(--muted); max-width:280px; margin:0 auto 22px; font-weight:300; }
+  .ds-view-portal{
+    padding:12px 22px; border-radius:999px; border:1px solid var(--hair-strong); background:transparent;
+    color:var(--white-dim); font-size:11.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+    min-height:44px; transition:border-color .2s var(--ease), color .2s var(--ease);
+  }
+  .ds-view-portal:hover{ border-color:var(--red-bright); color:var(--white); }
+
   /* ---------- toast ---------- */
   .toast{
     position:fixed; left:50%; bottom:26px; transform:translate(-50%,14px);
@@ -461,7 +531,7 @@
   .toast b{ color:var(--red-bright); font-weight:500; }
 
   @media (prefers-reduced-motion: reduce){
-    .link-row, .avatar-wrap, .theme-swatch.pop{ animation:none; opacity:1; transform:none; }
+    .link-row, .avatar-wrap, .theme-swatch.pop, .ds-icon, .ds-arrived{ animation:none; opacity:1; transform:none; }
     *{ transition-duration:.01ms !important; }
   }
 
@@ -589,6 +659,25 @@
     </div>
 
     <div class="editor-section">
+      <h3 data-i18n="modeSectionTitle">Tap Behavior</h3>
+      <div class="mode-toggle" id="modeToggle">
+        <button class="mode-option" type="button" data-mode="portal" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="4" rx="1.5"/><rect x="4" y="11" width="16" height="4" rx="1.5"/><rect x="4" y="17" width="10" height="4" rx="1.5"/></svg>
+          <span data-i18n="modePortalLabel">Full Portal</span>
+        </button>
+        <button class="mode-option" type="button" data-mode="direct" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7z"/></svg>
+          <span data-i18n="modeDirectLabel">Direct Link</span>
+        </button>
+      </div>
+      <p class="editor-hint" data-i18n="modeHint">Direct Link skips the portal page — tapping the card opens one platform immediately.</p>
+      <div class="direct-picker" id="directPicker" hidden>
+        <label data-i18n="directPickLabel">Which link should it open?</label>
+        <div class="direct-options" id="directOptions"></div>
+      </div>
+    </div>
+
+    <div class="editor-section">
       <h3 data-i18n="themeSectionTitle">Theme</h3>
       <div class="theme-row" id="themeRow"></div>
     </div>
@@ -615,6 +704,24 @@
 
     <div class="editor-footer">
       <button class="reset-btn" type="button" id="resetBtn" data-i18n="resetDefault">Reset to Default</button>
+    </div>
+  </div>
+</div>
+
+<div class="direct-screen" id="directScreen" hidden>
+  <div class="direct-screen-inner">
+    <div class="ds-identity">
+      <div class="ds-avatar" id="dsAvatar">AR</div>
+      <div class="ds-name" id="dsName">Alex Rivera</div>
+    </div>
+    <div class="ds-icon" id="dsIcon"></div>
+    <p class="ds-status" id="dsStatus">Redirecting you to Instagram…</p>
+    <div class="ds-progress"><div class="ds-progress-bar" id="dsProgressBar"></div></div>
+    <div class="ds-arrived" id="dsArrived" hidden>
+      <p class="ds-arrived-note" data-i18n="directArrivedNote">This is where visitors would land directly on</p>
+      <p class="ds-arrived-platform" id="dsArrivedPlatform">Instagram</p>
+      <p class="ds-arrived-sub" data-i18n="directArrivedSub">Demo mode — no live destination yet, but this is exactly how it will feel once your real link is connected.</p>
+      <button class="ds-view-portal" type="button" id="dsViewPortal" data-i18n="viewFullPortal">View Full Portal (Testing)</button>
     </div>
   </div>
 </div>
@@ -648,6 +755,16 @@
       bioFieldLabel: "Bio / Tagline",
       linksSectionTitle: "Your Links",
       addLink: "Add Link",
+      modeSectionTitle: "Tap Behavior",
+      modePortalLabel: "Full Portal",
+      modeDirectLabel: "Direct Link",
+      modeHint: "Direct Link skips the portal page — tapping the card opens one platform immediately.",
+      directPickLabel: "Which link should it open?",
+      directNoLinks: "Add at least one link first.",
+      directStatusPrefix: "Redirecting you to",
+      directArrivedNote: "This is where visitors would land directly on",
+      directArrivedSub: "Demo mode — no live destination yet, but this is exactly how it will feel once your real link is connected.",
+      viewFullPortal: "View Full Portal (Testing)",
       themeSectionTitle: "Theme",
       bgSectionTitle: "Background",
       bgGrid: "Grid", bgGlow: "Glow", bgFlat: "Flat", bgCustom: "Custom",
@@ -683,6 +800,16 @@
       bioFieldLabel: "Bio / Maikling Deskripsyon",
       linksSectionTitle: "Mga Link Mo",
       addLink: "Magdagdag ng Link",
+      modeSectionTitle: "Kapag Na-tap",
+      modePortalLabel: "Buong Portal",
+      modeDirectLabel: "Direktang Link",
+      modeHint: "Sa Direktang Link, nilalaktawan ang portal page — pagka-tap ng card, diretso agad sa isang platform.",
+      directPickLabel: "Aling link ang bubuksan?",
+      directNoLinks: "Magdagdag muna ng kahit isang link.",
+      directStatusPrefix: "Ididirekta ka papunta sa",
+      directArrivedNote: "Dito diretso na lalapag ang mga bisita sa",
+      directArrivedSub: "Demo mode pa lang — wala pang totoong destinasyon, pero ganito talaga ang mararamdaman kapag naka-connect na ang totoong link mo.",
+      viewFullPortal: "Tingnan ang Buong Portal (Testing)",
       themeSectionTitle: "Tema",
       bgSectionTitle: "Background",
       bgGrid: "Grid", bgGlow: "Glow", bgFlat: "Payak", bgCustom: "Custom",
@@ -889,15 +1016,18 @@
       ring:"#ffffff", gridLine:"rgba(255,255,255,0.02)" }
   ];
 
-  var LS_KEY = "noirPortalDemoState_v2";
+  var LS_KEY = "noirPortalDemoState_v3";
   var DEFAULT_STATE = {
     name:"Alex Rivera",
     bio:"One tap, every way to reach me. No app, no download — just hold your phone to the card.",
     links:[
-      { platform:"instagram", handle:"@alex.rivera" },
-      { platform:"facebook",  handle:"Alex Rivera" },
-      { platform:"viber",     handle:"Call or chat" }
+      { id:1, platform:"instagram", handle:"@alex.rivera" },
+      { id:2, platform:"facebook",  handle:"Alex Rivera" },
+      { id:3, platform:"viber",     handle:"Call or chat" }
     ],
+    nextLinkId:4,
+    linkMode:"portal",
+    directLinkId:null,
     theme:"noir",
     bgStyle:"grid",
     bgImage:null
@@ -1060,8 +1190,10 @@
       removeBtn.setAttribute("aria-label", t("removeLink"));
       removeBtn.innerHTML = TRASH_ICON;
       removeBtn.addEventListener("click", function(){
+        var removedId = state.links[i].id;
         state.links.splice(i, 1);
-        persist(); renderEditorLinks(); renderLinks();
+        if (state.directLinkId === removedId) state.directLinkId = null;
+        persist(); renderEditorLinks(); renderLinks(); renderDirectOptions();
       });
       tools.appendChild(upBtn);
       tools.appendChild(downBtn);
@@ -1147,9 +1279,9 @@
   }
 
   document.getElementById("addLinkBtn").addEventListener("click", function(){
-    state.links.push({ platform:"instagram", handle:"" });
-    persist(); renderEditorLinks(); renderLinks();
-    var inputs = document.querySelectorAll(".lec-field input");
+    state.links.push({ id: state.nextLinkId++, platform:"instagram", handle:"" });
+    persist(); renderEditorLinks(); renderLinks(); renderDirectOptions();
+    var inputs = document.querySelectorAll("#editorLinks .lec-field input");
     if (inputs.length) inputs[inputs.length - 1].focus();
   });
 
@@ -1309,12 +1441,128 @@
     persist(); applyProfile();
   });
 
+  /* ---------------- tap behavior: full portal vs. direct link ---------------- */
+  function renderModeToggle(){
+    document.querySelectorAll(".mode-option").forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.dataset.mode === state.linkMode ? "true" : "false");
+    });
+    document.getElementById("directPicker").hidden = state.linkMode !== "direct";
+  }
+  document.querySelectorAll(".mode-option").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      state.linkMode = btn.dataset.mode;
+      if (state.linkMode === "direct" && state.directLinkId == null && state.links.length){
+        state.directLinkId = state.links[0].id;
+      }
+      persist(); renderModeToggle(); renderDirectOptions();
+    });
+  });
+
+  function renderDirectOptions(){
+    var wrap = document.getElementById("directOptions");
+    wrap.innerHTML = "";
+    if (!state.links.length){
+      var empty = document.createElement("p");
+      empty.className = "links-empty";
+      empty.setAttribute("data-i18n", "directNoLinks");
+      empty.textContent = t("directNoLinks");
+      wrap.appendChild(empty);
+      return;
+    }
+    state.links.forEach(function(link){
+      var meta = PLATFORMS[link.platform] || PLATFORMS.custom;
+      var opt = document.createElement("button");
+      opt.type = "button";
+      opt.className = "direct-option";
+      opt.setAttribute("aria-pressed", link.id === state.directLinkId ? "true" : "false");
+
+      var icon = document.createElement("span");
+      icon.className = "lec-icon";
+      icon.innerHTML = ICONS[link.platform] || ICONS.custom;
+      tintIcon(icon, link.platform);
+
+      var text = document.createElement("span");
+      text.className = "direct-option-text";
+      var name = document.createElement("span");
+      name.className = "direct-option-name";
+      name.textContent = meta.label;
+      var handle = document.createElement("span");
+      handle.className = "direct-option-handle";
+      handle.textContent = link.handle || meta.placeholder;
+      text.appendChild(name);
+      text.appendChild(handle);
+
+      var check = document.createElement("span");
+      check.className = "direct-option-check";
+      check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg>';
+
+      opt.appendChild(icon);
+      opt.appendChild(text);
+      opt.appendChild(check);
+      opt.addEventListener("click", function(){
+        state.directLinkId = link.id;
+        persist();
+        wrap.querySelectorAll(".direct-option").forEach(function(o){
+          o.setAttribute("aria-pressed", o === opt ? "true" : "false");
+        });
+      });
+      wrap.appendChild(opt);
+    });
+  }
+
+  /* ---------------- direct-link redirect screen (replaces the portal on load) ---------------- */
+  var directScreenEl = document.getElementById("directScreen");
+  var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function showDirectRedirect(link){
+    var meta = PLATFORMS[link.platform] || PLATFORMS.custom;
+    document.getElementById("dsAvatar").textContent = initials(state.name);
+    document.getElementById("dsName").textContent = state.name;
+
+    var iconWrap = document.getElementById("dsIcon");
+    iconWrap.innerHTML = ICONS[link.platform] || ICONS.custom;
+    tintIcon(iconWrap, link.platform);
+    var svg = iconWrap.querySelector("svg");
+    var brand = BRAND_COLORS[link.platform];
+
+    var status = document.getElementById("dsStatus");
+    var arrived = document.getElementById("dsArrived");
+    var arrivedPlatform = document.getElementById("dsArrivedPlatform");
+    var progress = document.querySelector(".ds-progress");
+    var bar = document.getElementById("dsProgressBar");
+
+    status.textContent = t("directStatusPrefix") + " " + meta.label + "…";
+    arrivedPlatform.textContent = meta.label;
+    arrivedPlatform.style.color = (brand && brand.indexOf("#") === 0) ? brand : "var(--red-bright)";
+
+    arrived.hidden = true;
+    status.hidden = false;
+    progress.hidden = false;
+    bar.style.width = "0%";
+
+    stageEl.style.display = "none";
+    directScreenEl.hidden = false;
+
+    requestAnimationFrame(function(){ bar.style.width = "100%"; });
+
+    setTimeout(function(){
+      status.hidden = true;
+      progress.hidden = true;
+      arrived.hidden = false;
+      if (navigator.vibrate) navigator.vibrate(10);
+    }, reducedMotion ? 150 : 1100);
+  }
+  document.getElementById("dsViewPortal").addEventListener("click", function(){
+    directScreenEl.hidden = true;
+    stageEl.style.display = "";
+  });
+
   /* ---------------- editor: open / close ---------------- */
   var overlay = document.getElementById("editorOverlay");
   function openEditor(){
     editNameInput.value = state.name;
     editBioInput.value = state.bio;
-    renderEditorLinks(); renderThemes(); renderBgChips();
+    renderEditorLinks(); renderThemes(); renderBgChips(); renderModeToggle(); renderDirectOptions();
     overlay.classList.add("show");
     document.body.style.overflow = "hidden";
   }
@@ -1333,6 +1581,7 @@
     state = cloneDefault();
     try{ localStorage.removeItem(LS_KEY); } catch(err){}
     applyProfile(); applyTheme(); applyBackground(); renderLinks(); renderEditorLinks(); renderThemes(); renderBgChips();
+    renderModeToggle(); renderDirectOptions();
     editNameInput.value = state.name;
     editBioInput.value = state.bio;
     showToastKey("resetDone");
@@ -1345,7 +1594,14 @@
     document.querySelectorAll(".lang-toggle button").forEach(function(btn){
       btn.setAttribute("aria-pressed", btn.dataset.lang === currentLang ? "true" : "false");
     });
-    if (overlay.classList.contains("show")) renderEditorLinks();
+    if (overlay.classList.contains("show")){ renderEditorLinks(); renderDirectOptions(); }
+    if (!directScreenEl.hidden){
+      var activeLink = state.links.filter(function(l){ return l.id === state.directLinkId; })[0];
+      if (activeLink){
+        var meta = PLATFORMS[activeLink.platform] || PLATFORMS.custom;
+        document.getElementById("dsStatus").textContent = t("directStatusPrefix") + " " + meta.label + "…";
+      }
+    }
   }
   document.querySelectorAll(".lang-toggle button").forEach(function(btn){
     btn.addEventListener("click", function(){
@@ -1412,6 +1668,11 @@
   applyBackground();
   renderLinks();
   applyLang();
+
+  if (state.linkMode === "direct" && state.directLinkId != null){
+    var directTarget = state.links.filter(function(l){ return l.id === state.directLinkId; })[0];
+    if (directTarget) showDirectRedirect(directTarget);
+  }
 })();
 </script>
 
