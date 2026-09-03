@@ -463,6 +463,18 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="igGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FEDA75"/>
+      <stop offset="28%" stop-color="#FA7E1E"/>
+      <stop offset="55%" stop-color="#D62976"/>
+      <stop offset="78%" stop-color="#962FBF"/>
+      <stop offset="100%" stop-color="#4F5BD5"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <div class="stage" id="stage">
   <div class="custom-bg" id="customBg"></div>
   <div class="frame">
@@ -696,6 +708,38 @@
   };
   var CHEVRON = '<svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
 
+  // official-ish brand colors — used only to tint the platform icon + its chip,
+  // never applied to the rest of the UI. Generic entries (website/email/phone/
+  // custom) stay neutral since they're not a specific company's mark.
+  var BRAND_COLORS = {
+    instagram: "url(#igGradient)",
+    facebook: "#1877F2",
+    viber: "#7360F2",
+    whatsapp: "#25D366",
+    tiktok: "#25F4EE",
+    linkedin: "#0A66C2",
+    telegram: "#26A5E4",
+    youtube: "#FF0000"
+  };
+  function tintIcon(iconEl, platformKey){
+    var brand = BRAND_COLORS[platformKey];
+    var svg = iconEl.querySelector("svg");
+    if (!svg) return;
+    if (brand){
+      svg.style.stroke = brand;
+      if (brand.indexOf("url(") !== 0) svg.style.color = brand;
+      var soft = brand.indexOf("#") === 0 ? hexToRgba(brand, 0.16) : "rgba(200,16,46,0.12)";
+      var strong = brand.indexOf("#") === 0 ? hexToRgba(brand, 0.4) : "rgba(200,16,46,0.35)";
+      iconEl.style.background = soft;
+      iconEl.style.borderColor = strong;
+    } else {
+      svg.style.stroke = "";
+      svg.style.color = "";
+      iconEl.style.background = "";
+      iconEl.style.borderColor = "";
+    }
+  }
+
   /* ---------------- full style themes (not just an accent hue) ---------------- */
   var THEMES = [
     { key:"noir", name:"Noir Rouge",
@@ -888,6 +932,7 @@
       var icon = document.createElement("span");
       icon.className = "link-icon";
       icon.innerHTML = ICONS[link.platform] || ICONS.custom;
+      tintIcon(icon, link.platform);
 
       var body = document.createElement("span");
       body.className = "link-body";
@@ -941,6 +986,7 @@
       var iconSpan = document.createElement("span");
       iconSpan.className = "lec-icon";
       iconSpan.innerHTML = ICONS[link.platform] || ICONS.custom;
+      tintIcon(iconSpan, link.platform);
       var nameSpan = document.createElement("span");
       nameSpan.className = "lec-name";
       nameSpan.textContent = meta.label;
@@ -1021,6 +1067,7 @@
         var optIcon = document.createElement("span");
         optIcon.className = "lec-icon";
         optIcon.innerHTML = ICONS[key] || ICONS.custom;
+        tintIcon(optIcon, key);
         var optLabel = document.createElement("span");
         optLabel.textContent = PLATFORMS[key].label;
         opt.appendChild(optIcon);
@@ -1029,6 +1076,7 @@
           state.links[i].platform = key;
           persist();
           iconSpan.innerHTML = ICONS[key] || ICONS.custom;
+          tintIcon(iconSpan, key);
           nameSpan.textContent = PLATFORMS[key].label;
           input.placeholder = PLATFORMS[key].placeholder;
           grid.querySelectorAll(".lec-option").forEach(function(o){
