@@ -315,33 +315,73 @@
   .editor-section:first-of-type{ border-top:none; }
   .editor-section h3{ font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--white-dim); margin:0 0 12px; }
 
-  .editor-link-row{ display:flex; gap:8px; margin-bottom:8px; align-items:stretch; }
-  .el-reorder{
-    flex:none; display:flex; flex-direction:column; gap:2px; width:26px;
+  /* ---------- link edit card (replaces the old native <select> row) ---------- */
+  .link-edit-card{
+    background:var(--card); border:1px solid var(--hair); border-radius:14px;
+    padding:12px; margin-bottom:10px;
+    transition:border-color .2s var(--ease);
   }
-  .el-reorder button{
-    flex:1; display:flex; align-items:center; justify-content:center;
-    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:6px;
-    color:var(--white-dim); padding:0; min-height:19px;
+  .link-edit-card:focus-within{ border-color:var(--hair-strong); }
+  .lec-top{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .lec-platform{
+    flex:1; min-width:0; display:flex; align-items:center; gap:9px;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:10px;
+    padding:6px 10px; min-height:44px;
+    transition:border-color .2s var(--ease);
+  }
+  .lec-platform:hover{ border-color:var(--red-bright); }
+  .lec-icon{
+    flex:none; width:28px; height:28px; border-radius:7px; background:var(--icon-bg);
+    border:1px solid var(--hair); display:flex; align-items:center; justify-content:center;
+  }
+  .lec-icon svg{ width:14px; height:14px; stroke:var(--white); }
+  .lec-name{ flex:1; min-width:0; text-align:left; font-size:13.5px; font-weight:500; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lec-chevron{ flex:none; width:12px; height:12px; stroke:var(--muted); transition:transform .22s var(--ease); }
+  .lec-platform[aria-expanded="true"] .lec-chevron{ transform:rotate(180deg); }
+  .lec-tools{ flex:none; display:flex; gap:6px; }
+  .lec-tools button{
+    width:30px; height:30px; border-radius:8px; border:1px solid var(--hair-strong);
+    background:transparent; color:var(--white-dim); display:flex; align-items:center; justify-content:center;
     transition:color .2s var(--ease), border-color .2s var(--ease), opacity .2s var(--ease);
   }
-  .el-reorder button:hover:not(:disabled){ color:var(--red-bright); border-color:var(--red-bright); }
-  .el-reorder button:disabled{ opacity:.3; cursor:default; }
-  .el-reorder svg{ width:10px; height:10px; stroke:currentColor; }
-  .el-platform{
-    flex:none; width:104px; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
-    padding:0 8px; color:var(--white); font-size:12px; min-height:42px;
+  .lec-tools button svg{ width:12px; height:12px; stroke:currentColor; }
+  .lec-tools button:hover:not(:disabled){ color:var(--red-bright); border-color:var(--red-bright); }
+  .lec-tools button:disabled{ opacity:.3; }
+  .lec-tools .lec-remove:hover:not(:disabled){ color:#fff; background:var(--red-bright); border-color:var(--red-bright); }
+
+  .lec-field label{
+    display:block; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 6px 2px;
   }
-  .el-handle{
-    flex:1; min-width:0; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
-    padding:0 11px; color:var(--white); font-size:13px; min-height:42px;
+  .lec-field input{
+    width:100%; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:10px;
+    padding:0 12px; color:var(--white); font-size:13.5px; min-height:42px;
+    transition:border-color .2s var(--ease);
   }
-  .el-handle::placeholder{ color:#5a5a57; }
-  .el-remove{
-    flex:none; width:42px; height:42px; border-radius:9px; border:1px solid var(--hair-strong);
-    background:transparent; color:var(--muted); font-size:17px; line-height:1;
+  .lec-field input::placeholder{ color:#5a5a57; }
+  .lec-field input:focus{ border-color:var(--red-bright); outline:none; }
+
+  .lec-picker{
+    display:grid; grid-template-rows:0fr; opacity:0;
+    transition:grid-template-rows .28s var(--ease), opacity .22s var(--ease), margin-top .28s var(--ease);
   }
-  .el-remove:hover{ border-color:var(--red-bright); color:var(--red-bright); }
+  .lec-picker.open{ grid-template-rows:1fr; opacity:1; margin-top:12px; }
+  .lec-picker-inner{ overflow:hidden; }
+  .lec-picker-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+    padding-top:12px; border-top:1px solid var(--hair);
+  }
+  .lec-option{
+    display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 2px;
+    background:var(--input-bg); border:1px solid var(--hair); border-radius:10px;
+    transition:border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .lec-option:hover{ border-color:var(--hair-strong); background:var(--card-2); }
+  .lec-option[aria-pressed="true"]{ border-color:var(--red-bright); }
+  .lec-option .lec-icon{ background:transparent; border:none; width:22px; height:22px; }
+  .lec-option .lec-icon svg{ width:15px; height:15px; }
+  .lec-option span{ font-size:8.5px; font-weight:500; letter-spacing:.03em; text-transform:uppercase; color:var(--white-dim); text-align:center; line-height:1.2; }
+
   .add-link-btn{
     display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px;
     border:1px dashed var(--hair-strong); border-radius:10px; background:transparent; color:var(--white-dim);
@@ -581,6 +621,7 @@
       resetDefault: "Reset to Default",
       removeLink: "Remove link",
       moveUp: "Move up", moveDown: "Move down",
+      handleLabel: "Handle or Link",
       bgInvalidType: "Please choose an image file",
       bgTooLarge: "Image is too large — please use one under 3MB",
       saveFailed: "Could not save — try a smaller image",
@@ -613,6 +654,7 @@
       resetDefault: "Ibalik sa Default",
       removeLink: "Alisin ang link",
       moveUp: "Pataas", moveDown: "Pababa",
+      handleLabel: "Handle o Link",
       bgInvalidType: "Pumili ng image file",
       bgTooLarge: "Masyadong malaki ang image — gumamit ng wala pang 3MB",
       saveFailed: "Hindi na-save — subukan ng mas maliit na image",
@@ -873,20 +915,46 @@
   }
 
   /* ---------------- editor: links ---------------- */
+  var MOVE_UP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+  var MOVE_DOWN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  var TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M6 6l1 14a1.5 1.5 0 0 0 1.5 1.4h7A1.5 1.5 0 0 0 17 20L18 6"/></svg>';
+  var CHEVRON_DOWN_SM = '<svg class="lec-chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+
   function renderEditorLinks(){
     var wrap = document.getElementById("editorLinks");
     wrap.innerHTML = "";
     state.links.forEach(function(link, i){
-      var row = document.createElement("div");
-      row.className = "editor-link-row";
+      var meta = PLATFORMS[link.platform] || PLATFORMS.custom;
+      var card = document.createElement("div");
+      card.className = "link-edit-card";
 
-      var reorder = document.createElement("div");
-      reorder.className = "el-reorder";
+      // --- top row: platform picker trigger + reorder/remove tools ---
+      var top = document.createElement("div");
+      top.className = "lec-top";
+
+      var platformBtn = document.createElement("button");
+      platformBtn.type = "button";
+      platformBtn.className = "lec-platform";
+      platformBtn.setAttribute("aria-expanded", "false");
+      platformBtn.setAttribute("aria-haspopup", "true");
+
+      var iconSpan = document.createElement("span");
+      iconSpan.className = "lec-icon";
+      iconSpan.innerHTML = ICONS[link.platform] || ICONS.custom;
+      var nameSpan = document.createElement("span");
+      nameSpan.className = "lec-name";
+      nameSpan.textContent = meta.label;
+      platformBtn.appendChild(iconSpan);
+      platformBtn.appendChild(nameSpan);
+      platformBtn.insertAdjacentHTML("beforeend", CHEVRON_DOWN_SM);
+
+      var tools = document.createElement("div");
+      tools.className = "lec-tools";
       var upBtn = document.createElement("button");
       upBtn.type = "button";
       upBtn.setAttribute("aria-label", t("moveUp"));
       upBtn.disabled = i === 0;
-      upBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+      upBtn.innerHTML = MOVE_UP_ICON;
       upBtn.addEventListener("click", function(){
         if (i === 0) return;
         var tmp = state.links[i - 1];
@@ -898,7 +966,7 @@
       downBtn.type = "button";
       downBtn.setAttribute("aria-label", t("moveDown"));
       downBtn.disabled = i === state.links.length - 1;
-      downBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+      downBtn.innerHTML = MOVE_DOWN_ICON;
       downBtn.addEventListener("click", function(){
         if (i === state.links.length - 1) return;
         var tmp = state.links[i + 1];
@@ -906,59 +974,100 @@
         state.links[i] = tmp;
         persist(); renderEditorLinks(); renderLinks();
       });
-      reorder.appendChild(upBtn);
-      reorder.appendChild(downBtn);
-
-      var select = document.createElement("select");
-      select.className = "el-platform";
-      PLATFORM_ORDER.forEach(function(key){
-        var opt = document.createElement("option");
-        opt.value = key;
-        opt.textContent = PLATFORMS[key].label;
-        if (key === link.platform) opt.selected = true;
-        select.appendChild(opt);
-      });
-      select.addEventListener("change", function(){
-        state.links[i].platform = select.value;
-        persist(); renderLinks();
-        input.placeholder = PLATFORMS[select.value].placeholder;
-      });
-
-      var input = document.createElement("input");
-      input.type = "text";
-      input.className = "el-handle";
-      input.value = link.handle || "";
-      input.placeholder = meta_placeholder(link.platform);
-      input.addEventListener("input", function(){
-        state.links[i].handle = input.value;
-        persist(); renderLinks();
-      });
-
       var removeBtn = document.createElement("button");
       removeBtn.type = "button";
-      removeBtn.className = "el-remove";
+      removeBtn.className = "lec-remove";
       removeBtn.setAttribute("aria-label", t("removeLink"));
-      removeBtn.innerHTML = "&times;";
+      removeBtn.innerHTML = TRASH_ICON;
       removeBtn.addEventListener("click", function(){
         state.links.splice(i, 1);
         persist(); renderEditorLinks(); renderLinks();
       });
+      tools.appendChild(upBtn);
+      tools.appendChild(downBtn);
+      tools.appendChild(removeBtn);
 
-      row.appendChild(reorder);
-      row.appendChild(select);
-      row.appendChild(input);
-      row.appendChild(removeBtn);
-      wrap.appendChild(row);
+      top.appendChild(platformBtn);
+      top.appendChild(tools);
+
+      // --- handle/link field ---
+      var field = document.createElement("div");
+      field.className = "lec-field";
+      var label = document.createElement("label");
+      label.textContent = t("handleLabel");
+      var input = document.createElement("input");
+      input.type = "text";
+      input.value = link.handle || "";
+      input.placeholder = meta.placeholder;
+      input.addEventListener("input", function(){
+        state.links[i].handle = input.value;
+        persist(); renderLinks();
+      });
+      field.appendChild(label);
+      field.appendChild(input);
+
+      // --- expandable icon-grid platform picker ---
+      var picker = document.createElement("div");
+      picker.className = "lec-picker";
+      var pickerInner = document.createElement("div");
+      pickerInner.className = "lec-picker-inner";
+      var grid = document.createElement("div");
+      grid.className = "lec-picker-grid";
+      PLATFORM_ORDER.forEach(function(key){
+        var opt = document.createElement("button");
+        opt.type = "button";
+        opt.className = "lec-option";
+        opt.setAttribute("aria-pressed", key === link.platform ? "true" : "false");
+        var optIcon = document.createElement("span");
+        optIcon.className = "lec-icon";
+        optIcon.innerHTML = ICONS[key] || ICONS.custom;
+        var optLabel = document.createElement("span");
+        optLabel.textContent = PLATFORMS[key].label;
+        opt.appendChild(optIcon);
+        opt.appendChild(optLabel);
+        opt.addEventListener("click", function(){
+          state.links[i].platform = key;
+          persist();
+          iconSpan.innerHTML = ICONS[key] || ICONS.custom;
+          nameSpan.textContent = PLATFORMS[key].label;
+          input.placeholder = PLATFORMS[key].placeholder;
+          grid.querySelectorAll(".lec-option").forEach(function(o){
+            o.setAttribute("aria-pressed", o === opt ? "true" : "false");
+          });
+          picker.classList.remove("open");
+          platformBtn.setAttribute("aria-expanded", "false");
+          renderLinks();
+        });
+        grid.appendChild(opt);
+      });
+      pickerInner.appendChild(grid);
+      picker.appendChild(pickerInner);
+
+      platformBtn.addEventListener("click", function(){
+        var isOpen = picker.classList.contains("open");
+        document.querySelectorAll(".lec-picker.open").forEach(function(p){
+          if (p !== picker){
+            p.classList.remove("open");
+            var otherCard = p.closest(".link-edit-card");
+            var otherBtn = otherCard && otherCard.querySelector(".lec-platform");
+            if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+        picker.classList.toggle("open", !isOpen);
+        platformBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
+      });
+
+      card.appendChild(top);
+      card.appendChild(field);
+      card.appendChild(picker);
+      wrap.appendChild(card);
     });
-  }
-  function meta_placeholder(platform){
-    return (PLATFORMS[platform] || PLATFORMS.custom).placeholder;
   }
 
   document.getElementById("addLinkBtn").addEventListener("click", function(){
     state.links.push({ platform:"instagram", handle:"" });
     persist(); renderEditorLinks(); renderLinks();
-    var inputs = document.querySelectorAll(".el-handle");
+    var inputs = document.querySelectorAll(".lec-field input");
     if (inputs.length) inputs[inputs.length - 1].focus();
   });
 
