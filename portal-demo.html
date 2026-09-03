@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tap Portal — Live Demo</title>
+<meta name="description" content="Tap the card, land on your portal. A live demo of the personal link portal every NFC business card opens to.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#000000;
+    --card:#0a0a0a;
+    --card-2:#0e0e0e;
+    --hair:rgba(255,255,255,0.09);
+    --hair-strong:rgba(255,255,255,0.16);
+    --white:#f5f5f3;
+    --white-dim:#c9c9c6;
+    --muted:#84837f;
+    --red:#c8102e;
+    --red-bright:#e2223f;
+    --red-glow:rgba(200,16,46,0.35);
+    --serif:'Bodoni Moda',Georgia,serif;
+    --sans:'Jost',-apple-system,BlinkMacSystemFont,sans-serif;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    background:var(--black);
+    color:var(--white);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    min-height:100svh;
+  }
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+
+  ::selection{background:var(--red); color:#fff;}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--red-bright);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* ambient backdrop */
+  .stage{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .stage::before{
+    content:'';
+    position:absolute;
+    inset:-30% -20% auto -20%;
+    height:60%;
+    background:radial-gradient(ellipse at 50% 0%, rgba(200,16,46,0.16), transparent 65%);
+    pointer-events:none;
+  }
+  .stage::after{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:34px 34px;
+    -webkit-mask-image:radial-gradient(ellipse 60% 40% at 50% 0%, #000 0%, transparent 70%);
+            mask-image:radial-gradient(ellipse 60% 40% at 50% 0%, #000 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  .frame{
+    position:relative;
+    width:100%;
+    max-width:440px;
+    padding:20px 20px 48px;
+  }
+
+  /* demo badge */
+  .demo-tag{
+    display:flex;
+    justify-content:center;
+    padding-top:14px;
+  }
+  .demo-tag span{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-family:var(--sans);
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--hair-strong);
+    padding:7px 14px 7px 11px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.02);
+  }
+  .demo-tag .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--red-bright);
+    box-shadow:0 0 8px var(--red-glow);
+    flex:none;
+  }
+
+  /* ---------- hero / identity ---------- */
+  .hero{
+    text-align:center;
+    padding:34px 8px 30px;
+  }
+  .avatar-wrap{
+    position:relative;
+    width:104px; height:104px;
+    margin:0 auto 22px;
+  }
+  .avatar-ring{
+    position:absolute; inset:0;
+    border-radius:50%;
+    border:1px solid var(--hair-strong);
+  }
+  .avatar-ring::before{
+    content:'';
+    position:absolute; inset:-7px;
+    border-radius:50%;
+    border:1px solid rgba(200,16,46,0.5);
+  }
+  .avatar{
+    position:absolute; inset:6px;
+    border-radius:50%;
+    background:linear-gradient(160deg,#161615,#050505);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif);
+    font-size:30px;
+    font-weight:500;
+    color:var(--white);
+    box-shadow:inset 0 0 0 1px var(--hair);
+  }
+  .name{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:32px;
+    letter-spacing:.01em;
+    line-height:1.15;
+    margin:0 0 8px;
+  }
+  .role{
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--red-bright);
+    margin:0 0 14px;
+  }
+  .tagline{
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--white-dim);
+    max-width:300px;
+    margin:0 auto;
+    font-weight:300;
+  }
+
+  /* ---------- quick actions ---------- */
+  .quick-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:0 0 14px;
+  }
+  .quick{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:14px 6px 12px;
+    background:var(--card);
+    border:1px solid var(--hair);
+    border-radius:14px;
+    min-height:44px;
+    transition:border-color .2s var(--ease), transform .2s var(--ease), background .2s var(--ease);
+  }
+  .quick:hover{ border-color:var(--hair-strong); background:var(--card-2); }
+  .quick:active{ transform:scale(.96); }
+  .quick svg{ width:19px; height:19px; stroke:var(--white); }
+  .quick span{ font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--white-dim); }
+
+  /* ---------- primary CTA ---------- */
+  .cta{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%;
+    padding:16px 20px;
+    margin-bottom:28px;
+    background:var(--white);
+    color:#000;
+    border:none;
+    border-radius:14px;
+    font-family:var(--sans);
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    min-height:44px;
+    transition:transform .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .cta svg{ width:17px; height:17px; stroke:#000; }
+  .cta:hover{ box-shadow:0 10px 30px -8px rgba(255,255,255,0.25); }
+  .cta:active{ transform:scale(.98); }
+
+  /* ---------- divider ---------- */
+  .divider{
+    display:flex; align-items:center; gap:14px;
+    margin:0 0 22px;
+    color:var(--muted);
+    font-size:10px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+  }
+  .divider::before, .divider::after{
+    content:''; flex:1; height:1px; background:var(--hair);
+  }
+
+  /* ---------- links ---------- */
+  .links{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:36px;
+  }
+  .link-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:15px 16px;
+    background:var(--card);
+    border:1px solid var(--hair);
+    border-left:2px solid transparent;
+    border-radius:12px;
+    min-height:44px;
+    transition:border-color .22s var(--ease), background .22s var(--ease), transform .22s var(--ease);
+    opacity:0;
+    transform:translateY(10px);
+    animation:rise .5s var(--ease) forwards;
+  }
+  .link-row:hover{
+    background:var(--card-2);
+    border-color:var(--hair-strong);
+    border-left-color:var(--red-bright);
+  }
+  .link-row:active{ transform:scale(.985); }
+  .link-icon{
+    flex:none;
+    width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--hair);
+  }
+  .link-icon svg{ width:17px; height:17px; stroke:var(--white); }
+  .link-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .link-name{ font-size:14.5px; font-weight:500; color:var(--white); }
+  .link-sub{ font-size:12px; color:var(--muted); }
+  .link-go{ flex:none; width:15px; height:15px; stroke:var(--muted); transition:transform .22s var(--ease), stroke .22s var(--ease); }
+  .link-row:hover .link-go{ transform:translateX(3px); stroke:var(--red-bright); }
+
+  @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- footer ---------- */
+  .foot{
+    text-align:center;
+    padding-top:8px;
+    border-top:1px solid var(--hair);
+  }
+  .foot-brand{
+    font-family:var(--serif);
+    font-size:15px;
+    letter-spacing:.06em;
+    color:var(--white-dim);
+    margin:22px 0 6px;
+  }
+  .foot-brand b{ color:var(--white); font-weight:500; }
+  .foot-note{
+    font-size:11.5px;
+    line-height:1.7;
+    color:var(--muted);
+    max-width:300px;
+    margin:0 auto;
+    font-weight:300;
+  }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translate(-50%,14px);
+    background:#111;
+    border:1px solid var(--hair-strong);
+    color:var(--white);
+    font-size:12.5px;
+    font-weight:400;
+    letter-spacing:.02em;
+    padding:11px 18px;
+    border-radius:999px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s var(--ease), transform .25s var(--ease);
+    z-index:20;
+    white-space:nowrap;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+  }
+  .toast b{ color:var(--red-bright); font-weight:500; }
+
+  @media (prefers-reduced-motion: reduce){
+    .link-row{ animation:none; opacity:1; transform:none; }
+    *{ transition-duration:.01ms !important; }
+  }
+
+  @media (min-width:520px){
+    .frame{ padding-top:40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="frame">
+
+    <div class="demo-tag">
+      <span><i class="dot"></i>Live Demo — Tap Portal</span>
+    </div>
+
+    <header class="hero">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <div class="avatar">AR</div>
+      </div>
+      <h1 class="name">Alex Rivera</h1>
+      <p class="role">Founder — Rivera &amp; Co.</p>
+      <p class="tagline">One tap, every way to reach me. No app, no download — just hold your phone to the card.</p>
+    </header>
+
+    <nav class="quick-row" aria-label="Quick contact actions">
+      <button class="quick" type="button" data-copy="+1 (415) 555-0142" data-toast="Number copied">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+        <span>Call</span>
+      </button>
+      <button class="quick" type="button" data-copy="hello@alexrivera.co" data-toast="Email copied">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
+        <span>Email</span>
+      </button>
+      <button class="quick" type="button" data-toast="Directions would open here">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
+        <span>Visit</span>
+      </button>
+    </nav>
+
+    <button class="cta" type="button" id="saveContact">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6.5 11 5.5 5.5L17.5 11"/><path d="M4 20h16"/></svg>
+      Save My Contact
+    </button>
+
+    <div class="divider">Connect Elsewhere</div>
+
+    <div class="links" id="linkList">
+
+      <a class="link-row" href="#" data-toast="Would open Instagram">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span class="link-body"><span class="link-name">Instagram</span><span class="link-sub">@alex.rivera</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast="Would open Facebook">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.2-1.5 1.6-1.5H17V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.4-3.7 3.9V11H8.5v3H11v7z"/></svg></span>
+        <span class="link-body"><span class="link-name">Facebook</span><span class="link-sub">Alex Rivera</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast="Would open WhatsApp">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.8 19L4 20z"/><path d="M8.7 9.6c.3 2.6 2.6 4.9 5.2 5.2.9.1 1.5-.6 1.2-1.4l-.4-1-1.7-.3-.9.9c-1-.5-1.9-1.4-2.4-2.4l.9-.9-.3-1.7-1-.4c-.8-.3-1.5.3-1.4 1.2z" fill="currentColor" stroke="none"/></svg></span>
+        <span class="link-body"><span class="link-name">WhatsApp</span><span class="link-sub">Message directly</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast="Would open Viber">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c4.4 0 7.5 2.7 7.5 7 0 3.7-2.4 6.2-6 6.8-.6.1-.6.4-.5 1l.2 1.7c.1.6-.4.9-.9.5-2.2-1.8-3.4-2.9-3.7-3.2C5.4 16.9 4.5 14.1 4.5 11c0-4.3 3.1-7 7.5-7z"/><path d="M9.2 9.4c1 2.4 2.5 3.9 4.8 4.8.3.1.5 0 .7-.2l.6-.8c.2-.2.5-.3.7-.1l1.6 1c.3.2.3.5.1.8-.5.7-1.3 1.1-2.1.9-2.9-.7-5.6-3.4-6.3-6.3-.2-.8.2-1.6.9-2.1.3-.2.6-.2.8.1l1 1.6c.2.2.1.5-.1.7l-.7.6z"/></svg></span>
+        <span class="link-body"><span class="link-name">Viber</span><span class="link-sub">Call or chat</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast="Would open LinkedIn">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 10.5V17M8 7.6v.05"/><path d="M12 17v-3.6c0-1.5 1-2.3 2.2-2.3 1.2 0 1.8.8 1.8 2.3V17"/></svg></span>
+        <span class="link-body"><span class="link-name">LinkedIn</span><span class="link-sub">Professional profile</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast="Would open the website">
+        <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.3 3.4 5.3 3.4 8.5s-1.2 6.2-3.4 8.5c-2.2-2.3-3.4-5.3-3.4-8.5S9.8 5.8 12 3.5z"/></svg></span>
+        <span class="link-body"><span class="link-name">Website</span><span class="link-sub">rivera.co</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+    </div>
+
+    <footer class="foot">
+      <p class="foot-brand"><b>NOIR</b> · tap-to-connect cards</p>
+      <p class="foot-note">This is a live preview of a personal portal. Every card ships with its own private page — only its owner can sign in and edit what it opens to.</p>
+    </footer>
+
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+
+  function showToast(msg){
+    if(!msg) return;
+    toastEl.innerHTML = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){
+      toastEl.classList.remove("show");
+    }, 2000);
+  }
+
+  // stagger the link rows
+  document.querySelectorAll(".link-row").forEach(function(row, i){
+    row.style.animationDelay = (i * 55) + "ms";
+  });
+
+  // demo social/link rows: give tactile feedback instead of a dead navigation
+  document.querySelectorAll(".link-row[data-toast]").forEach(function(row){
+    row.addEventListener("click", function(e){
+      e.preventDefault();
+      showToast(row.dataset.toast + " <b>&middot;</b> demo mode");
+      if (navigator.vibrate) navigator.vibrate(8);
+    });
+  });
+
+  // quick actions: copy to clipboard where relevant
+  document.querySelectorAll(".quick[data-copy]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var value = btn.dataset.copy;
+      var done = function(){ showToast(btn.dataset.toast || "Copied"); };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(done, done);
+      } else {
+        done();
+      }
+      if (navigator.vibrate) navigator.vibrate(8);
+    });
+  });
+
+  document.querySelectorAll(".quick:not([data-copy])").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      showToast(btn.dataset.toast);
+      if (navigator.vibrate) navigator.vibrate(8);
+    });
+  });
+
+  // save contact -> generates a real vCard, client-side, no backend needed
+  document.getElementById("saveContact").addEventListener("click", function(){
+    var vcard = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      "N:Rivera;Alex;;;",
+      "FN:Alex Rivera",
+      "ORG:Rivera & Co.",
+      "TITLE:Founder",
+      "TEL;TYPE=CELL:+14155550142",
+      "EMAIL:hello@alexrivera.co",
+      "URL:https://rivera.co",
+      "END:VCARD"
+    ].join("\r\n");
+    var blob = new Blob([vcard], { type: "text/vcard" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "alex-rivera.vcf";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    showToast("Contact card downloaded");
+    if (navigator.vibrate) navigator.vibrate(12);
+  });
+})();
+</script>
+
+</body>
+</html>
