@@ -505,10 +505,7 @@
   }
   .ds-icon svg{ width:36px; height:36px; }
   @keyframes dsPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
-  .ds-status{ font-size:14px; font-weight:500; color:var(--white); margin:0 0 22px; }
-  .ds-progress{ width:170px; height:3px; background:var(--hair-strong); border-radius:99px; overflow:hidden; }
-  .ds-progress-bar{ height:100%; width:0%; background:var(--red-bright); border-radius:99px; transition:width 1s linear; }
-  .ds-arrived{ margin-top:30px; animation:heroIn .4s var(--ease) both; }
+  .ds-arrived{ margin-top:8px; animation:heroIn .4s var(--ease) both; }
   .ds-arrived-note{ font-size:12px; color:var(--muted); margin:0 0 4px; }
   .ds-arrived-platform{ font-family:var(--serif); font-size:24px; font-weight:700; color:var(--white); margin:0 0 14px; }
   .ds-arrived-sub{ font-size:11.5px; line-height:1.6; color:var(--muted); max-width:280px; margin:0 auto 22px; font-weight:300; }
@@ -715,10 +712,8 @@
       <div class="ds-name" id="dsName">Alex Rivera</div>
     </div>
     <div class="ds-icon" id="dsIcon"></div>
-    <p class="ds-status" id="dsStatus">Redirecting you to Instagram…</p>
-    <div class="ds-progress"><div class="ds-progress-bar" id="dsProgressBar"></div></div>
-    <div class="ds-arrived" id="dsArrived" hidden>
-      <p class="ds-arrived-note" data-i18n="directArrivedNote">This is where visitors would land directly on</p>
+    <div class="ds-arrived" id="dsArrived">
+      <p class="ds-arrived-note" data-i18n="directArrivedNote">This is where visitors land directly on</p>
       <p class="ds-arrived-platform" id="dsArrivedPlatform">Instagram</p>
       <p class="ds-arrived-sub" data-i18n="directArrivedSub">Demo mode — no live destination yet, but this is exactly how it will feel once your real link is connected.</p>
       <button class="ds-view-portal" type="button" id="dsViewPortal" data-i18n="viewFullPortal">View Full Portal (Testing)</button>
@@ -761,8 +756,7 @@
       modeHint: "Direct Link skips the portal page — tapping the card opens one platform immediately.",
       directPickLabel: "Which link should it open?",
       directNoLinks: "Add at least one link first.",
-      directStatusPrefix: "Redirecting you to",
-      directArrivedNote: "This is where visitors would land directly on",
+      directArrivedNote: "This is where visitors land directly on",
       directArrivedSub: "Demo mode — no live destination yet, but this is exactly how it will feel once your real link is connected.",
       viewFullPortal: "View Full Portal (Testing)",
       themeSectionTitle: "Theme",
@@ -806,8 +800,7 @@
       modeHint: "Sa Direktang Link, nilalaktawan ang portal page — pagka-tap ng card, diretso agad sa isang platform.",
       directPickLabel: "Aling link ang bubuksan?",
       directNoLinks: "Magdagdag muna ng kahit isang link.",
-      directStatusPrefix: "Ididirekta ka papunta sa",
-      directArrivedNote: "Dito diretso na lalapag ang mga bisita sa",
+      directArrivedNote: "Dito diretso na lumalapag ang mga bisita sa",
       directArrivedSub: "Demo mode pa lang — wala pang totoong destinasyon, pero ganito talaga ang mararamdaman kapag naka-connect na ang totoong link mo.",
       viewFullPortal: "Tingnan ang Buong Portal (Testing)",
       themeSectionTitle: "Tema",
@@ -1511,8 +1504,9 @@
   }
 
   /* ---------------- direct-link redirect screen (replaces the portal on load) ---------------- */
+  // No loading/transition state on purpose — a real card tap should feel
+  // instant, not like it's "buffering". The destination renders immediately.
   var directScreenEl = document.getElementById("directScreen");
-  var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function showDirectRedirect(link){
     var meta = PLATFORMS[link.platform] || PLATFORMS.custom;
@@ -1522,35 +1516,14 @@
     var iconWrap = document.getElementById("dsIcon");
     iconWrap.innerHTML = ICONS[link.platform] || ICONS.custom;
     tintIcon(iconWrap, link.platform);
-    var svg = iconWrap.querySelector("svg");
     var brand = BRAND_COLORS[link.platform];
 
-    var status = document.getElementById("dsStatus");
-    var arrived = document.getElementById("dsArrived");
     var arrivedPlatform = document.getElementById("dsArrivedPlatform");
-    var progress = document.querySelector(".ds-progress");
-    var bar = document.getElementById("dsProgressBar");
-
-    status.textContent = t("directStatusPrefix") + " " + meta.label + "…";
     arrivedPlatform.textContent = meta.label;
     arrivedPlatform.style.color = (brand && brand.indexOf("#") === 0) ? brand : "var(--red-bright)";
 
-    arrived.hidden = true;
-    status.hidden = false;
-    progress.hidden = false;
-    bar.style.width = "0%";
-
     stageEl.style.display = "none";
     directScreenEl.hidden = false;
-
-    requestAnimationFrame(function(){ bar.style.width = "100%"; });
-
-    setTimeout(function(){
-      status.hidden = true;
-      progress.hidden = true;
-      arrived.hidden = false;
-      if (navigator.vibrate) navigator.vibrate(10);
-    }, reducedMotion ? 150 : 1100);
   }
   document.getElementById("dsViewPortal").addEventListener("click", function(){
     directScreenEl.hidden = true;
@@ -1595,13 +1568,6 @@
       btn.setAttribute("aria-pressed", btn.dataset.lang === currentLang ? "true" : "false");
     });
     if (overlay.classList.contains("show")){ renderEditorLinks(); renderDirectOptions(); }
-    if (!directScreenEl.hidden){
-      var activeLink = state.links.filter(function(l){ return l.id === state.directLinkId; })[0];
-      if (activeLink){
-        var meta = PLATFORMS[activeLink.platform] || PLATFORMS.custom;
-        document.getElementById("dsStatus").textContent = t("directStatusPrefix") + " " + meta.label + "…";
-      }
-    }
   }
   document.querySelectorAll(".lang-toggle button").forEach(function(btn){
     btn.addEventListener("click", function(){
