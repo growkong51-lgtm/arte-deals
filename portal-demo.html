@@ -39,11 +39,12 @@
   }
   a{color:inherit; text-decoration:none;}
   button{font-family:inherit; cursor:pointer;}
+  input{font-family:inherit;}
 
   ::selection{background:var(--red); color:#fff;}
 
   /* focus visibility */
-  a:focus-visible, button:focus-visible{
+  a:focus-visible, button:focus-visible, input:focus-visible{
     outline:2px solid var(--red-bright);
     outline-offset:3px;
     border-radius:4px;
@@ -81,35 +82,67 @@
     position:relative;
     width:100%;
     max-width:440px;
-    padding:20px 20px 48px;
+    padding:20px 20px 96px;
   }
 
-  /* demo badge */
-  .demo-tag{
+  /* ---------- top bar: demo badge + language toggle ---------- */
+  .top-bar{
     display:flex;
-    justify-content:center;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
     padding-top:14px;
   }
-  .demo-tag span{
+  .demo-tag{
     display:inline-flex;
     align-items:center;
     gap:7px;
+    min-width:0;
     font-family:var(--sans);
-    font-size:10.5px;
+    font-size:10px;
     font-weight:500;
-    letter-spacing:.24em;
+    letter-spacing:.16em;
     text-transform:uppercase;
     color:var(--muted);
     border:1px solid var(--hair-strong);
-    padding:7px 14px 7px 11px;
+    padding:7px 12px 7px 10px;
     border-radius:999px;
     background:rgba(255,255,255,0.02);
+  }
+  .demo-tag span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .demo-tag .dot{
     width:6px; height:6px; border-radius:50%;
     background:var(--red-bright);
     box-shadow:0 0 8px var(--red-glow);
     flex:none;
+  }
+  .lang-toggle{
+    flex:none;
+    display:inline-flex;
+    border:1px solid var(--hair-strong);
+    border-radius:999px;
+    padding:3px;
+    background:rgba(255,255,255,0.02);
+  }
+  .lang-toggle button{
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.06em;
+    padding:6px 10px;
+    border-radius:999px;
+    min-height:26px;
+    transition:background .2s var(--ease), color .2s var(--ease);
+  }
+  .lang-toggle button[aria-pressed="true"]{
+    background:var(--red-bright);
+    color:#fff;
   }
 
   /* ---------- hero / identity ---------- */
@@ -144,14 +177,32 @@
     color:var(--white);
     box-shadow:inset 0 0 0 1px var(--hair);
   }
+  .name-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    margin:0 0 8px;
+  }
   .name{
     font-family:var(--serif);
     font-weight:500;
     font-size:32px;
     letter-spacing:.01em;
     line-height:1.15;
-    margin:0 0 8px;
+    margin:0;
   }
+  .verified{
+    flex:none;
+    width:19px; height:19px;
+    border-radius:50%;
+    background:var(--red-bright);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 0 0 3px rgba(226,34,63,0.16);
+  }
+  .verified svg{ width:11px; height:11px; stroke:#fff; }
   .role{
     font-size:11px;
     font-weight:500;
@@ -208,7 +259,7 @@
     min-height:44px;
     transition:transform .2s var(--ease), box-shadow .2s var(--ease);
   }
-  .cta svg{ width:17px; height:17px; stroke:#000; }
+  .cta svg{ width:17px; height:17px; stroke:#000; flex:none; }
   .cta:hover{ box-shadow:0 10px 30px -8px rgba(255,255,255,0.25); }
   .cta:active{ transform:scale(.98); }
 
@@ -224,6 +275,7 @@
   .divider::before, .divider::after{
     content:''; flex:1; height:1px; background:var(--hair);
   }
+  .links + .divider{ margin-top:-8px; }
 
   /* ---------- links ---------- */
   .links{
@@ -242,6 +294,8 @@
     border-left:2px solid transparent;
     border-radius:12px;
     min-height:44px;
+    width:100%;
+    text-align:left;
     transition:border-color .22s var(--ease), background .22s var(--ease), transform .22s var(--ease);
     opacity:0;
     transform:translateY(10px);
@@ -262,6 +316,8 @@
     border:1px solid var(--hair);
   }
   .link-icon svg{ width:17px; height:17px; stroke:var(--white); }
+  .link-icon.accent{ background:rgba(200,16,46,0.12); border-color:rgba(200,16,46,0.3); }
+  .link-icon.accent svg{ stroke:var(--red-bright); }
   .link-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
   .link-name{ font-size:14.5px; font-weight:500; color:var(--white); }
   .link-sub{ font-size:12px; color:var(--muted); }
@@ -269,6 +325,70 @@
   .link-row:hover .link-go{ transform:translateX(3px); stroke:var(--red-bright); }
 
   @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- lead capture ---------- */
+  .lead-card{
+    background:var(--card);
+    border:1px solid var(--hair);
+    border-radius:16px;
+    padding:22px 20px;
+    margin-bottom:32px;
+  }
+  .lead-heading{
+    font-family:var(--serif);
+    font-size:19px;
+    font-weight:500;
+    margin:0 0 6px;
+  }
+  .lead-sub{
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.6;
+    margin:0 0 18px;
+    font-weight:300;
+  }
+  .field{ margin-bottom:12px; }
+  .field label{
+    display:block;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--white-dim);
+    margin-bottom:7px;
+  }
+  .field input{
+    width:100%;
+    background:#050505;
+    border:1px solid var(--hair-strong);
+    border-radius:10px;
+    padding:12px 13px;
+    color:var(--white);
+    font-size:14px;
+    min-height:44px;
+    transition:border-color .2s var(--ease);
+  }
+  .field input::placeholder{ color:#5a5a57; }
+  .field input:focus{ border-color:var(--red-bright); outline:none; }
+  .lead-submit{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    width:100%;
+    padding:14px 18px;
+    margin-top:6px;
+    background:var(--red-bright);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    min-height:44px;
+    transition:filter .2s var(--ease), transform .2s var(--ease);
+  }
+  .lead-submit:hover{ filter:brightness(1.12); }
+  .lead-submit:active{ transform:scale(.98); }
+  .lead-submit svg{ width:15px; height:15px; stroke:#fff; }
 
   /* ---------- footer ---------- */
   .foot{
@@ -293,6 +413,75 @@
     font-weight:300;
   }
 
+  /* ---------- sticky save-contact bar ---------- */
+  .sticky-bar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    display:flex;
+    justify-content:center;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.92) 30%);
+    transform:translateY(100%);
+    opacity:0;
+    transition:transform .3s var(--ease), opacity .3s var(--ease);
+    pointer-events:none;
+    z-index:15;
+  }
+  .sticky-bar.show{
+    transform:translateY(0);
+    opacity:1;
+    pointer-events:auto;
+  }
+  .sticky-inner{
+    width:100%;
+    max-width:408px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border:1px solid var(--hair-strong);
+    border-radius:14px;
+    padding:8px 8px 8px 12px;
+    box-shadow:0 12px 34px -10px rgba(0,0,0,0.7);
+  }
+  .sticky-avatar{
+    flex:none;
+    width:32px; height:32px;
+    border-radius:50%;
+    background:linear-gradient(160deg,#1a1a19,#050505);
+    border:1px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif);
+    font-size:12px;
+    font-weight:500;
+  }
+  .sticky-name{
+    flex:1;
+    min-width:0;
+    font-size:13px;
+    font-weight:500;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .sticky-save{
+    flex:none;
+    display:flex; align-items:center; gap:7px;
+    background:var(--white);
+    color:#000;
+    border:none;
+    border-radius:9px;
+    padding:10px 14px;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    min-height:40px;
+    transition:transform .2s var(--ease);
+  }
+  .sticky-save:active{ transform:scale(.96); }
+  .sticky-save svg{ width:14px; height:14px; stroke:#000; }
+
   /* ---------- toast ---------- */
   .toast{
     position:fixed;
@@ -312,10 +501,13 @@
     transition:opacity .25s var(--ease), transform .25s var(--ease);
     z-index:20;
     white-space:nowrap;
+    max-width:calc(100vw - 32px);
+    text-overflow:ellipsis;
+    overflow:hidden;
   }
   .toast.show{
     opacity:1;
-    transform:translate(-50%,0);
+    transform:translate(-50%,-64px);
   }
   .toast b{ color:var(--red-bright); font-weight:500; }
 
@@ -334,8 +526,12 @@
 <div class="stage">
   <div class="frame">
 
-    <div class="demo-tag">
-      <span><i class="dot"></i>Live Demo — Tap Portal</span>
+    <div class="top-bar">
+      <div class="demo-tag"><i class="dot"></i><span data-i18n="demoTag">Live Demo — Tap Portal</span></div>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="tl" aria-pressed="false">TL</button>
+      </div>
     </div>
 
     <header class="hero">
@@ -343,48 +539,53 @@
         <div class="avatar-ring"></div>
         <div class="avatar">AR</div>
       </div>
-      <h1 class="name">Alex Rivera</h1>
-      <p class="role">Founder — Rivera &amp; Co.</p>
-      <p class="tagline">One tap, every way to reach me. No app, no download — just hold your phone to the card.</p>
+      <div class="name-row">
+        <h1 class="name">Alex Rivera</h1>
+        <span class="verified" title="Verified portal owner">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg>
+        </span>
+      </div>
+      <p class="role" data-i18n="role">Founder — Rivera &amp; Co.</p>
+      <p class="tagline" data-i18n="tagline">One tap, every way to reach me. No app, no download — just hold your phone to the card.</p>
     </header>
 
     <nav class="quick-row" aria-label="Quick contact actions">
-      <button class="quick" type="button" data-copy="+1 (415) 555-0142" data-toast="Number copied">
+      <button class="quick" type="button" data-copy="+1 (415) 555-0142" data-toast-key="callToast">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-        <span>Call</span>
+        <span data-i18n="callLabel">Call</span>
       </button>
-      <button class="quick" type="button" data-copy="hello@alexrivera.co" data-toast="Email copied">
+      <button class="quick" type="button" data-copy="hello@alexrivera.co" data-toast-key="emailToast">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
-        <span>Email</span>
+        <span data-i18n="emailLabel">Email</span>
       </button>
-      <button class="quick" type="button" data-toast="Directions would open here">
+      <button class="quick" type="button" data-toast-key="visitToast">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
-        <span>Visit</span>
+        <span data-i18n="visitLabel">Visit</span>
       </button>
     </nav>
 
     <button class="cta" type="button" id="saveContact">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6.5 11 5.5 5.5L17.5 11"/><path d="M4 20h16"/></svg>
-      Save My Contact
+      <span data-i18n="saveCta">Save My Contact</span>
     </button>
 
-    <div class="divider">Connect Elsewhere</div>
+    <div class="divider" data-i18n="divider1">Connect Elsewhere</div>
 
     <div class="links" id="linkList">
 
-      <a class="link-row" href="#" data-toast="Would open Instagram">
+      <a class="link-row" href="#" data-toast-key="igToast">
         <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span>
         <span class="link-body"><span class="link-name">Instagram</span><span class="link-sub">@alex.rivera</span></span>
         <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
       </a>
 
-      <a class="link-row" href="#" data-toast="Would open Facebook">
+      <a class="link-row" href="#" data-toast-key="fbToast">
         <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.2-1.5 1.6-1.5H17V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.4-3.7 3.9V11H8.5v3H11v7z"/></svg></span>
         <span class="link-body"><span class="link-name">Facebook</span><span class="link-sub">Alex Rivera</span></span>
         <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
       </a>
 
-      <a class="link-row" href="#" data-toast="Would open Viber">
+      <a class="link-row" href="#" data-toast-key="viberToast">
         <span class="link-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c4.4 0 7.5 2.7 7.5 7 0 3.7-2.4 6.2-6 6.8-.6.1-.6.4-.5 1l.2 1.7c.1.6-.4.9-.9.5-2.2-1.8-3.4-2.9-3.7-3.2C5.4 16.9 4.5 14.1 4.5 11c0-4.3 3.1-7 7.5-7z"/><path d="M9.2 9.4c1 2.4 2.5 3.9 4.8 4.8.3.1.5 0 .7-.2l.6-.8c.2-.2.5-.3.7-.1l1.6 1c.3.2.3.5.1.8-.5.7-1.3 1.1-2.1.9-2.9-.7-5.6-3.4-6.3-6.3-.2-.8.2-1.6.9-2.1.3-.2.6-.2.8.1l1 1.6c.2.2.1.5-.1.7l-.7.6z"/></svg></span>
         <span class="link-body"><span class="link-name">Viber</span><span class="link-sub">Call or chat</span></span>
         <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
@@ -392,11 +593,59 @@
 
     </div>
 
+    <div class="divider" data-i18n="divider2">Support This Business</div>
+
+    <div class="links" id="bizList">
+
+      <a class="link-row" href="#" data-toast-key="payToast">
+        <span class="link-icon accent"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/></svg></span>
+        <span class="link-body"><span class="link-name" data-i18n="payName">Pay via GCash / Maya</span><span class="link-sub" data-i18n="paySub">Send payment instantly</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+      <a class="link-row" href="#" data-toast-key="reviewToast">
+        <span class="link-icon accent"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 14.5 9l6 .8-4.4 4.1 1.1 5.9L12 17l-5.2 2.8 1.1-5.9-4.4-4.1 6-.8z"/></svg></span>
+        <span class="link-body"><span class="link-name" data-i18n="reviewName">Leave a Google Review</span><span class="link-sub" data-i18n="reviewSub">Takes 10 seconds</span></span>
+        <svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+
+    </div>
+
+    <div class="lead-card">
+      <h2 class="lead-heading" data-i18n="leadHeading">Send Alex Your Info</h2>
+      <p class="lead-sub" data-i18n="leadSub">So they can follow up with you directly.</p>
+      <form id="leadForm" novalidate>
+        <div class="field">
+          <label for="leadName" data-i18n="nameLabel">Your Name</label>
+          <input id="leadName" name="name" type="text" autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="Juan Dela Cruz" required>
+        </div>
+        <div class="field">
+          <label for="leadContact" data-i18n="contactLabel">Phone or Email</label>
+          <input id="leadContact" name="contact" type="text" autocomplete="tel" data-i18n-placeholder="contactPlaceholder" placeholder="09xx xxx xxxx or email" required>
+        </div>
+        <button class="lead-submit" type="submit">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 8-16 8 4-8-4-8z"/></svg>
+          <span data-i18n="leadSubmit">Share My Info</span>
+        </button>
+      </form>
+    </div>
+
     <footer class="foot">
-      <p class="foot-brand"><b>NOIR</b> · tap-to-connect cards</p>
-      <p class="foot-note">This is a live preview of a personal portal. Every card ships with its own private page — only its owner can sign in and edit what it opens to.</p>
+      <p class="foot-brand"><b>NOIR</b> · <span data-i18n="footBrand">tap-to-connect cards</span></p>
+      <p class="foot-note" data-i18n="footNote">This is a live preview of a personal portal. Every card ships with its own private page — only its owner can sign in and edit what it opens to.</p>
     </footer>
 
+  </div>
+</div>
+
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-inner">
+    <div class="sticky-avatar">AR</div>
+    <div class="sticky-name">Alex Rivera</div>
+    <button class="sticky-save" type="button" id="stickySave">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6.5 11 5.5 5.5L17.5 11"/><path d="M4 20h16"/></svg>
+      <span data-i18n="stickySave">Save Contact</span>
+    </button>
   </div>
 </div>
 
@@ -405,6 +654,84 @@
 <script>
 (function(){
   "use strict";
+
+  var I18N = {
+    en: {
+      demoTag: "Live Demo — Tap Portal",
+      role: "Founder — Rivera &amp; Co.",
+      tagline: "One tap, every way to reach me. No app, no download — just hold your phone to the card.",
+      callLabel: "Call", emailLabel: "Email", visitLabel: "Visit",
+      callToast: "Number copied", emailToast: "Email copied", visitToast: "Directions would open here",
+      saveCta: "Save My Contact",
+      divider1: "Connect Elsewhere",
+      igToast: "Would open Instagram", fbToast: "Would open Facebook", viberToast: "Would open Viber",
+      divider2: "Support This Business",
+      payName: "Pay via GCash / Maya", paySub: "Send payment instantly", payToast: "Would open GCash / Maya",
+      reviewName: "Leave a Google Review", reviewSub: "Takes 10 seconds", reviewToast: "Would open Google Reviews",
+      demoSuffix: "demo mode",
+      leadHeading: "Send Alex Your Info",
+      leadSub: "So they can follow up with you directly.",
+      nameLabel: "Your Name", contactLabel: "Phone or Email", leadSubmit: "Share My Info",
+      namePlaceholder: "Juan Dela Cruz", contactPlaceholder: "09xx xxx xxxx or email",
+      leadToast: "Info received — Alex will reach out",
+      leadIncomplete: "Please fill in both fields",
+      footBrand: "tap-to-connect cards",
+      footNote: "This is a live preview of a personal portal. Every card ships with its own private page — only its owner can sign in and edit what it opens to.",
+      stickySave: "Save Contact",
+      vcardToast: "Contact card downloaded"
+    },
+    tl: {
+      demoTag: "Live Demo — Portal",
+      role: "Tagapagtatag — Rivera &amp; Co.",
+      tagline: "Isang tap lang, lahat ng paraan para mahanap mo ako. Walang app, walang download — idikit lang ang phone sa card.",
+      callLabel: "Tawag", emailLabel: "Email", visitLabel: "Bisitahin",
+      callToast: "Na-copy ang number", emailToast: "Na-copy ang email", visitToast: "Dito magbubukas ang direksyon",
+      saveCta: "I-save ang Contact Ko",
+      divider1: "Kumonekta Dito",
+      igToast: "Magbubukas ang Instagram", fbToast: "Magbubukas ang Facebook", viberToast: "Magbubukas ang Viber",
+      divider2: "Suportahan ang Negosyo",
+      payName: "Magbayad via GCash / Maya", paySub: "Padalhan ng bayad agad", payToast: "Magbubukas ang GCash / Maya",
+      reviewName: "Mag-iwan ng Google Review", reviewSub: "10 segundo lang", reviewToast: "Magbubukas ang Google Reviews",
+      demoSuffix: "demo lang",
+      leadHeading: "Ipadala kay Alex ang Detalye Mo",
+      leadSub: "Para makausap ka nila agad.",
+      nameLabel: "Pangalan Mo", contactLabel: "Phone o Email", leadSubmit: "Ipadala ang Info Ko",
+      namePlaceholder: "Juan Dela Cruz", contactPlaceholder: "09xx xxx xxxx o email",
+      leadToast: "Natanggap — kokontakin ka ni Alex",
+      leadIncomplete: "Pakikumpleto ang dalawang field",
+      footBrand: "mga tap-to-connect na card",
+      footNote: "Live preview ito ng personal na portal. Bawat card ay may sariling pribadong page — ang may-ari lang ang makaka-sign in at makaka-edit kung saan ito magbubukas.",
+      stickySave: "I-save",
+      vcardToast: "Na-download ang contact card"
+    }
+  };
+  var currentLang = "en";
+
+  function t(key){
+    return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || "";
+  }
+
+  function applyLang(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      el.innerHTML = t(el.dataset.i18n);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function(el){
+      el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+    });
+    document.querySelectorAll(".lang-toggle button").forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.dataset.lang === currentLang ? "true" : "false");
+    });
+  }
+
+  document.querySelectorAll(".lang-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if (btn.dataset.lang === currentLang) return;
+      currentLang = btn.dataset.lang;
+      applyLang();
+    });
+  });
+
   var toastEl = document.getElementById("toast");
   var toastTimer = null;
 
@@ -415,7 +742,13 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function(){
       toastEl.classList.remove("show");
-    }, 2000);
+    }, 2200);
+  }
+
+  function showToastKey(key, withDemoSuffix){
+    var msg = t(key);
+    if (withDemoSuffix) msg += " <b>&middot;</b> " + t("demoSuffix");
+    showToast(msg);
   }
 
   // stagger the link rows
@@ -423,11 +756,11 @@
     row.style.animationDelay = (i * 55) + "ms";
   });
 
-  // demo social/link rows: give tactile feedback instead of a dead navigation
-  document.querySelectorAll(".link-row[data-toast]").forEach(function(row){
+  // demo social/business link rows: give tactile feedback instead of a dead navigation
+  document.querySelectorAll(".link-row[data-toast-key]").forEach(function(row){
     row.addEventListener("click", function(e){
       e.preventDefault();
-      showToast(row.dataset.toast + " <b>&middot;</b> demo mode");
+      showToastKey(row.dataset.toastKey, true);
       if (navigator.vibrate) navigator.vibrate(8);
     });
   });
@@ -436,7 +769,7 @@
   document.querySelectorAll(".quick[data-copy]").forEach(function(btn){
     btn.addEventListener("click", function(){
       var value = btn.dataset.copy;
-      var done = function(){ showToast(btn.dataset.toast || "Copied"); };
+      var done = function(){ showToastKey(btn.dataset.toastKey); };
       if (navigator.clipboard && navigator.clipboard.writeText){
         navigator.clipboard.writeText(value).then(done, done);
       } else {
@@ -448,13 +781,13 @@
 
   document.querySelectorAll(".quick:not([data-copy])").forEach(function(btn){
     btn.addEventListener("click", function(){
-      showToast(btn.dataset.toast);
+      showToastKey(btn.dataset.toastKey);
       if (navigator.vibrate) navigator.vibrate(8);
     });
   });
 
   // save contact -> generates a real vCard, client-side, no backend needed
-  document.getElementById("saveContact").addEventListener("click", function(){
+  function downloadVcard(){
     var vcard = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -476,9 +809,37 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
-    showToast("Contact card downloaded");
+    showToastKey("vcardToast");
     if (navigator.vibrate) navigator.vibrate(12);
+  }
+  document.getElementById("saveContact").addEventListener("click", downloadVcard);
+  document.getElementById("stickySave").addEventListener("click", downloadVcard);
+
+  // lead capture: client-only demo, no backend to send to yet
+  document.getElementById("leadForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var name = document.getElementById("leadName").value.trim();
+    var contact = document.getElementById("leadContact").value.trim();
+    if (!name || !contact){
+      showToastKey("leadIncomplete");
+      return;
+    }
+    showToastKey("leadToast", true);
+    if (navigator.vibrate) navigator.vibrate(12);
+    e.target.reset();
   });
+
+  // sticky save-contact bar: appears once the hero has scrolled out of view
+  var stickyBar = document.getElementById("stickyBar");
+  var hero = document.querySelector(".hero");
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        stickyBar.classList.toggle("show", !entry.isIntersecting);
+      });
+    }, { threshold: 0 });
+    io.observe(hero);
+  }
 })();
 </script>
 
