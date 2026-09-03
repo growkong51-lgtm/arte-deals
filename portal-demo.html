@@ -20,10 +20,18 @@
     --white:#f5f5f3;
     --white-dim:#c9c9c6;
     --muted:#84837f;
-    /* accent tokens — user-selectable via the theme picker, default Crimson */
+    /* accent tokens — user-selectable via the theme picker, default Noir Rouge */
     --red:#c8102e;
     --red-bright:#e2223f;
     --red-glow:rgba(200,16,46,0.35);
+    /* surface tokens — swapped per full theme, not just the accent */
+    --cta-bg:#f5f5f3;
+    --cta-text:#000000;
+    --sheet-bg:#0c0c0c;
+    --input-bg:#050505;
+    --icon-bg:rgba(255,255,255,0.04);
+    --ring:#ffffff;
+    --grid-line:rgba(255,255,255,0.025);
     --serif:'Bodoni Moda',Georgia,serif;
     --sans:'Jost',-apple-system,BlinkMacSystemFont,sans-serif;
     --ease:cubic-bezier(.16,1,.3,1);
@@ -70,8 +78,8 @@
     content:'';
     position:absolute; inset:0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:34px 34px;
     -webkit-mask-image:radial-gradient(ellipse 60% 40% at 50% 0%, #000 0%, transparent 70%);
             mask-image:radial-gradient(ellipse 60% 40% at 50% 0%, #000 0%, transparent 70%);
@@ -168,7 +176,7 @@
     position:absolute; inset:6px; border-radius:50%;
     background:linear-gradient(160deg,#161615,#050505);
     display:flex; align-items:center; justify-content:center;
-    font-family:var(--serif); font-size:30px; font-weight:500; color:var(--white);
+    font-family:var(--serif); font-size:30px; font-weight:500; color:#f2f0ec;
     box-shadow:inset 0 0 0 1px var(--hair);
   }
   .name-row{ display:flex; align-items:center; justify-content:center; gap:7px; margin:0 0 8px; }
@@ -198,11 +206,11 @@
   /* ---------- primary CTA ---------- */
   .cta{
     display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
-    padding:16px 20px; margin-bottom:28px; background:var(--white); color:#000; border:none;
+    padding:16px 20px; margin-bottom:28px; background:var(--cta-bg); color:var(--cta-text); border:none;
     border-radius:14px; font-size:14px; font-weight:500; letter-spacing:.06em; text-transform:uppercase;
-    min-height:44px; transition:transform .2s var(--ease), box-shadow .2s var(--ease);
+    min-height:44px; transition:transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
   }
-  .cta svg{ width:17px; height:17px; stroke:#000; flex:none; }
+  .cta svg{ width:17px; height:17px; stroke:var(--cta-text); flex:none; }
   .cta:hover{ box-shadow:0 10px 30px -8px rgba(255,255,255,0.25); }
   .cta:active{ transform:scale(.98); }
 
@@ -226,7 +234,7 @@
   .link-row:active{ transform:scale(.985); }
   .link-icon{
     flex:none; width:38px; height:38px; display:flex; align-items:center; justify-content:center;
-    border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid var(--hair);
+    border-radius:10px; background:var(--icon-bg); border:1px solid var(--hair);
   }
   .link-icon svg{ width:17px; height:17px; stroke:var(--white); }
   .link-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
@@ -263,15 +271,16 @@
     flex:none; width:32px; height:32px; border-radius:50%;
     background:linear-gradient(160deg,#1a1a19,#050505); border:1px solid var(--hair-strong);
     display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-size:12px; font-weight:500;
+    color:#f2f0ec;
   }
   .sticky-name{ flex:1; min-width:0; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .sticky-save{
-    flex:none; display:flex; align-items:center; gap:7px; background:var(--white); color:#000; border:none;
+    flex:none; display:flex; align-items:center; gap:7px; background:var(--cta-bg); color:var(--cta-text); border:none;
     border-radius:9px; padding:10px 14px; font-size:11.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
-    min-height:40px; transition:transform .2s var(--ease);
+    min-height:40px; transition:transform .2s var(--ease), background .2s var(--ease), color .2s var(--ease);
   }
   .sticky-save:active{ transform:scale(.96); }
-  .sticky-save svg{ width:14px; height:14px; stroke:#000; }
+  .sticky-save svg{ width:14px; height:14px; stroke:var(--cta-text); }
 
   /* ---------- editor: launcher + sheet ---------- */
   .editor-overlay{
@@ -281,9 +290,9 @@
   .editor-overlay.show{ opacity:1; pointer-events:auto; }
   .editor-sheet{
     width:100%; max-width:440px; max-height:88vh; overflow-y:auto;
-    background:#0c0c0c; border:1px solid var(--hair-strong); border-bottom:none;
+    background:var(--sheet-bg); border:1px solid var(--hair-strong); border-bottom:none;
     border-radius:22px 22px 0 0; padding:18px 20px calc(28px + env(safe-area-inset-bottom));
-    transform:translateY(40px); transition:transform .32s var(--ease);
+    transform:translateY(40px); transition:transform .32s var(--ease), background .2s var(--ease);
   }
   .editor-overlay.show .editor-sheet{ transform:translateY(0); }
   .editor-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px; }
@@ -301,11 +310,11 @@
 
   .editor-link-row{ display:flex; gap:8px; margin-bottom:8px; }
   .el-platform{
-    flex:none; width:118px; background:#050505; border:1px solid var(--hair-strong); border-radius:9px;
+    flex:none; width:118px; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
     padding:0 8px; color:var(--white); font-size:12px; min-height:42px;
   }
   .el-handle{
-    flex:1; min-width:0; background:#050505; border:1px solid var(--hair-strong); border-radius:9px;
+    flex:1; min-width:0; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:9px;
     padding:0 11px; color:var(--white); font-size:13px; min-height:42px;
   }
   .el-handle::placeholder{ color:#5a5a57; }
@@ -323,9 +332,23 @@
   .add-link-btn:hover{ border-color:var(--red-bright); color:var(--white); }
   .add-link-btn svg{ width:14px; height:14px; stroke:currentColor; }
 
-  .swatch-row{ display:flex; gap:10px; flex-wrap:wrap; }
-  .swatch{ width:34px; height:34px; border-radius:50%; border:2px solid transparent; padding:0; }
-  .swatch[aria-pressed="true"]{ border-color:#fff; box-shadow:0 0 0 2px #000, 0 0 0 3px rgba(255,255,255,.5); }
+  .theme-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .theme-chip{
+    width:76px; display:flex; flex-direction:column; align-items:center; gap:6px;
+    background:transparent; border:none; padding:0;
+  }
+  .theme-swatch{
+    width:76px; height:50px; border-radius:12px; border:2px solid transparent;
+    position:relative; overflow:hidden; transition:border-color .2s var(--ease), transform .2s var(--ease);
+  }
+  .theme-swatch:active{ transform:scale(.95); }
+  .theme-swatch .ts-card{ position:absolute; left:6px; right:6px; bottom:6px; top:18px; border-radius:6px; }
+  .theme-swatch .ts-dot{
+    position:absolute; width:14px; height:14px; border-radius:50%; bottom:8px; right:8px;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.25);
+  }
+  .theme-chip[aria-pressed="true"] .theme-swatch{ border-color:var(--ring); }
+  .theme-name{ font-size:9.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--white-dim); text-align:center; }
 
   .bg-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
   .bg-chip{
@@ -333,7 +356,7 @@
     color:var(--white-dim); font-size:11px; font-weight:500; letter-spacing:.05em; text-transform:uppercase; min-height:38px;
     transition:background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
   }
-  .bg-chip[aria-pressed="true"]{ background:var(--white); color:#000; border-color:var(--white); }
+  .bg-chip[aria-pressed="true"]{ background:var(--cta-bg); color:var(--cta-text); border-color:var(--cta-bg); }
   .upload-btn{
     display:flex; align-items:center; justify-content:center; gap:9px; width:100%; padding:13px;
     border:1px solid var(--hair-strong); border-radius:10px; color:var(--white); font-size:12.5px; font-weight:500;
@@ -360,7 +383,7 @@
   /* ---------- toast ---------- */
   .toast{
     position:fixed; left:50%; bottom:26px; transform:translate(-50%,14px);
-    background:#111; border:1px solid var(--hair-strong); color:var(--white);
+    background:#111; border:1px solid rgba(255,255,255,.16); color:#fff;
     font-size:12.5px; font-weight:400; letter-spacing:.02em; padding:11px 18px; border-radius:999px;
     opacity:0; pointer-events:none; transition:opacity .25s var(--ease), transform .25s var(--ease);
     z-index:50; white-space:nowrap; max-width:calc(100vw - 32px); text-overflow:ellipsis; overflow:hidden;
@@ -471,8 +494,8 @@
     </div>
 
     <div class="editor-section">
-      <h3 data-i18n="accentSectionTitle">Accent Color</h3>
-      <div class="swatch-row" id="swatchRow"></div>
+      <h3 data-i18n="themeSectionTitle">Theme</h3>
+      <div class="theme-row" id="themeRow"></div>
     </div>
 
     <div class="editor-section">
@@ -528,7 +551,7 @@
       editorNote: "This lives behind your private login in the real product — try it out here.",
       linksSectionTitle: "Your Links",
       addLink: "Add Link",
-      accentSectionTitle: "Accent Color",
+      themeSectionTitle: "Theme",
       bgSectionTitle: "Background",
       bgGrid: "Grid", bgGlow: "Glow", bgFlat: "Flat", bgCustom: "Custom",
       uploadBg: "Upload Your Own Design",
@@ -559,7 +582,7 @@
       editorNote: "Nasa likod ito ng sarili mong login sa totoong produkto — subukan mo dito.",
       linksSectionTitle: "Mga Link Mo",
       addLink: "Magdagdag ng Link",
-      accentSectionTitle: "Kulay ng Tema",
+      themeSectionTitle: "Tema",
       bgSectionTitle: "Background",
       bgGrid: "Grid", bgGlow: "Glow", bgFlat: "Payak", bgCustom: "Custom",
       uploadBg: "Mag-upload ng Sarili Mong Disenyo",
@@ -607,23 +630,58 @@
   };
   var CHEVRON = '<svg class="link-go" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
 
-  var ACCENTS = [
-    { key:"crimson",  name:"Crimson",  c1:"#c8102e", c2:"#e2223f" },
-    { key:"gold",     name:"Gold",     c1:"#8a6a1f", c2:"#c9a63f" },
-    { key:"emerald",  name:"Emerald",  c1:"#175c3e", c2:"#2f9066" },
-    { key:"sapphire", name:"Sapphire", c1:"#1c3f7a", c2:"#3866b8" },
-    { key:"rose",     name:"Rose",     c1:"#8a2d4c", c2:"#c94873" },
-    { key:"platinum", name:"Platinum", c1:"#5a5a58", c2:"#9c9c99" }
+  /* ---------------- full style themes (not just an accent hue) ---------------- */
+  var THEMES = [
+    { key:"noir", name:"Noir Rouge",
+      bg:"#000000", card:"#0a0a0a", card2:"#0e0e0e",
+      hair:"rgba(255,255,255,0.09)", hairStrong:"rgba(255,255,255,0.16)",
+      text:"#f5f5f3", textDim:"#c9c9c6", muted:"#84837f",
+      accent1:"#c8102e", accent2:"#e2223f",
+      ctaBg:"#f5f5f3", ctaText:"#000000",
+      sheetBg:"#0c0c0c", inputBg:"#050505", iconBg:"rgba(255,255,255,0.04)",
+      ring:"#ffffff", gridLine:"rgba(255,255,255,0.025)" },
+    { key:"ivory", name:"Ivory Gold",
+      bg:"#f7f2e9", card:"#ffffff", card2:"#faf6ee",
+      hair:"rgba(20,16,8,0.10)", hairStrong:"rgba(20,16,8,0.20)",
+      text:"#1c1a16", textDim:"#4d473c", muted:"#8a8272",
+      accent1:"#8a6a1f", accent2:"#7d5f1c",
+      ctaBg:"#17140f", ctaText:"#f7f2e9",
+      sheetBg:"#ffffff", inputBg:"#f2ede1", iconBg:"rgba(20,16,8,0.05)",
+      ring:"#17140f", gridLine:"rgba(20,16,8,0.035)" },
+    { key:"emerald", name:"Midnight Emerald",
+      bg:"#040907", card:"#0a120d", card2:"#0e1712",
+      hair:"rgba(255,255,255,0.08)", hairStrong:"rgba(255,255,255,0.15)",
+      text:"#f2f5f2", textDim:"#c3ccc5", muted:"#7d8a80",
+      accent1:"#175c3e", accent2:"#34a373",
+      ctaBg:"#f2f5f2", ctaText:"#04120a",
+      sheetBg:"#0a120d", inputBg:"#050b07", iconBg:"rgba(255,255,255,0.04)",
+      ring:"#ffffff", gridLine:"rgba(255,255,255,0.02)" },
+    { key:"sapphire", name:"Royal Sapphire",
+      bg:"#050710", card:"#0a0e1c", card2:"#0e1424",
+      hair:"rgba(255,255,255,0.08)", hairStrong:"rgba(255,255,255,0.16)",
+      text:"#f2f4fa", textDim:"#c4c9db", muted:"#7d84a0",
+      accent1:"#1c3f7a", accent2:"#4c7fd6",
+      ctaBg:"#f2f4fa", ctaText:"#050815",
+      sheetBg:"#0a0e1c", inputBg:"#05070f", iconBg:"rgba(255,255,255,0.04)",
+      ring:"#ffffff", gridLine:"rgba(255,255,255,0.02)" },
+    { key:"platinum", name:"Platinum Mono",
+      bg:"#0a0a0a", card:"#111111", card2:"#151515",
+      hair:"rgba(255,255,255,0.08)", hairStrong:"rgba(255,255,255,0.18)",
+      text:"#f2f2f0", textDim:"#c9c9c6", muted:"#8a8a86",
+      accent1:"#5a5a58", accent2:"#b8b8b3",
+      ctaBg:"#f2f2f0", ctaText:"#0a0a0a",
+      sheetBg:"#111111", inputBg:"#060606", iconBg:"rgba(255,255,255,0.04)",
+      ring:"#ffffff", gridLine:"rgba(255,255,255,0.025)" }
   ];
 
-  var LS_KEY = "noirPortalDemoState_v1";
+  var LS_KEY = "noirPortalDemoState_v2";
   var DEFAULT_STATE = {
     links:[
       { platform:"instagram", handle:"@alex.rivera" },
       { platform:"facebook",  handle:"Alex Rivera" },
       { platform:"viber",     handle:"Call or chat" }
     ],
-    accent:"crimson",
+    theme:"noir",
     bgStyle:"grid",
     bgImage:null
   };
@@ -770,35 +828,71 @@
     if (inputs.length) inputs[inputs.length - 1].focus();
   });
 
-  /* ---------------- editor: accent swatches ---------------- */
+  /* ---------------- editor: full theme picker ---------------- */
   function hexToRgba(hex, alpha){
     var h = hex.replace("#", "");
     if (h.length === 3) h = h.split("").map(function(c){ return c + c; }).join("");
     var r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
     return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
   }
-  function applyAccent(){
-    var a = ACCENTS.filter(function(x){ return x.key === state.accent; })[0] || ACCENTS[0];
-    var root = document.documentElement.style;
-    root.setProperty("--red", a.c1);
-    root.setProperty("--red-bright", a.c2);
-    root.setProperty("--red-glow", hexToRgba(a.c2, 0.35));
+  function findTheme(key){
+    return THEMES.filter(function(x){ return x.key === key; })[0] || THEMES[0];
   }
-  function renderSwatches(){
-    var row = document.getElementById("swatchRow");
+  function applyTheme(){
+    var th = findTheme(state.theme);
+    var root = document.documentElement.style;
+    root.setProperty("--black", th.bg);
+    root.setProperty("--card", th.card);
+    root.setProperty("--card-2", th.card2);
+    root.setProperty("--hair", th.hair);
+    root.setProperty("--hair-strong", th.hairStrong);
+    root.setProperty("--white", th.text);
+    root.setProperty("--white-dim", th.textDim);
+    root.setProperty("--muted", th.muted);
+    root.setProperty("--red", th.accent1);
+    root.setProperty("--red-bright", th.accent2);
+    root.setProperty("--red-glow", hexToRgba(th.accent2, 0.35));
+    root.setProperty("--cta-bg", th.ctaBg);
+    root.setProperty("--cta-text", th.ctaText);
+    root.setProperty("--sheet-bg", th.sheetBg);
+    root.setProperty("--input-bg", th.inputBg);
+    root.setProperty("--icon-bg", th.iconBg);
+    root.setProperty("--ring", th.ring);
+    root.setProperty("--grid-line", th.gridLine);
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", th.bg);
+  }
+  function renderThemes(){
+    var row = document.getElementById("themeRow");
     row.innerHTML = "";
-    ACCENTS.forEach(function(a){
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "swatch";
-      btn.style.background = "linear-gradient(135deg," + a.c1 + "," + a.c2 + ")";
-      btn.setAttribute("aria-label", a.name);
-      btn.setAttribute("aria-pressed", a.key === state.accent ? "true" : "false");
-      btn.addEventListener("click", function(){
-        state.accent = a.key;
-        persist(); applyAccent(); renderSwatches();
+    THEMES.forEach(function(th){
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "theme-chip";
+      chip.setAttribute("aria-pressed", th.key === state.theme ? "true" : "false");
+
+      var swatch = document.createElement("span");
+      swatch.className = "theme-swatch";
+      swatch.style.background = th.bg;
+      var card = document.createElement("span");
+      card.className = "ts-card";
+      card.style.background = th.card;
+      var dot = document.createElement("span");
+      dot.className = "ts-dot";
+      dot.style.background = th.accent2;
+      swatch.appendChild(card);
+      swatch.appendChild(dot);
+
+      var label = document.createElement("span");
+      label.className = "theme-name";
+      label.textContent = th.name;
+
+      chip.appendChild(swatch);
+      chip.appendChild(label);
+      chip.addEventListener("click", function(){
+        state.theme = th.key;
+        persist(); applyTheme(); renderThemes();
       });
-      row.appendChild(btn);
+      row.appendChild(chip);
     });
   }
 
@@ -865,7 +959,7 @@
   /* ---------------- editor: open / close ---------------- */
   var overlay = document.getElementById("editorOverlay");
   function openEditor(){
-    renderEditorLinks(); renderSwatches(); renderBgChips();
+    renderEditorLinks(); renderThemes(); renderBgChips();
     overlay.classList.add("show");
     document.body.style.overflow = "hidden";
   }
@@ -883,7 +977,7 @@
   document.getElementById("resetBtn").addEventListener("click", function(){
     state = cloneDefault();
     try{ localStorage.removeItem(LS_KEY); } catch(err){}
-    applyAccent(); applyBackground(); renderLinks(); renderEditorLinks(); renderSwatches(); renderBgChips();
+    applyTheme(); applyBackground(); renderLinks(); renderEditorLinks(); renderThemes(); renderBgChips();
     showToastKey("resetDone");
   });
 
@@ -950,7 +1044,7 @@
   }
 
   /* ---------------- boot ---------------- */
-  applyAccent();
+  applyTheme();
   applyBackground();
   renderLinks();
   applyLang();
