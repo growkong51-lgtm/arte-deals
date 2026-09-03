@@ -244,9 +244,8 @@
     border-radius:10px; background:var(--icon-bg); border:1px solid var(--hair);
   }
   .link-icon svg{ width:17px; height:17px; stroke:var(--white); }
-  .link-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
-  .link-name{ font-size:14.5px; font-weight:500; color:var(--white); }
-  .link-sub{ font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .link-body{ flex:1; min-width:0; }
+  .link-name{ font-size:15px; font-weight:500; letter-spacing:.01em; color:var(--white); }
   .link-go{ flex:none; width:15px; height:15px; stroke:var(--muted); transition:transform .22s var(--ease), stroke .22s var(--ease); }
   .link-row:hover .link-go{ transform:translateX(3px); stroke:var(--red-bright); }
   .links-empty{ text-align:center; font-size:12.5px; color:var(--muted); padding:22px 10px; border:1px dashed var(--hair-strong); border-radius:12px; line-height:1.6; }
@@ -360,6 +359,14 @@
   }
   .lec-field input::placeholder{ color:#5a5a57; }
   .lec-field input:focus{ border-color:var(--red-bright); outline:none; }
+  .lec-field textarea{
+    width:100%; background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:10px;
+    padding:10px 12px; color:var(--white); font-size:13.5px; font-family:inherit; line-height:1.5;
+    resize:vertical; min-height:56px; transition:border-color .2s var(--ease);
+  }
+  .lec-field textarea::placeholder{ color:#5a5a57; }
+  .lec-field textarea:focus{ border-color:var(--red-bright); outline:none; }
+  .profile-fields{ display:flex; flex-direction:column; gap:12px; }
 
   .lec-picker{
     display:grid; grid-template-rows:0fr; opacity:0;
@@ -495,16 +502,16 @@
     <header class="hero">
       <div class="avatar-wrap">
         <div class="avatar-ring"></div>
-        <div class="avatar">AR</div>
+        <div class="avatar" id="avatarInitials">AR</div>
       </div>
       <div class="name-row">
-        <h1 class="name">Alex Rivera</h1>
+        <h1 class="name" id="displayName">Alex Rivera</h1>
         <span class="verified" title="Verified portal owner">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/></svg>
         </span>
       </div>
       <p class="role" data-i18n="role">Founder — Rivera &amp; Co.</p>
-      <p class="tagline" data-i18n="tagline">One tap, every way to reach me. No app, no download — just hold your phone to the card.</p>
+      <p class="tagline" id="displayBio">One tap, every way to reach me. No app, no download — just hold your phone to the card.</p>
     </header>
 
     <nav class="quick-row" aria-label="Quick contact actions">
@@ -541,8 +548,8 @@
 
 <div class="sticky-bar" id="stickyBar">
   <div class="sticky-inner">
-    <div class="sticky-avatar">AR</div>
-    <div class="sticky-name">Alex Rivera</div>
+    <div class="sticky-avatar" id="stickyAvatarInitials">AR</div>
+    <div class="sticky-name" id="stickyNameText">Alex Rivera</div>
     <button class="sticky-save" type="button" id="stickySave">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m6.5 11 5.5 5.5L17.5 11"/><path d="M4 20h16"/></svg>
       <span data-i18n="stickySave">Save Contact</span>
@@ -557,6 +564,20 @@
       <button class="editor-close" type="button" id="editorClose" aria-label="Close">&times;</button>
     </div>
     <p class="editor-note" data-i18n="editorNote">This lives behind your private login in the real product — try it out here.</p>
+
+    <div class="editor-section">
+      <h3 data-i18n="profileSectionTitle">Profile</h3>
+      <div class="profile-fields">
+        <div class="lec-field">
+          <label for="editName" data-i18n="nameFieldLabel">Display Name</label>
+          <input id="editName" type="text" maxlength="60" autocomplete="name">
+        </div>
+        <div class="lec-field">
+          <label for="editBio" data-i18n="bioFieldLabel">Bio / Tagline</label>
+          <textarea id="editBio" rows="2" maxlength="140"></textarea>
+        </div>
+      </div>
+    </div>
 
     <div class="editor-section">
       <h3 data-i18n="linksSectionTitle">Your Links</h3>
@@ -609,7 +630,6 @@
     en: {
       demoTag: "Live Demo — Tap Portal",
       role: "Founder — Rivera &amp; Co.",
-      tagline: "One tap, every way to reach me. No app, no download — just hold your phone to the card.",
       callLabel: "Call", emailLabel: "Email", visitLabel: "Visit",
       callToast: "Number copied", emailToast: "Email copied", visitToast: "Directions would open here",
       saveCta: "Save My Contact",
@@ -623,6 +643,9 @@
       vcardToast: "Contact card downloaded",
       editorTitle: "Edit Your Portal",
       editorNote: "This lives behind your private login in the real product — try it out here.",
+      profileSectionTitle: "Profile",
+      nameFieldLabel: "Display Name",
+      bioFieldLabel: "Bio / Tagline",
       linksSectionTitle: "Your Links",
       addLink: "Add Link",
       themeSectionTitle: "Theme",
@@ -642,7 +665,6 @@
     tl: {
       demoTag: "Live Demo — Portal",
       role: "Tagapagtatag — Rivera &amp; Co.",
-      tagline: "Isang tap lang, lahat ng paraan para mahanap mo ako. Walang app, walang download — idikit lang ang phone sa card.",
       callLabel: "Tawag", emailLabel: "Email", visitLabel: "Bisitahin",
       callToast: "Na-copy ang number", emailToast: "Na-copy ang email", visitToast: "Dito magbubukas ang direksyon",
       saveCta: "I-save ang Contact Ko",
@@ -656,6 +678,9 @@
       vcardToast: "Na-download ang contact card",
       editorTitle: "I-edit ang Portal Mo",
       editorNote: "Nasa likod ito ng sarili mong login sa totoong produkto — subukan mo dito.",
+      profileSectionTitle: "Profile",
+      nameFieldLabel: "Pangalang Ipapakita",
+      bioFieldLabel: "Bio / Maikling Deskripsyon",
       linksSectionTitle: "Mga Link Mo",
       addLink: "Magdagdag ng Link",
       themeSectionTitle: "Tema",
@@ -695,7 +720,7 @@
   var ICONS = {
     instagram:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>',
     facebook:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.2-1.5 1.6-1.5H17V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.4-3.7 3.9V11H8.5v3H11v7z"/></svg>',
-    viber:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c4.4 0 7.5 2.7 7.5 7 0 3.7-2.4 6.2-6 6.8-.6.1-.6.4-.5 1l.2 1.7c.1.6-.4.9-.9.5-2.2-1.8-3.4-2.9-3.7-3.2C5.4 16.9 4.5 14.1 4.5 11c0-4.3 3.1-7 7.5-7z"/><path d="M9.2 9.4c1 2.4 2.5 3.9 4.8 4.8.3.1.5 0 .7-.2l.6-.8c.2-.2.5-.3.7-.1l1.6 1c.3.2.3.5.1.8-.5.7-1.3 1.1-2.1.9-2.9-.7-5.6-3.4-6.3-6.3-.2-.8.2-1.6.9-2.1.3-.2.6-.2.8.1l1 1.6c.2.2.1.5-.1.7l-.7.6z"/></svg>',
+    viber:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="14" rx="6"/><path d="M8 17.3 6.7 20.5l3.9-2.4"/><path d="M8.6 8.9c1.6 3.3 3.7 5.3 6.9 6.7"/><circle cx="8.6" cy="8.9" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.6" r="1" fill="currentColor" stroke="none"/></svg>',
     whatsapp:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.8 19L4 20z"/><path d="M8.7 9.6c.3 2.6 2.6 4.9 5.2 5.2.9.1 1.5-.6 1.2-1.4l-.4-1-1.7-.3-.9.9c-1-.5-1.9-1.4-2.4-2.4l.9-.9-.3-1.7-1-.4c-.8-.3-1.5.3-1.4 1.2z" fill="currentColor" stroke="none"/></svg>',
     tiktok:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.3a3.3 3.3 0 1 1-2.6-3.23"/><path d="M14 4c.35 2.1 1.95 3.6 4 3.8"/></svg>',
     linkedin:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 10.5V17M8 7.6v.05"/><path d="M12 17v-3.6c0-1.5 1-2.3 2.2-2.3 1.2 0 1.8.8 1.8 2.3V17"/></svg>',
@@ -866,6 +891,8 @@
 
   var LS_KEY = "noirPortalDemoState_v2";
   var DEFAULT_STATE = {
+    name:"Alex Rivera",
+    bio:"One tap, every way to reach me. No app, no download — just hold your phone to the card.",
     links:[
       { platform:"instagram", handle:"@alex.rivera" },
       { platform:"facebook",  handle:"Alex Rivera" },
@@ -882,10 +909,18 @@
       var raw = localStorage.getItem(LS_KEY);
       if(raw){
         var parsed = JSON.parse(raw);
-        if(parsed && Array.isArray(parsed.links)) return parsed;
+        // merge over a fresh default so fields added in later versions
+        // (like name/bio) backfill cleanly for state saved before they existed
+        if(parsed && Array.isArray(parsed.links)) return Object.assign(cloneDefault(), parsed);
       }
     } catch(err){}
     return cloneDefault();
+  }
+  function initials(name){
+    var parts = (name || "").trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return "?";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
   var state = loadState();
 
@@ -934,16 +969,15 @@
       icon.innerHTML = ICONS[link.platform] || ICONS.custom;
       tintIcon(icon, link.platform);
 
+      // Handle/username intentionally not shown here — the public card stays
+      // discreet (platform + icon only); the actual handle is still stored
+      // and used as the tap destination, just not printed on the card.
       var body = document.createElement("span");
       body.className = "link-body";
       var name = document.createElement("span");
       name.className = "link-name";
       name.textContent = meta.label;
-      var sub = document.createElement("span");
-      sub.className = "link-sub";
-      sub.textContent = link.handle || meta.placeholder;
       body.appendChild(name);
-      body.appendChild(sub);
 
       row.appendChild(icon);
       row.appendChild(body);
@@ -1255,9 +1289,31 @@
     document.getElementById("bgUpload").value = "";
   });
 
+  /* ---------------- profile: name + bio ---------------- */
+  function applyProfile(){
+    var ini = initials(state.name);
+    document.getElementById("displayName").textContent = state.name;
+    document.getElementById("displayBio").textContent = state.bio;
+    document.getElementById("avatarInitials").textContent = ini;
+    document.getElementById("stickyAvatarInitials").textContent = ini;
+    document.getElementById("stickyNameText").textContent = state.name;
+  }
+  var editNameInput = document.getElementById("editName");
+  var editBioInput = document.getElementById("editBio");
+  editNameInput.addEventListener("input", function(){
+    state.name = editNameInput.value;
+    persist(); applyProfile();
+  });
+  editBioInput.addEventListener("input", function(){
+    state.bio = editBioInput.value;
+    persist(); applyProfile();
+  });
+
   /* ---------------- editor: open / close ---------------- */
   var overlay = document.getElementById("editorOverlay");
   function openEditor(){
+    editNameInput.value = state.name;
+    editBioInput.value = state.bio;
     renderEditorLinks(); renderThemes(); renderBgChips();
     overlay.classList.add("show");
     document.body.style.overflow = "hidden";
@@ -1276,7 +1332,9 @@
   document.getElementById("resetBtn").addEventListener("click", function(){
     state = cloneDefault();
     try{ localStorage.removeItem(LS_KEY); } catch(err){}
-    applyTheme(); applyBackground(); renderLinks(); renderEditorLinks(); renderThemes(); renderBgChips();
+    applyProfile(); applyTheme(); applyBackground(); renderLinks(); renderEditorLinks(); renderThemes(); renderBgChips();
+    editNameInput.value = state.name;
+    editBioInput.value = state.bio;
     showToastKey("resetDone");
   });
 
@@ -1317,14 +1375,20 @@
 
   /* ---------------- save contact (real vCard) ---------------- */
   function downloadVcard(){
+    var name = (state.name || "Alex Rivera").trim();
+    var parts = name.split(/\s+/);
+    var first = parts[0] || name;
+    var last = parts.slice(1).join(" ");
     var vcard = [
-      "BEGIN:VCARD","VERSION:3.0","N:Rivera;Alex;;;","FN:Alex Rivera","ORG:Rivera & Co.","TITLE:Founder",
+      "BEGIN:VCARD","VERSION:3.0","N:" + last + ";" + first + ";;;","FN:" + name,
+      "ORG:Rivera & Co.","TITLE:Founder",
       "TEL;TYPE=CELL:+14155550142","EMAIL:hello@alexrivera.co","URL:https://rivera.co","END:VCARD"
     ].join("\r\n");
     var blob = new Blob([vcard], { type: "text/vcard" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = "alex-rivera.vcf";
+    var fileSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "contact";
+    a.href = url; a.download = fileSlug + ".vcf";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
     showToastKey("vcardToast");
@@ -1343,6 +1407,7 @@
   }
 
   /* ---------------- boot ---------------- */
+  applyProfile();
   applyTheme();
   applyBackground();
   renderLinks();
