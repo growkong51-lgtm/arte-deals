@@ -141,20 +141,6 @@
     flex:none;
   }
   .top-controls{ display:flex; align-items:center; gap:8px; flex:none; }
-  .lang-toggle{
-    display:inline-flex;
-    border:1px solid var(--hair-strong);
-    border-radius:999px;
-    padding:3px;
-    background:rgba(255,255,255,0.02);
-  }
-  .lang-toggle button{
-    border:none; background:transparent; color:var(--muted);
-    font-size:10px; font-weight:600; letter-spacing:.06em;
-    padding:6px 10px; border-radius:999px; min-height:26px;
-    transition:background .2s var(--ease), color .2s var(--ease);
-  }
-  .lang-toggle button[aria-pressed="true"]{ background:var(--red-bright); color:#fff; }
   .edit-btn{
     flex:none; width:36px; height:36px; border-radius:50%;
     border:1px solid var(--hair-strong); background:rgba(255,255,255,.02);
@@ -466,6 +452,14 @@
     display:block; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
     color:var(--muted); margin:0 0 8px 2px;
   }
+  .url-preview{
+    display:flex; align-items:center; gap:9px; margin-top:12px; padding:11px 13px;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:10px;
+    font-size:12px; color:var(--white-dim);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    overflow-x:auto; white-space:nowrap;
+  }
+  .url-preview svg{ width:14px; height:14px; stroke:var(--muted); flex:none; }
   .direct-options{ display:flex; flex-direction:column; gap:8px; }
   .direct-option{
     display:flex; align-items:center; gap:12px; padding:9px 12px; width:100%; text-align:left;
@@ -556,10 +550,6 @@
     <div class="top-bar">
       <div class="demo-tag"><i class="dot"></i><span data-i18n="demoTag">Live Demo — Tap Portal</span></div>
       <div class="top-controls">
-        <div class="lang-toggle" role="group" aria-label="Language">
-          <button type="button" data-lang="en" aria-pressed="true">EN</button>
-          <button type="button" data-lang="tl" aria-pressed="false">TL</button>
-        </div>
         <button class="edit-btn" type="button" id="editPortalBtn" aria-label="Edit Portal">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l.8-3.6L16.6 4.6a1.8 1.8 0 0 1 2.6 0l.2.2a1.8 1.8 0 0 1 0 2.6L7.6 19.2 4 20z"/><path d="M14.5 6.7l2.8 2.8"/></svg>
         </button>
@@ -675,6 +665,25 @@
     </div>
 
     <div class="editor-section">
+      <h3>Link Visibility</h3>
+      <div class="mode-toggle" id="visibilityToggle">
+        <button class="mode-option" type="button" data-visibility="public" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.3 3.4 5.3 3.4 8.5s-1.2 6.2-3.4 8.5c-2.2-2.3-3.4-5.3-3.4-8.5S9.8 5.8 12 3.5z"/></svg>
+          <span>Public</span>
+        </button>
+        <button class="mode-option" type="button" data-visibility="private" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+          <span>Private</span>
+        </button>
+      </div>
+      <p class="editor-hint" id="visibilityHint">Discoverable — anyone who searches your name can find this page.</p>
+      <div class="url-preview">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M8.5 12.5 6 15a3 3 0 0 0 4.2 4.2l2.5-2.5"/><path d="M15.5 11.5 18 9a3 3 0 0 0-4.2-4.2l-2.5 2.5"/></svg>
+        <span id="urlPreviewText">shopardela.com/alex-rivera</span>
+      </div>
+    </div>
+
+    <div class="editor-section">
       <h3 data-i18n="themeSectionTitle">Theme</h3>
       <div class="theme-row" id="themeRow"></div>
     </div>
@@ -772,54 +781,10 @@
       bgTooLarge: "Image is too large — please use one under 3MB",
       saveFailed: "Could not save — try a smaller image",
       resetDone: "Portal reset to default"
-    },
-    tl: {
-      demoTag: "Live Demo — Portal",
-      role: "Tagapagtatag — Rivera &amp; Co.",
-      callLabel: "Tawag", emailLabel: "Email", visitLabel: "Bisitahin",
-      callToast: "Na-copy ang number", emailToast: "Na-copy ang email", visitToast: "Dito magbubukas ang direksyon",
-      saveCta: "I-save ang Contact Ko",
-      divider1: "Kumonekta Dito",
-      wouldOpenPrefix: "Magbubukas ang",
-      demoSuffix: "demo lang",
-      noLinksYet: "Wala pang link — pindutin ang Edit Portal para magdagdag.",
-      footBrand: "mga tap-to-connect na card",
-      footNote: "Live preview ito ng personal na portal. Bawat card ay may sariling pribadong page — ang may-ari lang ang makaka-sign in at makaka-edit kung saan ito magbubukas.",
-      stickySave: "I-save",
-      vcardToast: "Na-download ang contact card",
-      editorTitle: "I-edit ang Portal Mo",
-      editorNote: "Nasa likod ito ng sarili mong login sa totoong produkto — subukan mo dito.",
-      profileSectionTitle: "Profile",
-      nameFieldLabel: "Pangalang Ipapakita",
-      bioFieldLabel: "Bio / Maikling Deskripsyon",
-      linksSectionTitle: "Mga Link Mo",
-      addLink: "Magdagdag ng Link",
-      modeSectionTitle: "Kapag Na-tap",
-      modePortalLabel: "Buong Portal",
-      modeDirectLabel: "Direktang Link",
-      modeHint: "Sa Direktang Link, nilalaktawan ang portal page — pagka-tap ng card, diretso agad sa isang platform.",
-      directPickLabel: "Aling link ang bubuksan?",
-      directNoLinks: "Magdagdag muna ng kahit isang link.",
-      directArrivedNote: "Dito diretso na lumalapag ang mga bisita sa",
-      directArrivedSub: "Demo mode pa lang — wala pang totoong destinasyon, pero ganito talaga ang mararamdaman kapag naka-connect na ang totoong link mo.",
-      viewFullPortal: "Tingnan ang Buong Portal (Testing)",
-      themeSectionTitle: "Tema",
-      bgSectionTitle: "Background",
-      bgGrid: "Grid", bgGlow: "Glow", bgFlat: "Payak", bgCustom: "Custom",
-      uploadBg: "Mag-upload ng Sarili Mong Disenyo",
-      bgHint: "Naka-save lang dito sa device mo — design preview pa lang ito, hindi pa live na produkto.",
-      resetDefault: "Ibalik sa Default",
-      removeLink: "Alisin ang link",
-      moveUp: "Pataas", moveDown: "Pababa",
-      handleLabel: "Handle o Link",
-      bgInvalidType: "Pumili ng image file",
-      bgTooLarge: "Masyadong malaki ang image — gumamit ng wala pang 3MB",
-      saveFailed: "Hindi na-save — subukan ng mas maliit na image",
-      resetDone: "Na-reset ang portal sa default"
     }
   };
   var currentLang = "en";
-  function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || ""; }
+  function t(key){ return I18N.en[key] || ""; }
 
   /* ---------------- platform + icon catalog ---------------- */
   var PLATFORM_ORDER = ["instagram","facebook","viber","whatsapp","tiktok","linkedin","telegram","youtube","website","email","phone","custom"];
@@ -1021,6 +986,8 @@
     nextLinkId:4,
     linkMode:"portal",
     directLinkId:null,
+    linkVisibility:"public",
+    privateSlug:"x7k2m9qz",
     theme:"noir",
     bgStyle:"grid",
     bgImage:null
@@ -1422,7 +1389,32 @@
     document.getElementById("avatarInitials").textContent = ini;
     document.getElementById("stickyAvatarInitials").textContent = ini;
     document.getElementById("stickyNameText").textContent = state.name;
+    updateVisibilityUI();
   }
+
+  /* ---------------- link visibility: public vs. private ---------------- */
+  function slugify(str){
+    return (str || "").toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "you";
+  }
+  function updateVisibilityUI(){
+    document.querySelectorAll(".mode-option[data-visibility]").forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.dataset.visibility === state.linkVisibility ? "true" : "false");
+    });
+    var isPublic = state.linkVisibility === "public";
+    document.getElementById("visibilityHint").textContent = isPublic
+      ? "Discoverable — anyone who searches your name can find this page."
+      : "Hidden from search engines. Only reachable via a direct tap or a link you share yourself.";
+    var path = isPublic ? slugify(state.name) : "p/" + state.privateSlug;
+    document.getElementById("urlPreviewText").textContent = "shopardela.com/" + path;
+  }
+  document.querySelectorAll(".mode-option[data-visibility]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      state.linkVisibility = btn.dataset.visibility;
+      persist(); updateVisibilityUI();
+    });
+  });
   var editNameInput = document.getElementById("editName");
   var editBioInput = document.getElementById("editBio");
   editNameInput.addEventListener("input", function(){
@@ -1564,18 +1556,7 @@
   function applyLang(){
     document.documentElement.lang = currentLang;
     document.querySelectorAll("[data-i18n]").forEach(function(el){ el.innerHTML = t(el.dataset.i18n); });
-    document.querySelectorAll(".lang-toggle button").forEach(function(btn){
-      btn.setAttribute("aria-pressed", btn.dataset.lang === currentLang ? "true" : "false");
-    });
-    if (overlay.classList.contains("show")){ renderEditorLinks(); renderDirectOptions(); }
   }
-  document.querySelectorAll(".lang-toggle button").forEach(function(btn){
-    btn.addEventListener("click", function(){
-      if (btn.dataset.lang === currentLang) return;
-      currentLang = btn.dataset.lang;
-      applyLang();
-    });
-  });
 
   /* ---------------- quick actions ---------------- */
   document.querySelectorAll(".quick[data-copy]").forEach(function(btn){
