@@ -460,6 +460,20 @@
     overflow-x:auto; white-space:nowrap;
   }
   .url-preview svg{ width:14px; height:14px; stroke:var(--muted); flex:none; }
+
+  .card-type-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .card-type-option{
+    display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px;
+    background:var(--input-bg); border:1px solid var(--hair-strong); border-radius:12px;
+    transition:border-color .2s var(--ease);
+  }
+  .card-type-option[aria-pressed="true"]{ border-color:var(--red-bright); }
+  .cto-swatch{ width:34px; height:22px; border-radius:4px; border:1px solid rgba(255,255,255,.15); }
+  .cto-one{ background:linear-gradient(145deg,#fdfcfa,#e8e4dc); }
+  .cto-noir{ background:linear-gradient(145deg,#2a2a2a,#050505); }
+  .cto-titanium{ background:linear-gradient(145deg,#c9cdd1,#7c8288); }
+  .cto-name{ font-size:10.5px; font-weight:600; color:var(--white); text-align:center; }
+  .cto-desc{ font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
   .direct-options{ display:flex; flex-direction:column; gap:8px; }
   .direct-option{
     display:flex; align-items:center; gap:12px; padding:9px 12px; width:100%; text-align:left;
@@ -665,6 +679,27 @@
     </div>
 
     <div class="editor-section">
+      <h3>Your Card</h3>
+      <div class="card-type-row" id="cardTypeRow">
+        <button class="card-type-option" type="button" data-card="one" aria-pressed="false">
+          <span class="cto-swatch cto-one"></span>
+          <span class="cto-name">Ardela One</span>
+          <span class="cto-desc">White Card</span>
+        </button>
+        <button class="card-type-option" type="button" data-card="noir" aria-pressed="true">
+          <span class="cto-swatch cto-noir"></span>
+          <span class="cto-name">Ardela Noir</span>
+          <span class="cto-desc">Black Card</span>
+        </button>
+        <button class="card-type-option" type="button" data-card="titanium" aria-pressed="false">
+          <span class="cto-swatch cto-titanium"></span>
+          <span class="cto-name">Ardela Titanium</span>
+          <span class="cto-desc">Metal Card</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-section">
       <h3>Link Visibility</h3>
       <div class="mode-toggle" id="visibilityToggle">
         <button class="mode-option" type="button" data-visibility="public" aria-pressed="true">
@@ -679,7 +714,7 @@
       <p class="editor-hint" id="visibilityHint">Discoverable — anyone who searches your name can find this page.</p>
       <div class="url-preview">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M8.5 12.5 6 15a3 3 0 0 0 4.2 4.2l2.5-2.5"/><path d="M15.5 11.5 18 9a3 3 0 0 0-4.2-4.2l-2.5 2.5"/></svg>
-        <span id="urlPreviewText">shopardela.com/alex-rivera</span>
+        <span id="urlPreviewText">linkardela.com/alex-rivera</span>
       </div>
     </div>
 
@@ -988,6 +1023,7 @@
     directLinkId:null,
     linkVisibility:"public",
     privateSlug:"x7k2m9qz",
+    cardType:"noir",
     theme:"noir",
     bgStyle:"grid",
     bgImage:null
@@ -1399,6 +1435,9 @@
       .replace(/(^-|-$)/g, "") || "you";
   }
   function updateVisibilityUI(){
+    document.querySelectorAll(".card-type-option[data-card]").forEach(function(btn){
+      btn.setAttribute("aria-pressed", btn.dataset.card === state.cardType ? "true" : "false");
+    });
     document.querySelectorAll(".mode-option[data-visibility]").forEach(function(btn){
       btn.setAttribute("aria-pressed", btn.dataset.visibility === state.linkVisibility ? "true" : "false");
     });
@@ -1406,9 +1445,17 @@
     document.getElementById("visibilityHint").textContent = isPublic
       ? "Discoverable — anyone who searches your name can find this page."
       : "Hidden from search engines. Only reachable via a direct tap or a link you share yourself.";
-    var path = isPublic ? slugify(state.name) : "p/" + state.privateSlug;
-    document.getElementById("urlPreviewText").textContent = "shopardela.com/" + path;
+    var path = isPublic
+      ? slugify(state.name)
+      : "link-ardela-" + state.cardType + "-" + state.privateSlug;
+    document.getElementById("urlPreviewText").textContent = "linkardela.com/" + path;
   }
+  document.querySelectorAll(".card-type-option[data-card]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      state.cardType = btn.dataset.card;
+      persist(); updateVisibilityUI();
+    });
+  });
   document.querySelectorAll(".mode-option[data-visibility]").forEach(function(btn){
     btn.addEventListener("click", function(){
       state.linkVisibility = btn.dataset.visibility;
